@@ -1,0 +1,109 @@
+// 系统主题色
+$primary: #3f51b5; // 主色（靛蓝色）
+$primary-light: #757de8;
+$primary-dark: #002984;
+$secondary: #ff4081; // 强调色（粉红色）
+$secondary-light: #ff79b0;
+$secondary-dark: #c60055;
+
+// 中性色
+$white: #ffffff;
+$gray-100: #f8f9fa;
+$gray-200: #e9ecef;
+$gray-300: #dee2e6;
+$gray-400: #ced4da;
+$gray-500: #adb5bd;
+$gray-600: #6c757d;
+$gray-700: #495057;
+$gray-800: #343a40;
+$gray-900: #212529;
+$black: #000000;
+
+// 功能色
+$success: #4caf50;
+$success-light: #80e27e;
+$success-dark: #087f23;
+$warning: #ff9800;
+$warning-light: #ffc947;
+$warning-dark: #c66900;
+$danger: #f44336;
+$danger-light: #ff7961;
+$danger-dark: #ba000d;
+$info: #2196f3;
+$info-light: #6ec6ff;
+$info-dark: #0069c0;
+
+// 布局相关
+$sideBarWidth: 240px;
+$navbarHeight: 64px;
+$menuBg: $white;
+$menuText: $gray-700;
+$menuActiveText: $primary;
+$menuHover: $gray-100;
+$subMenuBg: $gray-100;
+$subMenuHover: $gray-200;
+$subMenuActiveText: $primary;
+
+// 圆角和阴影
+$border-radius-sm: 4px;
+$border-radius-base: 8px;
+$border-radius-lg: 16px;
+$box-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+$box-shadow-base: 0 4px 12px rgba(0, 0, 0, 0.08);
+$box-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+// 过渡动画
+$transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+$transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+$transition-slow: all 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+
+// 字体
+$font-family-base: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+$font-size-xs: 12px;
+$font-size-sm: 14px;
+$font-size-base: 16px;
+$font-size-lg: 18px;
+$font-size-xl: 20px;
+$font-size-xxl: 24px;
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+// 间距
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+
+// 边框
+$border-color: $gray-300;
+$border-width: 1px;
+
+// 主题混合颜色 - 预先计算好的混合色，避免在运行时使用CSS变量进行混合
+$primary-mix-white-8: mix($primary, $white, 8%);
+
+// the :export directive is the magic sauce for webpack
+// https://www.bluematador.com/blog/how-to-share-variables-between-js-and-sass
+:export {
+  menuText: $menuText;
+  menuActiveText: $menuActiveText;
+  subMenuActiveText: $subMenuActiveText;
+  menuBg: $menuBg;
+  menuHover: $menuHover;
+  subMenuBg: $subMenuBg;
+  subMenuHover: $subMenuHover;
+  sideBarWidth: $sideBarWidth;
+  
+  primary: $primary;
+  primaryLight: $primary-light;
+  primaryDark: $primary-dark;
+  secondary: $secondary;
+  
+  success: $success;
+  warning: $warning;
+  danger: $danger;
+  info: $info;
+}

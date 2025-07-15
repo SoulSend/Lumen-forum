@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="8c4dc304-a7bf-4794-8f0b-38e820559f14" name="更改" comment="初步完成项目架构搭建，服务间通信，配置，完整的登录/登出流程，redis缓存，简单api" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Interface" />
+        <option value="Enum" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="KubernetesApiPersistence">{}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
+}</component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="customMavenHome" value="C:\A_WorkSpace\E5_PortableTools\apache-maven-3.9.10-bin\apache-maven-3.9.10" />
+        <option name="mavenHomeTypeForPersistence" value="CUSTOM" />
+        <option name="userSettingsFile" value="C:\A_WorkSpace\E5_PortableTools\apache-maven-3.9.10-bin\apache-maven-3.9.10\conf\settings.xml" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="2zRY6RTTJDxoKDCHXpNlGzOH80e" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Maven.cloud-common [org.apache.maven.plugins:maven-install-plugin:3.1.2:install].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.lumen-backend [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.lumen-backend [org.apache.maven.plugins:maven-clean-plugin:3.2.0:clean].executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;Spring Boot.AuthApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;Spring Boot.ContentApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;Spring Boot.GatewayApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;Spring Boot.UserApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/A_WorkSpace/B2_Project/web/Lumen-forum/lumen-backend/gateway-service/src/main/java/life/lumen/gateway&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;模块&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mysql&quot;
+    ],
+    &quot;com.intellij.ide.scratch.LRUPopupBuilder$1/&quot;: [
+      &quot;MySQL&quot;
+    ]
+  }
+}</component>
+  <component name="ReactorSettings">
+    <option name="notificationShown" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\A_WorkSpace\B2_Project\web\Lumen-forum\lumen-backend\gateway-service\src\main\java\life\lumen\gateway" />
+      <recent name="C:\A_WorkSpace\B2_Project\web\Lumen-forum\lumen-backend\content-service\src\main\resources" />
+      <recent name="C:\A_WorkSpace\B2_Project\web\Lumen-forum\lumen-backend\content-service\src\main\java\life\lumen\content" />
+      <recent name="C:\A_WorkSpace\B2_Project\web\Lumen-forum\lumen-backend\user-service\src\main\java\life\lumen\user" />
+      <recent name="C:\A_WorkSpace\B2_Project\web\Lumen-forum\lumen-backend\cloud-common\src\main\java\life\lumen\common\exception" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\A_WorkSpace\B2_Project\web\Lumen-forum\lumen-backend\Z_doc" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="life.lumen.common.utils.context" />
+      <recent name="life.lumen.common.utils.auth" />
+      <recent name="life.lumen.auth.config" />
+      <recent name="life.lumen.common.enums" />
+      <recent name="life.lumen.common.model" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="life.lumen.auth.config" />
+      <recent name="life.lumen.content.config" />
+      <recent name="life.lumen.content" />
+      <recent name="life.lumen.user.interceptor" />
+      <recent name="life.lumen.auth.repository" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="configurationTypes">
+      <set>
+        <option value="KtorApplicationConfigurationType" />
+        <option value="MicronautRunConfigurationType" />
+        <option value="QuarkusRunConfigurationType" />
+        <option value="SpringBootApplicationConfigurationType" />
+      </set>
+    </option>
+  </component>
+  <component name="RunManager" selected="Spring Boot.ContentApplication">
+    <configuration name="AuthApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="auth-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="life.lumen.auth.AuthApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ContentApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
+      <module name="content-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="life.lumen.content.ContentApplication" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="life.lumen.content.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GatewayApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="gateway-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="life.lumen.gateway.GatewayApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="user-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="life.lumen.user.UserApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Spring Boot.ContentApplication" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-fbdcb00ec9e3-intellij.indexing.shared.core-IU-251.26927.53" />
+        <option value="bundled-js-predefined-d6986cc7102b-09060db00ec0-JavaScript-IU-251.26927.53" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="8c4dc304-a7bf-4794-8f0b-38e820559f14" name="更改" comment="" />
+      <created>1751695176637</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1751695176637</updated>
+      <workItem from="1751695177732" duration="5602000" />
+      <workItem from="1751706435563" duration="1193000" />
+      <workItem from="1751801618578" duration="5483000" />
+      <workItem from="1751859922739" duration="1859000" />
+      <workItem from="1751861849349" duration="28636000" />
+      <workItem from="1751898868676" duration="7248000" />
+      <workItem from="1751942298471" duration="17266000" />
+      <workItem from="1751983185255" duration="5813000" />
+      <workItem from="1752031538512" duration="20649000" />
+      <workItem from="1752067966259" duration="5940000" />
+      <workItem from="1752142142370" duration="10477000" />
+      <workItem from="1752157650172" duration="3447000" />
+      <workItem from="1752226228389" duration="16652000" />
+      <workItem from="1752301042796" duration="1378000" />
+      <workItem from="1752487989987" duration="8150000" />
+      <workItem from="1752506177467" duration="2053000" />
+      <workItem from="1752508391557" duration="3568000" />
+      <workItem from="1752549492674" duration="4000" />
+      <workItem from="1752551564899" duration="465000" />
+    </task>
+    <task id="LOCAL-00001" summary="初步完成项目架构搭建，服务间通信，配置，完整的登录/登出流程，redis缓存，简单api">
+      <option name="closed" value="true" />
+      <created>1752511950366</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1752511950366</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="初步完成项目架构搭建，服务间通信，配置，完整的登录/登出流程，redis缓存，简单api" />
+    <option name="LAST_COMMIT_MESSAGE" value="初步完成项目架构搭建，服务间通信，配置，完整的登录/登出流程，redis缓存，简单api" />
+  </component>
+</project>
