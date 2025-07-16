@@ -16,7 +16,8 @@ public enum ErrorCode {
     CACHE_CODE_ERROR(2001,"验证码缓存异常"),
     //用户相关
     USER_QUERY_ERROR(3000,"找不到用户"),
-
+    //文章相关
+    POST_NOT_FOUND_ERROR(4000,"找不到文章")
     ;
 
     private final int code;

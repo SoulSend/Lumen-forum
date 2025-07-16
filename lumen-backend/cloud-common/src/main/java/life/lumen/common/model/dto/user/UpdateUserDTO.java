@@ -1,14 +1,14 @@
 package life.lumen.common.model.dto.user;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
 
+@Data
 public class UpdateUserDTO {
     @NotBlank
     private String username;
-    @NotBlank
-    private String email;
 
     private String bio;
-
+    @NotBlank
     private String avatar;
 }

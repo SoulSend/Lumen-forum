@@ -28,8 +28,8 @@ public abstract class BaseEntity {
     /**
      * 逻辑删除字段
      */
-    @Column(name = "deleted_at", updatable = false)
-    private Boolean deletedAt=false;
+    @Column(name = "deleted", updatable = false)
+    private Boolean deleted=false;
     /**
      * 创建时间
      * @CreationTimestamp - Hibernate注解，在插入记录时自动设置当前时间

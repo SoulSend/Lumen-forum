@@ -1,10 +1,12 @@
 package life.lumen.user.service;
 
+import jakarta.validation.Valid;
 import life.lumen.common.enums.ErrorCode;
 import life.lumen.common.enums.LoginType;
 import life.lumen.common.exception.CustomException;
 import life.lumen.common.model.bo.UserContext;
 import life.lumen.common.model.dto.user.CreateUserDTO;
+import life.lumen.common.model.dto.user.UpdateUserDTO;
 import life.lumen.common.model.entity.user.UserPO;
 import life.lumen.common.utils.context.UserContextHolder;
 import life.lumen.user.controller.UserController;
@@ -72,5 +74,17 @@ public class UserService {
             throw new CustomException(ErrorCode.USER_QUERY_ERROR);
         }
         return userRepository.findUserPoById(id);
+    }
+
+    public UserPO updateProfile(UpdateUserDTO userDTO) {
+        UserPO oldUser = userRepository.findUserPoById(UserContextHolder.getUserContext().getUserId());
+        if (oldUser == null) {
+            throw new CustomException(ErrorCode.USER_QUERY_ERROR);
+        }
+        oldUser.setAvatar(userDTO.getAvatar());
+        oldUser.setUsername(userDTO.getUsername());
+        oldUser.setBio(userDTO.getBio());
+
+        return userRepository.save(oldUser);
     }
 }

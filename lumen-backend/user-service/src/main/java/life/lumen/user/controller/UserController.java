@@ -17,20 +17,39 @@ public class UserController {
     UserController(UserService userService) {
         this.userService = userService;
     }
+
+    /**
+     * 获取当前用户的信息
+     * @return
+     */
     @GetMapping("/me")
     public Result<UserVO> getMe(){
         UserPO user=userService.getMe();
         UserVO userVO = UserMapper.INSTANCE.userPOToUserVO(user);
         return Result.success(userVO);
     }
+
+    /**
+     * 获取指定id的用户信息
+     * @param id
+     * @return
+     */
     @GetMapping("/{id}")
     public Result<UserVO> getSomeone(@PathVariable Long id){
         UserPO user=userService.getSomeone(id);
         UserVO userVO = UserMapper.INSTANCE.userPOToUserVO(user);
         return Result.success(userVO);
     }
+
+    /**
+     * 更新用户个人资料
+     * @param userDTO
+     * @return
+     */
     @PutMapping("/profile")
-    public Result<UserVO> updateProfile(@RequestBody @Valid UpdateUserDTO userVO){
-        return null;
+    public Result<UserVO> updateProfile(@RequestBody @Valid UpdateUserDTO userDTO){
+        UserPO user=userService.updateProfile(userDTO);
+        UserVO userVO = UserMapper.INSTANCE.userPOToUserVO(user);
+        return Result.success(userVO);
     }
 }

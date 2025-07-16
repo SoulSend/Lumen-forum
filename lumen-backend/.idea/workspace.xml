@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8c4dc304-a7bf-4794-8f0b-38e820559f14" name="更改" comment="初步完成项目架构搭建，服务间通信，配置，完整的登录/登出流程，redis缓存，简单api" />
+    <list default="true" id="8c4dc304-a7bf-4794-8f0b-38e820559f14" name="更改" comment="初步完成项目架构搭建，服务间通信，配置，完整的登录/登出流程，redis缓存，简单api">
+      <change beforePath="$PROJECT_DIR$/../user/lumen_database.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../user/lumen_database.sql" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,8 +15,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Interface" />
         <option value="Enum" />
+        <option value="Interface" />
         <option value="Class" />
       </list>
     </option>
@@ -102,11 +104,11 @@
       <recent name="C:\A_WorkSpace\B2_Project\web\Lumen-forum\lumen-backend\Z_doc" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="life.lumen.common.model.vo.post" />
+      <recent name="life.lumen.common.model.dto.post" />
       <recent name="life.lumen.common.utils.context" />
       <recent name="life.lumen.common.utils.auth" />
       <recent name="life.lumen.auth.config" />
-      <recent name="life.lumen.common.enums" />
-      <recent name="life.lumen.common.model" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="life.lumen.auth.config" />
@@ -201,6 +203,9 @@
       <workItem from="1752508391557" duration="3568000" />
       <workItem from="1752549492674" duration="4000" />
       <workItem from="1752551564899" duration="465000" />
+      <workItem from="1752552711978" duration="595000" />
+      <workItem from="1752587716922" duration="5556000" />
+      <workItem from="1752673097509" duration="7120000" />
     </task>
     <task id="LOCAL-00001" summary="初步完成项目架构搭建，服务间通信，配置，完整的登录/登出流程，redis缓存，简单api">
       <option name="closed" value="true" />

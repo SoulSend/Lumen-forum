@@ -10,11 +10,11 @@ import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = "categories")
-@SQLDelete(sql="update users set delated_at = 1 where id = ? ")
-@Where(clause = "deleted_at = 0")
+@SQLDelete(sql="update users set delated = 1 where id = ? ")
+@Where(clause = "deleted = 0")
 @Getter
 @Setter
-public class Category extends BaseEntity {
+public class CategoryPO extends BaseEntity {
 
     private String name;
     
@@ -24,7 +24,7 @@ public class Category extends BaseEntity {
     
     @ManyToOne
     @JoinColumn(name = "parent_id")
-    private Category parent;
+    private CategoryPO parent;
     
     private Integer postCount = 0;
     

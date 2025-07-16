@@ -18,8 +18,8 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "users")
-@SQLDelete(sql="update users set delated_at = 1 where id = ? ")
-@Where(clause = "deleted_at = 0")
+@SQLDelete(sql="update users set delated = 1 where id = ? ")
+@Where(clause = "deleted = 0")
 @Getter
 @Setter
 public class UserPO extends BaseEntity {

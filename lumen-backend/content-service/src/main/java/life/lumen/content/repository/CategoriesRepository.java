@@ -1,10 +1,10 @@
 package life.lumen.content.repository;
 
-import life.lumen.common.model.entity.category.Category;
+import life.lumen.common.model.entity.category.CategoryPO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CategoriesRepository extends JpaRepository<Category,Long> {
-    Category findCategoriesById(Long id);
+public interface CategoriesRepository extends JpaRepository<CategoryPO,Long> {
+    CategoryPO findCategoriesById(Long id);
 }

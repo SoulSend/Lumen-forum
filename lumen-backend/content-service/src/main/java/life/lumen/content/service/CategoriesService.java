@@ -1,6 +1,6 @@
 package life.lumen.content.service;
 
-import life.lumen.common.model.entity.category.Category;
+import life.lumen.common.model.entity.category.CategoryPO;
 import life.lumen.content.repository.CategoriesRepository;
 import org.springframework.stereotype.Service;
 
@@ -12,11 +12,11 @@ public class CategoriesService {
     public CategoriesService(CategoriesRepository categoriesRepository) {
         this.categoriesRepository = categoriesRepository;
     }
-    public List<Category> getCategories() {
+    public List<CategoryPO> getCategories() {
         return categoriesRepository.findAll();
     }
 
-    public Category getCategory(Long id) {
+    public CategoryPO getCategory(Long id) {
         return categoriesRepository.findCategoriesById(id);
     }
 }
