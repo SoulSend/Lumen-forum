@@ -4,7 +4,7 @@ package life.lumen.content.service;
 import jakarta.validation.Valid;
 import life.lumen.common.enums.ErrorCode;
 import life.lumen.common.exception.CustomException;
-import life.lumen.common.model.dto.post.PageQueryDTO;
+import life.lumen.common.model.dto.PageQueryDTO;
 import life.lumen.common.model.entity.post.PostPO;
 import life.lumen.content.repository.PostRepository;
 import org.springframework.data.domain.Page;
@@ -57,8 +57,13 @@ public class PostService {
         return postRepository.findByIsRecommendedTrueOrderByCreatedAtDesc(pageable);
     }
 
-    public List<PostPO> getRecommendedSidePosts(@Valid PageQueryDTO pageQueryDTO) {
+    public List<PostPO> getRecommendedSidePosts( PageQueryDTO pageQueryDTO) {
         Pageable pageable=PageRequest.of(pageQueryDTO.getPage(),pageQueryDTO.getSize());
         return postRepository.findTopByIsRecommendedTrueOrderByCreatedAtDesc(pageable);
+    }
+
+    public Page<PostPO> getCategoriesPosts( PageQueryDTO pageQueryDTO) {
+        Pageable pageable=PageRequest.of(pageQueryDTO.getPage(),pageQueryDTO.getSize());
+        return postRepository.findByCategoryIdOrderByCreatedAtDesc(pageable);
     }
 }

@@ -32,4 +32,6 @@ public interface PostRepository extends JpaRepository<PostPO,Long> {
 
     // 获取固定数量的推荐帖子（用于首页轮播）
     List<PostPO> findTopByIsRecommendedTrueOrderByCreatedAtDesc(Pageable pageable);
+
+    Page<PostPO> findByCategoryIdOrderByCreatedAtDesc(Pageable categoryId);
 }

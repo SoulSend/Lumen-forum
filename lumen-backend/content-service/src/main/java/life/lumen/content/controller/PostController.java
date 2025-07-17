@@ -2,7 +2,7 @@ package life.lumen.content.controller;
 
 import jakarta.validation.Valid;
 import life.lumen.common.model.Result;
-import life.lumen.common.model.dto.post.PageQueryDTO;
+import life.lumen.common.model.dto.PageQueryDTO;
 import life.lumen.common.model.entity.post.PostPO;
 import life.lumen.common.model.vo.post.PostVO;
 import life.lumen.common.utils.mapstruct.PostMapper;
@@ -52,6 +52,12 @@ public class PostController {
     @GetMapping("/user")
     public Result<Page<PostVO>> getUsersPosts(@RequestBody @Valid PageQueryDTO pageQueryDTO){
         Page<PostPO> postPO= postService.getUsersPosts(pageQueryDTO);
+        Page<PostVO> res= PostMapper.INSTANCE.pagePostPOToPagePostVO(postPO);
+        return  Result.success(res);
+    }
+    @GetMapping("/categories")
+    public Result<Page<PostVO>> getCategoriesPosts(@RequestBody @Valid PageQueryDTO pageQueryDTO){
+        Page<PostPO> postPO= postService.getCategoriesPosts(pageQueryDTO);
         Page<PostVO> res= PostMapper.INSTANCE.pagePostPOToPagePostVO(postPO);
         return  Result.success(res);
     }

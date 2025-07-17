@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8c4dc304-a7bf-4794-8f0b-38e820559f14" name="更改" comment="初步完成项目架构搭建，服务间通信，配置，完整的登录/登出流程，redis缓存，简单api">
-      <change beforePath="$PROJECT_DIR$/../user/lumen_database.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../user/lumen_database.sql" afterDir="false" />
-    </list>
+    <list default="true" id="8c4dc304-a7bf-4794-8f0b-38e820559f14" name="更改" comment="初步完成项目架构搭建，服务间通信，配置，完整的登录/登出流程，redis缓存，简单api" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -104,11 +102,11 @@
       <recent name="C:\A_WorkSpace\B2_Project\web\Lumen-forum\lumen-backend\Z_doc" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="life.lumen.common.model.dto" />
       <recent name="life.lumen.common.model.vo.post" />
       <recent name="life.lumen.common.model.dto.post" />
       <recent name="life.lumen.common.utils.context" />
       <recent name="life.lumen.common.utils.auth" />
-      <recent name="life.lumen.auth.config" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="life.lumen.auth.config" />
@@ -206,6 +204,8 @@
       <workItem from="1752552711978" duration="595000" />
       <workItem from="1752587716922" duration="5556000" />
       <workItem from="1752673097509" duration="7120000" />
+      <workItem from="1752686428495" duration="1001000" />
+      <workItem from="1752757438859" duration="149000" />
     </task>
     <task id="LOCAL-00001" summary="初步完成项目架构搭建，服务间通信，配置，完整的登录/登出流程，redis缓存，简单api">
       <option name="closed" value="true" />

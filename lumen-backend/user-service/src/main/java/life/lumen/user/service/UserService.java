@@ -5,15 +5,18 @@ import life.lumen.common.enums.ErrorCode;
 import life.lumen.common.enums.LoginType;
 import life.lumen.common.exception.CustomException;
 import life.lumen.common.model.bo.UserContext;
+import life.lumen.common.model.dto.PageQueryDTO;
 import life.lumen.common.model.dto.user.CreateUserDTO;
 import life.lumen.common.model.dto.user.UpdateUserDTO;
 import life.lumen.common.model.entity.user.UserPO;
+import life.lumen.common.model.vo.user.UserVO;
 import life.lumen.common.utils.context.UserContextHolder;
 import life.lumen.user.controller.UserController;
 import life.lumen.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 
 
 @Service
@@ -86,5 +89,10 @@ public class UserService {
         oldUser.setBio(userDTO.getBio());
 
         return userRepository.save(oldUser);
+    }
+
+    public List<UserVO> getActiveUsers( PageQueryDTO pageQueryDTO) {
+        // todo
+        return null;
     }
 }
