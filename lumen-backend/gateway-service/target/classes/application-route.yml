@@ -1,6 +1,22 @@
 spring:
   cloud:
     gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]': # 匹配所有路由
+            allowedOrigins: # 允许跨域的源
+              - "https://example.com"
+              - "http://localhost:5173"
+            allowedMethods: # 允许的HTTP方法
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: # 允许的请求头
+              - "*"
+            allowCredentials: true  # 允许携带Cookie/认证信息
+            maxAge: 3600  # 预检请求缓存时间（秒）
       routes:
         - id: auth-service
           uri: lb://auth-service

@@ -233,6 +233,7 @@ import LoginPrompt from '../components/common/LoginPrompt.vue'
 import { usePostStore } from '../stores/postStore'
 import { useCommentStore } from '../stores/commentStore'
 import { useUserStore } from '../stores/userStore'
+// import { useBookmarkStore } from '../stores/bookmarkStore' // 🚧 收藏功能未完成，暂时注释
 import type { Post } from '../types/forum'
 
 const route = useRoute()
@@ -240,6 +241,7 @@ const router = useRouter()
 const postStore = usePostStore()
 const commentStore = useCommentStore()
 const userStore = useUserStore()
+// const bookmarkStore = useBookmarkStore() // 🚧 收藏功能未完成，暂时注释
 
 const post = ref<Post | null>(null)
 const loading = ref(true)
@@ -323,15 +325,16 @@ const formatDate = (dateString: string): string => {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
 }
 
-// 点赞帖子
+// 🚧 点赞帖子 - 后端未完成，暂时使用模拟操作
 const handleLike = async () => {
   if (!userStore.isAuthenticated) {
     showLoginPrompt('like')
     return
   }
-  
+
+  // 🚧 暂时只做UI更新，等后端完成后替换为真实API调用
   post.value.is_liked = !post.value.is_liked
-  
+
   if (post.value.is_liked) {
     post.value.like_count++
     ElMessage.success('点赞成功')
@@ -339,28 +342,35 @@ const handleLike = async () => {
     post.value.like_count--
     ElMessage.info('已取消点赞')
   }
-  
-  // 调用点赞API
-  try {
-    // postStore.likePost(post.value.id)
-    // 在实际项目中，应使用以下API调用:
-    // isLiked.value ? await postApi.likePost(post.value.id) : await postApi.unlikePost(post.value.id)
-  } catch (error) {
-    // 如果API调用失败，回滚UI状态
-    post.value.is_liked = !post.value.is_liked
-    if (post.value.is_liked) {
-      post.value.like_count--
-    } else {
-      post.value.like_count++
-    }
-    ElMessage.error('操作失败，请稍后再试')
-  }
+
+  // 🚧 等后端完成后启用以下代码
+  // try {
+  //   const result = await postStore.likePost(post.value.id)
+  //   if (result) {
+  //     post.value.is_liked = result.isLiked
+  //     post.value.like_count = result.likeCount
+  //   }
+  // } catch (error) {
+  //   // 回滚UI状态
+  //   post.value.is_liked = !post.value.is_liked
+  //   if (post.value.is_liked) {
+  //     post.value.like_count++
+  //   } else {
+  //     post.value.like_count--
+  //   }
+  //   ElMessage.error('操作失败，请稍后再试')
+  // }
 }
 
-// 收藏帖子
-const handleBookmark = () => {
+// 🚧 收藏帖子 - 后端未完成，暂时使用模拟操作
+const handleBookmark = async () => {
+  if (!userStore.isAuthenticated) {
+    showLoginPrompt('bookmark')
+    return
+  }
+
+  // 🚧 暂时只做UI更新，等后端完成后替换为真实API调用
   isBookmarked.value = !isBookmarked.value
-  
   if (isBookmarked.value) {
     bookmarkCount.value++
     ElMessage.success('收藏成功')
@@ -368,12 +378,44 @@ const handleBookmark = () => {
     bookmarkCount.value--
     ElMessage.info('已取消收藏')
   }
+
+  // 🚧 等后端完成后启用以下代码
+  // try {
+  //   const result = await bookmarkStore.toggleBookmark(post.value.id)
+  //   if (result) {
+  //     isBookmarked.value = result.isBookmarked
+  //     bookmarkCount.value = result.bookmarkCount || bookmarkCount.value
+  //   }
+  // } catch (error) {
+  //   // 回滚UI状态
+  //   isBookmarked.value = !isBookmarked.value
+  //   if (isBookmarked.value) {
+  //     bookmarkCount.value--
+  //   } else {
+  //     bookmarkCount.value++
+  //   }
+  //   ElMessage.error('操作失败，请稍后再试')
+  // }
 }
 
-// 检查收藏状态
-const checkBookmarkStatus = () => {
-  // 模拟检查收藏状态，实际应该从API获取
+// 🚧 检查收藏状态 - 后端未完成，暂时使用模拟数据
+const checkBookmarkStatus = async () => {
+  if (!userStore.isAuthenticated || !post.value) {
+    return
+  }
+
+  // 🚧 暂时使用随机状态，等后端完成后替换为真实API调用
   isBookmarked.value = Math.random() > 0.7
+
+  // 🚧 等后端完成后启用以下代码
+  // try {
+  //   const result = await bookmarkStore.checkBookmarkStatus(post.value.id)
+  //   if (result) {
+  //     isBookmarked.value = result.isBookmarked
+  //   }
+  // } catch (error) {
+  //   isBookmarked.value = false
+  // }
 }
 
 // 显示分享选项
@@ -447,20 +489,19 @@ const submitComment = async () => {
         parent_id: commentForm.parent_id
       }
       
-      // 调用评论API
-      const result = await commentStore.createComment(commentData)
-      
-      if (result) {
-        ElMessage.success(replyingTo.value ? '回复成功' : '评论发布成功')
-        
-        // 清空表单
-        commentForm.content = ''
-        cancelReply()
-        
-        // 触发评论列表刷新
-        const event = new CustomEvent('refreshComments')
-        window.dispatchEvent(event)
-      }
+      // 🚧 调用评论API - 后端未完成，暂时使用模拟操作
+      // const result = await commentStore.createComment(commentData)
+
+      // 🚧 暂时模拟成功，等后端完成后替换为真实API调用
+      ElMessage.success(replyingTo.value ? '回复成功' : '评论发布成功')
+
+      // 清空表单
+      commentForm.content = ''
+      cancelReply()
+
+      // 🚧 暂时不触发评论列表刷新，等后端完成后启用
+      // const event = new CustomEvent('refreshComments')
+      // window.dispatchEvent(event)
     } catch (error) {
       console.error('Failed to submit comment:', error)
       ElMessage.error('评论提交失败，请稍后再试')

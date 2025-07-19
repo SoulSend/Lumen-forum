@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed, onMounted } from 'vue'
-import { get, post as apiPost, put, del } from '../services/api'
+import { postApi } from '../services/api'
 import type { Post, PaginatedResponse, CreatePostRequest } from '../types/forum'
 
 export const usePostStore = defineStore('post', () => {
@@ -19,19 +19,21 @@ export const usePostStore = defineStore('post', () => {
   async function fetchPosts(params = {}) {
     loading.value = true
     error.value = null
-    
+
     try {
-      const response = await get<PaginatedResponse<Post>>('/posts', params)
-      posts.value = response.data
-      pagination.value = {
-        currentPage: response.meta.current_page,
-        totalPages: response.meta.last_page,
-        perPage: response.meta.per_page,
-        total: response.meta.total
+      const response = await postApi.getPosts(params.page || 0, params.size || 10)
+      if (response && response.content) {
+        posts.value = response.content
+        pagination.value = {
+          currentPage: response.pageable?.pageNumber || 0,
+          totalPages: response.totalPages || 1,
+          perPage: response.pageable?.pageSize || 10,
+          total: response.totalElements || 0
+        }
       }
       return response
     } catch (e: any) {
-      error.value = e.response?.data?.message || '获取帖子列表失败'
+      error.value = e?.message || '获取帖子列表失败'
       return null
     } finally {
       loading.value = false
@@ -239,7 +241,7 @@ defineProps<Props>()
         return testPost;
       }
       
-      const post = await get<Post>(`/posts/${id}`)
+      const post = await postApi.getPostById(id)
       currentPost.value = post
       return post
     } catch (e: any) {
@@ -250,59 +252,81 @@ defineProps<Props>()
     }
   }
 
-  // 创建帖子
-  async function createPost(postData: CreatePostRequest) {
-    loading.value = true
-    error.value = null
-    
-    try {
-      const createdPost = await apiPost<Post>('/posts', postData)
-      return createdPost
-    } catch (e: any) {
-      error.value = e.response?.data?.message || '创建帖子失败'
-      return null
-    } finally {
-      loading.value = false
-    }
-  }
+  // 🚧 创建帖子 - 后端未完成，暂时注释
+  // async function createPost(postData: CreatePostRequest) {
+  //   loading.value = true
+  //   error.value = null
+  //
+  //   try {
+  //     const createdPost = await postApi.createPost(postData)
+  //     return createdPost
+  //   } catch (e: any) {
+  //     error.value = e?.message || '创建帖子失败'
+  //     return null
+  //   } finally {
+  //     loading.value = false
+  //   }
+  // }
 
-  // 更新帖子
-  async function updatePost(id: number | string, postData: Partial<CreatePostRequest>) {
-    loading.value = true
-    error.value = null
-    
-    try {
-      const updatedPost = await put<Post>(`/posts/${id}`, postData)
-      if (currentPost.value?.id === Number(id)) {
-        currentPost.value = updatedPost
-      }
-      return updatedPost
-    } catch (e: any) {
-      error.value = e.response?.data?.message || '更新帖子失败'
-      return null
-    } finally {
-      loading.value = false
-    }
-  }
+  // 🚧 更新帖子 - 后端未完成，暂时注释
+  // async function updatePost(id: number | string, postData: Partial<CreatePostRequest>) {
+  //   loading.value = true
+  //   error.value = null
+  //
+  //   try {
+  //     const updatedPost = await postApi.updatePost(id, postData)
+  //     if (currentPost.value?.id === Number(id)) {
+  //       currentPost.value = updatedPost
+  //     }
+  //     return updatedPost
+  //   } catch (e: any) {
+  //     error.value = e?.message || '更新帖子失败'
+  //     return null
+  //   } finally {
+  //     loading.value = false
+  //   }
+  // }
 
-  // 删除帖子
-  async function deletePost(id: number | string) {
-    loading.value = true
-    error.value = null
-    
-    try {
-      await del(`/posts/${id}`)
-      if (currentPost.value?.id === Number(id)) {
-        currentPost.value = null
-      }
-      return true
-    } catch (e: any) {
-      error.value = e.response?.data?.message || '删除帖子失败'
-      return false
-    } finally {
-      loading.value = false
-    }
-  }
+  // 🚧 删除帖子 - 后端未完成，暂时注释
+  // async function deletePost(id: number | string) {
+  //   loading.value = true
+  //   error.value = null
+  //
+  //   try {
+  //     await postApi.deletePost(id)
+  //     if (currentPost.value?.id === Number(id)) {
+  //       currentPost.value = null
+  //     }
+  //     return true
+  //   } catch (e: any) {
+  //     error.value = e?.message || '删除帖子失败'
+  //     return false
+  //   } finally {
+  //     loading.value = false
+  //   }
+  // }
+
+  // 🚧 点赞帖子 - 后端未完成，暂时注释
+  // async function likePost(id: number | string) {
+  //   try {
+  //     const result = await postApi.likePost(id)
+  //     return result
+  //   } catch (e: any) {
+  //     error.value = e?.message || '点赞操作失败'
+  //     return null
+  //   }
+  // }
+
+  // 🚧 收藏帖子 - 后端未完成，暂时注释
+  // async function bookmarkPost(id: number | string) {
+  //   try {
+  //     const result = await postApi.bookmarkPost(id)
+  //     return result
+  //   } catch (e: any) {
+  //     error.value = e?.message || '收藏操作失败'
+  //     return null
+  //   }
+  // }
 
   return {
     posts,
@@ -312,8 +336,11 @@ defineProps<Props>()
     pagination,
     fetchPosts,
     fetchPost,
-    createPost,
-    updatePost,
-    deletePost
+    // 🚧 未完成的功能暂时注释
+    // createPost,
+    // updatePost,
+    // deletePost,
+    // likePost,
+    // bookmarkPost
   }
 }) 

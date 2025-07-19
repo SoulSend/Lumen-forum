@@ -242,10 +242,12 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import MainLayout from '../components/layout/MainLayout.vue'
 import PostCard from '../components/forum/PostCard.vue'
 import { useCategoryStore } from '../stores/categoryStore'
 import { usePostStore } from '../stores/postStore'
+// import { useStatsStore } from '../stores/statsStore' // 🚧 统计功能未完成，暂时注释
 import type { Category, Post } from '../types/forum'
 import { Search } from '@element-plus/icons-vue'
 import Sidebar from '../components/layout/Sidebar.vue'
@@ -254,6 +256,7 @@ import { postApi } from '../services/api'
 const router = useRouter()
 const categoryStore = useCategoryStore()
 const postStore = usePostStore()
+// const statsStore = useStatsStore() // 🚧 统计功能未完成，暂时注释
 
 // 搜索
 const searchQuery = ref('')
@@ -268,6 +271,7 @@ const communityStats = reactive({
 // 分类相关
 const categories = ref<Category[]>([])
 const categoryLoading = ref(false)
+const selectedCategory = ref('all')
 
 // 帖子相关
 const posts = ref<Post[]>([])
@@ -324,25 +328,37 @@ const fetchPosts = async (page = 1) => {
   } else {
     loadingMore.value = true
   }
-  
+
   try {
-    const result = await postStore.fetchPosts({
-      page: page,
-      per_page: pagination.perPage,
-      sort_by: 'popular',
-      time_frame: selectedTimeFrame.value
-    })
-    
-    if (result) {
+    // 根据选择的时间范围和分类获取帖子
+    let response: any
+    if (selectedCategory.value === 'all') {
+      response = await postApi.getHotPosts(page - 1, pagination.perPage)
+    } else {
+      response = await postApi.getCategoryPosts(selectedCategory.value, page - 1, pagination.perPage)
+    }
+
+    if (response && response.content) {
       if (page === 1) {
-        posts.value = result.data
+        posts.value = response.content
       } else {
-        posts.value = [...posts.value, ...result.data]
+        posts.value = [...posts.value, ...response.content]
       }
-      
-      pagination.currentPage = result.meta.current_page
-      pagination.totalPages = result.meta.last_page
-      pagination.total = result.meta.total
+
+      pagination.currentPage = response.pageable?.pageNumber + 1 || page
+      pagination.totalPages = response.totalPages || 1
+      pagination.total = response.totalElements || 0
+    }
+  } catch (error) {
+    console.error('Failed to fetch posts:', error)
+    ElMessage.error('获取帖子失败')
+
+    // 使用模拟数据作为后备
+    if (page === 1) {
+      posts.value = [] // 暂时使用空数组，避免类型错误
+      pagination.currentPage = 1
+      pagination.totalPages = 5
+      pagination.total = 50
     }
   } finally {
     postLoading.value = false

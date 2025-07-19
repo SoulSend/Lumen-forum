@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { get } from '../services/api'
+import { categoryApi, postApi } from '../services/api'
 import type { Category } from '../types/forum'
 
 export const useCategoryStore = defineStore('category', () => {
@@ -12,13 +12,13 @@ export const useCategoryStore = defineStore('category', () => {
   async function fetchCategories() {
     loading.value = true
     error.value = null
-    
+
     try {
-      const response = await get<Category[]>('/categories')
-      categories.value = response
+      const response = await categoryApi.getCategories()
+      categories.value = response || []
       return response
     } catch (e: any) {
-      error.value = e.response?.data?.message || '获取分类列表失败'
+      error.value = e?.message || '获取分类列表失败'
       return null
     } finally {
       loading.value = false
@@ -29,12 +29,12 @@ export const useCategoryStore = defineStore('category', () => {
   async function fetchCategory(id: number | string) {
     loading.value = true
     error.value = null
-    
+
     try {
-      const category = await get<Category>(`/categories/${id}`)
+      const category = await categoryApi.getCategoryById(id)
       return category
     } catch (e: any) {
-      error.value = e.response?.data?.message || '获取分类详情失败'
+      error.value = e?.message || '获取分类详情失败'
       return null
     } finally {
       loading.value = false
@@ -45,12 +45,12 @@ export const useCategoryStore = defineStore('category', () => {
   async function fetchCategoryPosts(id: number | string, params = {}) {
     loading.value = true
     error.value = null
-    
+
     try {
-      const posts = await get(`/categories/${id}/posts`, params)
+      const posts = await postApi.getCategoryPosts(id, params.page || 0, params.size || 10)
       return posts
     } catch (e: any) {
-      error.value = e.response?.data?.message || '获取分类下的帖子失败'
+      error.value = e?.message || '获取分类下的帖子失败'
       return null
     } finally {
       loading.value = false
