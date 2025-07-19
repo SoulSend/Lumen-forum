@@ -64,6 +64,6 @@ public class PostService {
 
     public Page<PostPO> getCategoriesPosts( PageQueryDTO pageQueryDTO) {
         Pageable pageable=PageRequest.of(pageQueryDTO.getPage(),pageQueryDTO.getSize());
-        return postRepository.findByCategoryIdOrderByCreatedAtDesc(pageable);
+        return postRepository.findByCategoryIdOrderByCreatedAtDesc(pageQueryDTO.getId(),pageable);
     }
 }

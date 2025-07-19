@@ -3,7 +3,7 @@ import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 
 // 创建axios实例
 const apiClient: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: 'http://localhost:8080/api',
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
@@ -14,8 +14,8 @@ const apiClient: AxiosInstance = axios.create({
 // 请求拦截器
 apiClient.interceptors.request.use(
   (config) => {
-    // 从localStorage获取token并添加到请求头
-    const token = localStorage.getItem('token')
+    // 从localStorage或sessionStorage获取token并添加到请求头
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token')
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`
     }
@@ -29,17 +29,35 @@ apiClient.interceptors.request.use(
 // 响应拦截器
 apiClient.interceptors.response.use(
   (response) => {
-    return response
+    // 处理后端统一响应格式 { code, message, data }
+    const { code, message, data } = response.data
+
+    if (code === 200) {
+      // 成功响应，返回data部分
+      return { ...response, data }
+    } else {
+      // 业务错误，抛出异常
+      const error = new Error(message || '请求失败')
+      error.code = code
+      throw error
+    }
   },
   (error) => {
-    // 处理token过期
-    if (error.response && error.response.status === 401) {
-      // 清除本地存储的token
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
-      // 跳转到登录页
-      window.location.href = '/login'
+    // 处理HTTP错误
+    if (error.response) {
+      const { status, data } = error.response
+
+      // 401错误由userStore统一处理，这里不重复处理
+      // if (status === 401) {
+      //   // Token过期或无效处理已移至userStore
+      // }
+
+      // 如果后端返回了错误信息，使用后端的错误信息
+      if (data && data.message) {
+        error.message = data.message
+      }
     }
+
     return Promise.reject(error)
   }
 )
@@ -74,72 +92,56 @@ export const del = <T = any>(url: string, config: AxiosRequestConfig = {}): Prom
 
 // 分类API
 export const categoryApi = {
-  getCategories: () => get('/categories'),
-  getCategoryById: (id: string | number) => get(`/categories/${id}`),
-}
-
-// 标签API
-export const tagApi = {
-  getPopularTags: (limit = 20) => get('/tags/popular', { limit }),
-  searchTags: (query: string, limit = 10) => get('/tags/search', { query, limit }),
-  getTagPosts: (tagName: string, page = 1, pageSize = 10) => get(`/tags/${tagName}/posts`, { page, pageSize }),
+  getCategories: () => get('/content/categories'),
+  getCategoryById: (id: string | number) => get(`/content/categories/${id}`),
 }
 
 // 用户API
 export const userApi = {
   getCurrentUser: () => get('/users/me'),
   getUserById: (id: string | number) => get(`/users/${id}`),
-  getUserPosts: (id: string | number, page = 1, pageSize = 10) => get(`/users/${id}/posts`, { page, pageSize }),
-  getActiveUsers: (limit = 5) => get('/users/active', { limit }),
+  updateProfile: (data: any) => put('/users/profile', data),
+  getActiveUsers: (page = 0, size = 10) => get('/users/active', { id: -1, page, size }),
 }
 
 // 帖子API
 export const postApi = {
-  getPosts: (params = {}) => get('/posts', params),
-  getPostById: (id: string | number) => get(`/posts/${id}`),
-  createPost: (data: any) => post('/posts', data),
-  updatePost: (id: string | number, data: any) => put(`/posts/${id}`, data),
-  deletePost: (id: string | number) => del(`/posts/${id}`),
-  getHotTopics: (limit = 5) => get('/posts/hot', { limit }),
-  getRecommendedPosts: (limit = 3) => get('/posts/recommended', { limit }),
+  getPosts: (page = 0, size = 10) => get('/content/posts', { id: -1, page, size }),
+  getPostById: (id: string | number) => get(`/content/posts/${id}`),
+  getUserPosts: (userId: string | number, page = 0, size = 10) => get('/content/posts/user', { id: userId, page, size }),
+  getCategoryPosts: (categoryId: string | number, page = 0, size = 10) => get('/content/posts/categories', { id: categoryId, page, size }),
+  getHotPosts: (page = 0, size = 10) => get('/content/posts/hot', { id: -1, page, size }),
+  getRecommendedPosts: (page = 0, size = 10) => get('/content/posts/recommended', { id: -1, page, size }),
 }
 
-// 评论API
-export const commentApi = {
-  getPostComments: (postId: string | number, page = 1, pageSize = 10) => get(`/posts/${postId}/comments`, { page, pageSize }),
-  createComment: (postId: string | number, data: any) => post(`/posts/${postId}/comments`, data),
-  updateComment: (commentId: string | number, data: any) => put(`/comments/${commentId}`, data),
-  deleteComment: (commentId: string | number) => del(`/comments/${commentId}`),
+
+
+// 认证API
+export const authApi = {
+  // 发送验证码
+  sendCode: (loginType: 'EMAIL' | 'SMS', identifier: string) =>
+    post('/auth/login/code', { loginType, identifier }),
+
+  // 用户登录
+  login: (loginType: 'EMAIL' | 'SMS', identifier: string, code: string, rememberMe: boolean = false) =>
+    post('/auth/login', { loginType, identifier, code, rememberMe }),
+
+  // 用户登出
+  logout: () => post('/auth/logout'),
 }
 
-// 通知API
-export const notificationApi = {
-  getNotifications: (params = {}) => get('/notifications', params),
-  markAsRead: (id: string | number) => put(`/notifications/${id}/read`),
-  markAllAsRead: () => put('/notifications/read-all'),
-}
-
-// 活动API
-export const activityApi = {
-  getRecentActivities: (limit = 3) => get('/activities/recent', { limit }),
-}
-
-// 论坛统计API
-export const statsApi = {
-  getForumStats: () => get('/stats/forum'),
-}
+// 论坛统计API（待实现）
+// export const statsApi = {
+//   getForumStats: () => get('/stats/forum'),
+// }
 
 export default {
   get,
   post,
   put,
   del,
+  authApi,
   categoryApi,
-  tagApi,
   userApi,
   postApi,
-  commentApi,
-  notificationApi,
-  activityApi,
-  statsApi,
-} 
+}

@@ -334,33 +334,43 @@ const switchLoginType = (type) => {
 
 const getVerificationCode = async (type: 'phone' | 'email') => {
   try {
+    let success = false
+
     if (type === 'phone') {
       await phoneFormRef.value.validateField('phone')
       // 发送手机验证码
-      // await userStore.sendPhoneCode(phoneForm.value.phone)
+      success = await userStore.sendVerificationCode('SMS', phoneForm.value.phone)
     } else {
       await emailFormRef.value.validateField('email')
       // 发送邮箱验证码
-      // await userStore.sendEmailCode(emailForm.value.email)
+      success = await userStore.sendVerificationCode('EMAIL', emailForm.value.email)
     }
-    
-    // 模拟发送验证码
-    isGettingCode.value = true
-    countdown.value = 60
-    
-    const timer = setInterval(() => {
-      countdown.value--
-      if (countdown.value <= 0) {
-        clearInterval(timer)
-        isGettingCode.value = false
-      }
-    }, 1000)
-    
-    ElMessage({
-      message: '验证码已发送，请查收',
-      type: 'success',
-      duration: 2000
-    })
+
+    if (success) {
+      // 开始倒计时
+      isGettingCode.value = true
+      countdown.value = 60
+
+      const timer = setInterval(() => {
+        countdown.value--
+        if (countdown.value <= 0) {
+          clearInterval(timer)
+          isGettingCode.value = false
+        }
+      }, 1000)
+
+      ElMessage({
+        message: '验证码已发送，请查收',
+        type: 'success',
+        duration: 2000
+      })
+    } else {
+      ElMessage({
+        message: userStore.error || '发送验证码失败，请稍后重试',
+        type: 'error',
+        duration: 3000
+      })
+    }
   } catch (error) {
     // 表单验证失败，不做处理
   }
@@ -410,19 +420,29 @@ const handlePhoneLogin = async () => {
         }, 1000)
       } else {
         // 实际登录逻辑
-        // await userStore.loginWithPhone(phoneForm.value.phone, phoneForm.value.code)
-        
-        // 模拟登录成功
-        setTimeout(() => {
-          isLoggingIn.value = false
+        const success = await userStore.loginWithPhone(
+          phoneForm.value.phone,
+          phoneForm.value.code,
+          phoneForm.value.rememberMe
+        )
+
+        isLoggingIn.value = false
+
+        if (success) {
           ElMessage({
-            message: '登录成功',
+            message: '登录成功！',
             type: 'success',
             duration: 2000
           })
           emit('login-success')
           handleClose()
-        }, 1000)
+        } else {
+          ElMessage({
+            message: userStore.error || '登录失败，请检查手机号和验证码',
+            type: 'error',
+            duration: 3000
+          })
+        }
       }
     } catch (error) {
       isLoggingIn.value = false
@@ -477,19 +497,29 @@ const handleEmailLogin = async () => {
         }, 1000)
       } else {
         // 实际登录逻辑
-        // await userStore.loginWithEmail(emailForm.value.email, emailForm.value.code)
-        
-        // 模拟登录成功
-        setTimeout(() => {
-          isLoggingIn.value = false
+        const success = await userStore.loginWithEmail(
+          emailForm.value.email,
+          emailForm.value.code,
+          emailForm.value.rememberMe
+        )
+
+        isLoggingIn.value = false
+
+        if (success) {
           ElMessage({
-            message: '登录成功',
+            message: '登录成功！',
             type: 'success',
             duration: 2000
           })
           emit('login-success')
           handleClose()
-        }, 1000)
+        } else {
+          ElMessage({
+            message: userStore.error || '登录失败，请检查邮箱和验证码',
+            type: 'error',
+            duration: 3000
+          })
+        }
       }
     } catch (error) {
       isLoggingIn.value = false

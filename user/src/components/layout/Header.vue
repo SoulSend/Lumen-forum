@@ -574,17 +574,7 @@ const handleShowLogin = () => {
 
 // 登录成功处理
 const handleLoginSuccess = async () => {
-  // 更新用户状态
-  isAuthenticated.value = true
-  // 获取并更新当前用户信息
-  try {
-    await userStore.getCurrentUser()
-    // 更新用户数据
-    currentUser.value = userStore.currentUser
-    // 可以在这里处理其他登录后的操作，如加载用户偏好设置等
-  } catch (error) {
-    console.error('获取用户信息失败:', error)
-  }
+  // 用户状态已经在userStore中更新，computed值会自动响应
 }
 
 // 退出登录
@@ -617,22 +607,9 @@ const navigateToCreatePost = () => {
 
 // 生命周期钩子
 onMounted(async () => {
-  // 检查用户登录状态
-  const token = localStorage.getItem('token')
-  if (token) {
-    try {
-      // 验证token并获取用户信息
-      await userStore.getCurrentUser()
-      isAuthenticated.value = true
-      currentUser.value = userStore.currentUser
-    } catch (error) {
-      // token无效或过期，清除本地存储
-      console.error('验证用户状态失败:', error)
-      localStorage.removeItem('token')
-      isAuthenticated.value = false
-    }
-  }
-  
+  // 用户状态已经在App.vue中初始化，这里不需要重复处理
+  // userStore的computed值会自动响应状态变化
+
   // 加载搜索历史
   loadSearchHistory()
 })

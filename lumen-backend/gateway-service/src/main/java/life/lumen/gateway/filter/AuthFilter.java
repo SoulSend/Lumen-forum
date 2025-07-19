@@ -30,7 +30,18 @@ public class AuthFilter implements GlobalFilter, Ordered {
     // 白名单
     private static final List<String> WHITE_LIST = Arrays.asList(
             "/api/auth/login",
-            "/api/auth/login/code"
+            "/api/auth/login/code",
+            "/api/users/{id}",
+            "/api/users/active",
+            "/api/content/categories",
+            "/api/content/categories/{id}",
+            "/api/content/posts",
+            "/api/content/posts/{id}",
+            "/api/content/posts/user",
+            "/api/content/posts/categories",
+            "/api/content/posts/hot/side",
+            "/api/content/posts/recommended",
+            "/api/content/posts/recommended/side"
     );
 
     @Override

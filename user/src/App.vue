@@ -4,13 +4,13 @@ import { useUserStore } from './stores/userStore'
 
 const userStore = useUserStore()
 
-onMounted(() => {
+onMounted(async () => {
   // 初始化用户状态
   userStore.initFromLocalStorage()
-  
-  // 如果有token但没有当前用户信息，则获取用户信息
-  if (userStore.token && !userStore.currentUser) {
-    userStore.fetchCurrentUser()
+
+  // 如果有token，验证其有效性并获取最新用户信息
+  if (userStore.token) {
+    await userStore.validateTokenAndFetchUser()
   }
 })
 </script>
