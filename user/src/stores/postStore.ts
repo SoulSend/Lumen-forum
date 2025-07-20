@@ -2,6 +2,8 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { postApi } from '../services/api'
 import type { Post } from '../types/forum'
+import { ErrorHandler } from '../utils/errorHandler'
+import { ERROR_MESSAGES, API_CONFIG } from '../constants'
 
 export const usePostStore = defineStore('post', () => {
   const posts = ref<Post[]>([])
@@ -68,20 +70,22 @@ export const usePostStore = defineStore('post', () => {
     error.value = null
 
     try {
-      const response = await postApi.getPosts(params.page || 0, params.size || 10)
+      const response = await postApi.getPosts(params.page || 0, params.size || API_CONFIG.DEFAULT_PAGE_SIZE)
       if (response && response.content) {
         // 使用映射函数转换数据
         posts.value = response.content.map(mapApiPostToPost)
         pagination.value = {
           currentPage: response.pageable?.pageNumber || 0,
           totalPages: response.totalPages || 1,
-          perPage: response.pageable?.pageSize || 10,
+          perPage: response.pageable?.pageSize || API_CONFIG.DEFAULT_PAGE_SIZE,
           total: response.totalElements || 0
         }
       }
       return response
     } catch (e: any) {
-      error.value = e?.message || '获取帖子列表失败'
+      const errorInfo = ErrorHandler.handleApiError(e)
+      error.value = ERROR_MESSAGES.FETCH_POSTS_FAILED
+      ErrorHandler.showError(errorInfo)
       return null
     } finally {
       loading.value = false
@@ -99,7 +103,9 @@ export const usePostStore = defineStore('post', () => {
       currentPost.value = post
       return post
     } catch (e: any) {
-      error.value = e.response?.data?.message || '获取帖子详情失败'
+      const errorInfo = ErrorHandler.handleApiError(e)
+      error.value = ERROR_MESSAGES.FETCH_POSTS_FAILED
+      ErrorHandler.showError(errorInfo)
       return null
     } finally {
       loading.value = false

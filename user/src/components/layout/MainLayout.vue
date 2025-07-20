@@ -575,6 +575,7 @@ import LoginModal from '../common/LoginModal.vue'
 import { useCategoryStore } from '../../stores/categoryStore'
 import { useUserStore } from '../../stores/userStore'
 import { categoryApi, userApi, postApi } from '../../services/api'
+import { formatNumber, formatRelativeTime, formatDate } from '../../utils/format'
 
 const categoryStore = useCategoryStore()
 const userStore = useUserStore()
@@ -888,30 +889,40 @@ const userRecentActivities = ref([
   }
 ])
 
-// 格式化数字
-const formatNumber = (num: number): string => {
-  if (num < 1000) return String(num);
-  if (num < 10000) return (num / 1000).toFixed(1) + 'k';
-  return (num / 10000).toFixed(1) + 'w';
-};
+// 使用统一的格式化工具函数
 
-// 格式化公告日期
-const formatAnnouncementDate = (timestamp) => {
-  const date = new Date(timestamp)
-  return `${date.getMonth() + 1}月${date.getDate()}日`
+// 格式化公告日期 - 添加防御式编程
+const formatAnnouncementDate = (timestamp: number | string | null | undefined) => {
+  if (!timestamp) return '未知日期'
+
+  try {
+    const date = new Date(timestamp)
+    if (isNaN(date.getTime())) {
+      return '无效日期'
+    }
+    return `${date.getMonth() + 1}月${date.getDate()}日`
+  } catch (error) {
+    console.warn('格式化公告日期失败:', timestamp, error)
+    return '日期格式错误'
+  }
 }
 
-// 格式化活动内容
-const formatActivity = (activity) => {
+// 格式化活动内容 - 添加防御式编程
+const formatActivity = (activity: any) => {
+  if (!activity) return '未知活动'
+
+  const username = activity.user?.username || '未知用户'
+  const postTitle = activity.post?.title || '未知帖子'
+
   switch (activity.type) {
     case 'post':
-      return `<strong>${activity.user.username}</strong> 发布了 <strong>${activity.post.title}</strong>`
+      return `<strong>${username}</strong> 发布了 <strong>${postTitle}</strong>`
     case 'comment':
-      return `<strong>${activity.user.username}</strong> 评论了 <strong>${activity.post.title}</strong>`
+      return `<strong>${username}</strong> 评论了 <strong>${postTitle}</strong>`
     case 'like':
-      return `<strong>${activity.user.username}</strong> 赞了 <strong>${activity.post.title}</strong>`
+      return `<strong>${username}</strong> 赞了 <strong>${postTitle}</strong>`
     default:
-      return ''
+      return `<strong>${username}</strong> 进行了某项活动`
   }
 }
 
@@ -934,67 +945,19 @@ const activityIconClass = (type: string) => {
   return `activity-icon-${type}`
 }
 
-// 格式化时间
-const formatTime = (timestamp) => {
-  const now = new Date().getTime()
-  const diff = now - timestamp
-  
-  // 小于1小时
-  if (diff < 3600000) {
-    const minutes = Math.floor(diff / 60000)
-    return `${minutes}分钟前`
-  }
-  
-  // 小于24小时
-  if (diff < 86400000) {
-    const hours = Math.floor(diff / 3600000)
-    return `${hours}小时前`
-  }
-  
-  // 小于7天
-  if (diff < 604800000) {
-    const days = Math.floor(diff / 86400000)
-    return `${days}天前`
-  }
-  
-  // 其他情况显示日期
-  const date = new Date(timestamp)
-  return `${date.getMonth() + 1}月${date.getDate()}日`
-}
+// 格式化时间 - 使用统一工具函数，添加防御式编程
+const formatTime = (timestamp: number | string | null | undefined) => {
+  if (!timestamp) return '未知时间'
 
-// 格式化日期
-const formatDate = (dateString) => {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  return date.toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
-}
-
-// 格式化相对时间
-const formatRelativeTime = (dateString) => {
-  if (!dateString) return '未知'
-  
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffSecs = Math.floor(diffMs / 1000)
-  const diffMins = Math.floor(diffSecs / 60)
-  const diffHours = Math.floor(diffMins / 60)
-  const diffDays = Math.floor(diffHours / 24)
-  
-  if (diffDays > 30) {
-    return formatDate(dateString)
-  } else if (diffDays > 0) {
-    return `${diffDays}天前`
-  } else if (diffHours > 0) {
-    return `${diffHours}小时前`
-  } else if (diffMins > 0) {
-    return `${diffMins}分钟前`
-  } else {
-    return '刚刚'
+  try {
+    const date = new Date(timestamp)
+    if (isNaN(date.getTime())) {
+      return '无效时间'
+    }
+    return formatRelativeTime(date.toISOString())
+  } catch (error) {
+    console.warn('格式化时间失败:', timestamp, error)
+    return '时间格式错误'
   }
 }
 
@@ -1014,26 +977,34 @@ const getUserActivityIcon = (type) => {
   }
 }
 
-// 格式化用户活动内容
-const formatUserActivity = (activity) => {
-  return activity.content
+// 格式化用户活动内容 - 添加防御式编程
+const formatUserActivity = (activity: any) => {
+  return activity?.content || '无内容'
 }
 
-// 计算分类百分比
-const calculateCategoryPercentage = (category) => {
+// 计算分类百分比 - 添加防御式编程
+const calculateCategoryPercentage = (category: any) => {
+  if (!category) return 0
+
   const postCount = category.postCount || category.post_count || 0
   const totalPosts = category.totalPosts || category.total_posts || 1
+
+  if (totalPosts === 0) return 0
+
   return Math.round((postCount / totalPosts) * 100)
 }
 
-// 获取分类颜色
-const getCategoryColor = (index) => {
+// 获取分类颜色 - 添加防御式编程
+const getCategoryColor = (index: number) => {
   const colors = ['#409eff', '#67c23a', '#e6a23c', '#f56c6c', '#909399']
-  return colors[index % colors.length]
+  const safeIndex = Math.abs(index || 0)
+  return colors[safeIndex % colors.length]
 }
 
-// 获取分类图标
-const getCategoryIcon = (name) => {
+// 获取分类图标 - 添加防御式编程
+const getCategoryIcon = (name: string | null | undefined) => {
+  if (!name) return 'category'
+
   switch (name) {
     case '生活技巧':
       return 'lightbulb_outline'
@@ -1052,15 +1023,16 @@ const getCategoryIcon = (name) => {
   }
 }
 
-// 获取技能标签类型
-const getSkillTagType = (index) => {
-  const types = ['', 'success', 'warning', 'danger', 'info']
-  return types[index % types.length]
+// 获取技能标签类型 - 添加防御式编程，修复Element Plus type警告
+const getSkillTagType = (index: number | null | undefined) => {
+  const types = ['primary', 'success', 'warning', 'danger', 'info']
+  const safeIndex = Math.abs(index || 0)
+  return types[safeIndex % types.length]
 }
 
-// 格式化网站URL显示
-const formatWebsiteUrl = (url) => {
-  if (!url) return '';
+// 格式化网站URL显示 - 添加防御式编程
+const formatWebsiteUrl = (url: string | null | undefined) => {
+  if (!url || typeof url !== 'string') return '';
   try {
     const urlObj = new URL(url);
     return urlObj.hostname;
@@ -1069,23 +1041,46 @@ const formatWebsiteUrl = (url) => {
   }
 }
 
-// 获取标签大小
-const getTagSize = (count) => {
+// 获取标签大小 - 添加防御式编程
+const getTagSize = (count: number | null | undefined) => {
   const minSize = 12;
   const maxSize = 20;
-  const maxCount = Math.max(...userTags.value.map(tag => tag.count));
-  const size = minSize + (count / maxCount) * (maxSize - minSize);
-  return `${size}px`;
+
+  if (!count || count <= 0) return `${minSize}px`;
+
+  if (!userTags.value || userTags.value.length === 0) return `${minSize}px`;
+
+  try {
+    const validCounts = userTags.value.map(tag => tag?.count || 0).filter(c => c > 0);
+    if (validCounts.length === 0) return `${minSize}px`;
+
+    const maxCount = Math.max(...validCounts);
+    if (maxCount === 0) return `${minSize}px`;
+
+    const size = minSize + (count / maxCount) * (maxSize - minSize);
+    return `${Math.round(size)}px`;
+  } catch (error) {
+    console.warn('计算标签大小失败:', count, error);
+    return `${minSize}px`;
+  }
 }
 
-// 关注用户
-const followUser = (userId) => {
+// 关注用户 - 添加防御式编程
+const followUser = (userId: string | number | null | undefined) => {
+  if (!userId) {
+    console.warn('无法关注：用户ID不存在')
+    return
+  }
   // 实际项目中应该调用API进行关注操作
   // 例如：userApi.followUser(userId)
 }
 
-// 向父组件传递滚动事件
-const emitScrollToComments = (commentId) => {
+// 向父组件传递滚动事件 - 添加防御式编程
+const emitScrollToComments = (commentId: string | number | null | undefined) => {
+  if (!commentId) {
+    console.warn('无法滚动：评论ID不存在')
+    return
+  }
   const event = new CustomEvent('scrollToComments', {
     detail: { commentId }
   })

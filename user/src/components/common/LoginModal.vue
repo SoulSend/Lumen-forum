@@ -181,6 +181,7 @@ import { ref, computed, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Phone as PhoneIcon, Message as MessageIcon, Key as KeyIcon } from '@element-plus/icons-vue'
 import { useUserStore } from '../../stores/userStore'
+import { TIME_CONSTANTS } from '../../constants'
 
 // 状态管理
 const userStore = useUserStore()
@@ -311,7 +312,7 @@ const codeButtonText = computed(() => {
 const countdownProgress = computed(() => {
   // 计算圆环进度，从113.1 (2π*18) 到 0
   const circumference = 2 * Math.PI * 18
-  const progress = (countdown.value / 60) * circumference
+  const progress = (countdown.value / (TIME_CONSTANTS.MINUTE / 1000)) * circumference
   return circumference - progress
 })
 
@@ -349,7 +350,7 @@ const getVerificationCode = async (type: 'phone' | 'email') => {
     if (success) {
       // 开始倒计时
       isGettingCode.value = true
-      countdown.value = 60
+      countdown.value = TIME_CONSTANTS.MINUTE / 1000
 
       const timer = setInterval(() => {
         countdown.value--

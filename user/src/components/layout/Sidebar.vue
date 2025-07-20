@@ -7,7 +7,7 @@
         <div v-for="(activity, index) in recentActivities.slice(0, 3)" :key="index" class="activity-item">
           <div class="activity-header">
             <router-link :to="{ name: 'userProfile', params: { id: activity.user.id } }" class="user-avatar-link">
-              <img :src="activity.user?.avatar || '/src/assets/default-avatar.png'" :alt="activity.user?.username || '用户'" class="activity-avatar">
+              <img :src="getUserAvatarUrl(activity.user?.avatar)" :alt="activity.user?.username || '用户'" class="avatar avatar--small">
             </router-link>
             <div class="activity-info">
               <div class="activity-content">
@@ -53,6 +53,9 @@
 import { ref, onMounted } from 'vue';
 import { useCategoryStore } from '../../stores/categoryStore';
 import type { Category } from '../../types/forum';
+import { formatNumber } from '../../utils/format';
+import { getUserAvatarUrl } from '../../utils/assets';
+import { DEFAULT_TEXTS } from '../../constants';
 
 const categoryStore = useCategoryStore();
 
@@ -158,12 +161,7 @@ const getCategoryIcon = (category: Category) => {
   return iconMap[category.name] || 'icon-default';
 };
 
-// 格式化数字
-const formatNumber = (num: number): string => {
-  if (num < 1000) return String(num);
-  if (num < 10000) return (num / 1000).toFixed(1) + 'k';
-  return (num / 10000).toFixed(1) + 'w';
-};
+// 使用统一的格式化工具函数
 
 // 获取活动动作文本
 const getActivityAction = (type: string): string => {

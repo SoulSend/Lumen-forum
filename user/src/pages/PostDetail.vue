@@ -16,12 +16,12 @@
                       :to="{ name: 'userProfile', params: { id: post.user.id } }"
                       class="author-link"
                     >
-                      <img :src="post.user?.avatar || '/src/assets/default-avatar.png'" :alt="post.user?.username || '用户'" class="author-avatar">
+                      <img :src="getUserAvatarUrl(post.user?.avatar)" :alt="post.user?.username || '用户'" class="avatar avatar--medium">
                       <span class="author-name">{{ post.user.username }}</span>
                     </router-link>
                     <div v-else class="author-link">
-                      <img src="/src/assets/default-avatar.png" alt="用户" class="author-avatar">
-                      <span class="author-name">未知用户</span>
+                      <img :src="getUserAvatarUrl()" alt="用户" class="avatar avatar--medium">
+                      <span class="author-name">{{ DEFAULT_TEXTS.UNKNOWN_USER }}</span>
                     </div>
                     <span class="post-time">{{ formatDate(post.createdAt || post.created_at) }}</span>
                   </div>
@@ -247,6 +247,9 @@ import { usePostStore } from '../stores/postStore'
 import { useUserStore } from '../stores/userStore'
 // import { useBookmarkStore } from '../stores/bookmarkStore' // 🚧 收藏功能未完成，暂时注释
 import type { Post } from '../types/forum'
+import { formatNumber, formatDate } from '../utils/format'
+import { getUserAvatarUrl } from '../utils/assets'
+import { DEFAULT_TEXTS } from '../constants'
 
 const route = useRoute()
 const router = useRouter()
@@ -325,22 +328,7 @@ const fetchPostDetail = async () => {
   }
 }
 
-// 格式化数字，简化数值显示
-const formatNumber = (num: number): string => {
-  if (num >= 1000000) {
-    return (num / 1000000).toFixed(1) + 'M'
-  }
-  if (num >= 1000) {
-    return (num / 1000).toFixed(1) + 'K'
-  }
-  return num.toString()
-}
-
-// 格式化日期
-const formatDate = (dateString: string): string => {
-  const date = new Date(dateString)
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
-}
+// 使用统一的格式化工具函数
 
 // 🚧 点赞帖子 - 后端未完成，暂时使用模拟操作
 const handleLike = async () => {

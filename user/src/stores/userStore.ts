@@ -2,6 +2,8 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { User } from '../types/forum'
 import { authApi, userApi } from '../services/api'
+import { ErrorHandler } from '../utils/errorHandler'
+import { ERROR_MESSAGES } from '../constants'
 
 export const useUserStore = defineStore('user', () => {
   const currentUser = ref<User | null>(null)
@@ -144,7 +146,9 @@ export const useUserStore = defineStore('user', () => {
 
       return true
     } catch (e: any) {
-      error.value = e?.message || '登录失败，请检查手机号和验证码'
+      const errorInfo = ErrorHandler.handleApiError(e)
+      error.value = ERROR_MESSAGES.AUTH_FAILED
+      ErrorHandler.showError(errorInfo)
       return false
     } finally {
       loading.value = false
@@ -202,7 +206,9 @@ export const useUserStore = defineStore('user', () => {
 
       return true
     } catch (e: any) {
-      error.value = e?.message || '登录失败，请检查邮箱和验证码'
+      const errorInfo = ErrorHandler.handleApiError(e)
+      error.value = ERROR_MESSAGES.AUTH_FAILED
+      ErrorHandler.showError(errorInfo)
       return false
     } finally {
       loading.value = false
@@ -257,7 +263,9 @@ export const useUserStore = defineStore('user', () => {
 
       return user
     } catch (e: any) {
-      error.value = e?.message || '获取用户信息失败'
+      const errorInfo = ErrorHandler.handleApiError(e)
+      error.value = ERROR_MESSAGES.FETCH_USER_FAILED
+      ErrorHandler.showError(errorInfo)
       return null
     } finally {
       loading.value = false
@@ -285,7 +293,9 @@ export const useUserStore = defineStore('user', () => {
 
       return user
     } catch (e: any) {
-      error.value = e?.message || '更新个人资料失败'
+      const errorInfo = ErrorHandler.handleApiError(e)
+      error.value = ERROR_MESSAGES.VALIDATION_FAILED
+      ErrorHandler.showError(errorInfo)
       return null
     } finally {
       loading.value = false
@@ -301,7 +311,9 @@ export const useUserStore = defineStore('user', () => {
       await authApi.sendCode(type, identifier)
       return true
     } catch (e: any) {
-      error.value = e?.message || '发送验证码失败'
+      const errorInfo = ErrorHandler.handleApiError(e)
+      error.value = ERROR_MESSAGES.NETWORK_ERROR
+      ErrorHandler.showError(errorInfo)
       return false
     } finally {
       loading.value = false

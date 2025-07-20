@@ -4,6 +4,7 @@
  */
 
 import type { User, Post, Category } from '../types/forum'
+import { getUserAvatarUrl } from './assets'
 
 /**
  * 为User对象提供安全的默认值
@@ -191,7 +192,8 @@ export function getUserDisplayName(user: Partial<User> | null | undefined): stri
  * 安全获取用户头像
  */
 export function getUserAvatar(user: Partial<User> | null | undefined): string {
-  return user?.avatar ?? '/img/avatar-default.png'
+  // 使用ESM导入的统一资源管理工具
+  return getUserAvatarUrl(user?.avatar)
 }
 
 /**

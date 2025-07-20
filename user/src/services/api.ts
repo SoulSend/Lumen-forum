@@ -1,14 +1,15 @@
 import axios from 'axios'
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
+import { API_CONFIG } from '@/constants'
 
 // 创建axios实例
 const apiClient: AxiosInstance = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL: API_CONFIG.BASE_URL,
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
   },
-  timeout: 10000, // 请求超时时间
+  timeout: API_CONFIG.TIMEOUT,
 })
 
 // 请求拦截器
@@ -112,33 +113,33 @@ export const userApi = {
   updateProfile: (data: any) => put('/users/profile', data),
 
   // 获取活跃用户列表 - 修正为使用查询参数
-  getActiveUsers: (page = 0, size = 10) => get('/users/active', { page, size }),
+  getActiveUsers: (page = 0, size = API_CONFIG.DEFAULT_PAGE_SIZE) => get('/users/active', { page, size }),
 }
 
 // 帖子API - 根据API文档实现
 export const postApi = {
   // 获取帖子列表 (最新) - 修正为使用查询参数
-  getPosts: (page = 0, size = 10) => get('/content/posts', { page, size }),
+  getPosts: (page = 0, size = API_CONFIG.DEFAULT_PAGE_SIZE) => get('/content/posts', { page, size }),
 
   // 获取帖子详情
   getPostById: (id: string | number) => get(`/content/posts/${id}`),
 
   // 获取用户的帖子列表 - 修正为使用查询参数
-  getUserPosts: (userId: string | number, page = 0, size = 10) =>
+  getUserPosts: (userId: string | number, page = 0, size = API_CONFIG.DEFAULT_PAGE_SIZE) =>
     get('/content/posts/user', { id: userId, page, size }),
 
   // 获取分类下的帖子列表 - 修正为使用查询参数
-  getCategoryPosts: (categoryId: string | number, page = 0, size = 10) =>
+  getCategoryPosts: (categoryId: string | number, page = 0, size = API_CONFIG.DEFAULT_PAGE_SIZE) =>
     get('/content/posts/categories', { id: categoryId, page, size }),
 
   // 获取热门帖子列表 - 修正为使用查询参数
-  getHotPosts: (page = 0, size = 10) => get('/content/posts/hot', { page, size }),
+  getHotPosts: (page = 0, size = API_CONFIG.DEFAULT_PAGE_SIZE) => get('/content/posts/hot', { page, size }),
 
   // 获取侧边栏热门帖子 - 修正为使用查询参数
   getHotPostsSide: (page = 0, size = 5) => get('/content/posts/hot/side', { page, size }),
 
   // 获取推荐帖子列表 - 修正为使用查询参数
-  getRecommendedPosts: (page = 0, size = 10) => get('/content/posts/recommended', { page, size }),
+  getRecommendedPosts: (page = 0, size = API_CONFIG.DEFAULT_PAGE_SIZE) => get('/content/posts/recommended', { page, size }),
 
   // 获取轮播推荐帖子 - 修正为使用查询参数
   getRecommendedPostsSide: (page = 0, size = 5) => get('/content/posts/recommended/side', { page, size }),

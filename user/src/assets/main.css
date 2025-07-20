@@ -1,4 +1,5 @@
 @import './base.css';
+@import './design-system.css';
 
 /* 全局样式 */
 html, body {
@@ -37,19 +38,19 @@ h1, h2, h3, h4, h5, h6 {
   font-family: 'Nunito', 'Quicksand', 'HarmonyOS Sans', 'Noto Sans SC', sans-serif;
 }
 
-/* 圆润文本样式 */
+/* 圆润文本样式 - 使用设计系统 */
 .rounded-text {
-  font-family: 'Quicksand', 'Varela Round', 'Nunito', sans-serif !important;
+  font-family: 'Quicksand', 'Varela Round', 'Nunito', sans-serif;
   letter-spacing: 0.02em;
 }
 
 /* 中文优化 */
 .cn-text {
-  font-family: 'HarmonyOS Sans', 'Noto Sans SC', sans-serif !important;
+  font-family: 'HarmonyOS Sans', 'Noto Sans SC', sans-serif;
   letter-spacing: 0.02em;
 }
 
-/* Material Icons 全局样式 */
+/* Material Icons 全局样式 - 使用设计系统 */
 .material-icons-round {
   font-size: 1.2rem;
   vertical-align: middle;
@@ -57,27 +58,18 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   justify-content: center;
   color: var(--primary-color);
-  transition: transform 0.2s ease, color 0.2s ease;
+  transition: all var(--transition-normal);
 }
 
-/* 修改图标颜色规则，确保按钮内的图标颜色与按钮文本颜色一致 */
-button .material-icons-round,
+/* 在按钮中的图标继承颜色 */
+.btn .material-icons-round,
 .el-button .material-icons-round {
-  color: inherit !important; /* 继承父元素的文本颜色 */
+  color: inherit;
 }
 
-a:hover .material-icons-round,
-button:hover .material-icons-round {
+/* 交互状态 */
+.material-icons-round:hover {
   transform: scale(1.1);
-  color: var(--primary-hover);
-}
-
-/* 确保按钮中的图标在悬浮状态下保持正确的颜色 */
-.el-button:hover .material-icons-round,
-.el-button:focus .material-icons-round,
-button:hover .material-icons-round,
-button:focus .material-icons-round {
-  color: inherit !important; /* 继承父元素的文本颜色 */
 }
 
 /* 容器样式 */
@@ -130,35 +122,37 @@ button:focus .material-icons-round {
   justify-content: space-between;
 }
 
-/* 按钮样式 */
+/* 按钮样式 - 使用设计系统 */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-2) var(--spacing-4);
   border-radius: var(--radius-md);
-  font-size: var(--font-size-sm);
-  line-height: 1.5;
-  text-align: center;
-  cursor: pointer;
+  font-weight: var(--font-weight-medium);
+  font-family: 'Nunito', 'Quicksand', 'HarmonyOS Sans', 'Noto Sans SC', sans-serif;
   transition: all var(--transition-normal);
   border: 1px solid transparent;
-  white-space: nowrap;
+  cursor: pointer;
+  text-decoration: none;
+  padding: var(--spacing-2) var(--spacing-4);
+  font-size: var(--font-size-sm);
 }
 
 .btn-primary {
   background-color: var(--primary-color);
   color: var(--white);
+  border-color: var(--primary-color);
 }
 
 .btn-primary:hover {
   background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
 }
 
 .btn-outline {
   background-color: transparent;
-  border-color: var(--primary-color);
   color: var(--primary-color);
+  border-color: var(--primary-color);
 }
 
 .btn-outline:hover {
@@ -169,6 +163,7 @@ button:focus .material-icons-round {
 .btn-subtle {
   background-color: var(--bg-subtle);
   color: var(--text-secondary);
+  border-color: transparent;
 }
 
 .btn-subtle:hover {
@@ -302,7 +297,7 @@ button:focus .material-icons-round {
 
 /* 重写Element Plus样式 */
 .el-button {
-  transition: all var(--transition-normal) !important; /* 使过渡更平滑 */
+  transition: all var(--transition-normal); /* 使过渡更平滑 */
 }
 
 .el-button--primary {
@@ -350,11 +345,11 @@ button:focus .material-icons-round {
 
 /* 全局覆盖所有Element Plus组件的focus-visible状态 */
 *:focus-visible {
-  outline-color: var(--primary-color) !important;
+  outline-color: var(--primary-color);
 }
 
 .el-button:focus-visible {
-  box-shadow: 0 0 0 2px var(--white), 0 0 0 4px var(--primary-color) !important;
+  box-shadow: 0 0 0 2px var(--white), 0 0 0 4px var(--primary-color);
 }
 
 .el-input__wrapper {
@@ -365,26 +360,26 @@ button:focus .material-icons-round {
 .el-tabs__active-bar,
 .el-tabs__item.is-active,
 .el-tabs__item:hover {
-  color: var(--primary-color) !important;
+  color: var(--primary-color);
 }
 
 .el-tabs__active-bar {
-  background-color: var(--primary-color) !important;
+  background-color: var(--primary-color);
 }
 
 .el-radio__input.is-checked .el-radio__inner {
-  border-color: var(--primary-color) !important;
-  background: var(--primary-color) !important;
+  border-color: var(--primary-color);
+  background: var(--primary-color);
 }
 
 .el-radio__input.is-checked + .el-radio__label {
-  color: var(--primary-color) !important;
+  color: var(--primary-color);
 }
 
 .el-radio-button__orig-radio:checked + .el-radio-button__inner {
-  background-color: var(--primary-color) !important;
-  border-color: var(--primary-color) !important;
-  box-shadow: -1px 0 0 0 var(--primary-color) !important;
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  box-shadow: -1px 0 0 0 var(--primary-color);
 }
 
 .el-dialog {
@@ -453,13 +448,13 @@ button:focus .material-icons-round {
   background: var(--gray-400);
 }
 
-/* 字体辅助类 */
+/* 字体辅助类 - 移除!important */
 .font-rounded {
-  font-family: 'Quicksand', 'Varela Round', 'Nunito', sans-serif !important;
+  font-family: 'Quicksand', 'Varela Round', 'Nunito', sans-serif;
 }
 
 .font-cn {
-  font-family: 'HarmonyOS Sans', 'Noto Sans SC', sans-serif !important;
+  font-family: 'HarmonyOS Sans', 'Noto Sans SC', sans-serif;
 }
 
 .text-smooth {

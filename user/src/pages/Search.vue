@@ -59,10 +59,10 @@
               <template v-if="activeTab === 'all' || activeTab === 'users'">
                 <div v-for="user in userResults" :key="user.id" class="user-card card">
                   <router-link :to="{ name: 'userProfile', params: { id: user.id } }" class="user-link">
-                    <img :src="user?.avatar || '/src/assets/default-avatar.png'" :alt="user?.username || '用户'" class="user-avatar">
+                    <img :src="getUserAvatarUrl(user?.avatar)" :alt="user?.username || '用户'" class="avatar avatar--medium">
                     <div class="user-info">
                       <h3 class="user-name">{{ user.username }}</h3>
-                      <p class="user-bio">{{ user.bio || '这个用户很懒，还没有填写个人简介' }}</p>
+                      <p class="user-bio">{{ user.bio || DEFAULT_TEXTS.EMPTY_BIO }}</p>
                     </div>
                   </router-link>
                 </div>
@@ -117,6 +117,8 @@ import MainLayout from '../components/layout/MainLayout.vue';
 import PostCard from '../components/forum/PostCard.vue';
 import Sidebar from '../components/layout/Sidebar.vue';
 import { usePostStore } from '../stores/postStore';
+import { getUserAvatarUrl } from '../utils/assets';
+import { DEFAULT_TEXTS } from '../constants';
 
 const route = useRoute();
 const router = useRouter();

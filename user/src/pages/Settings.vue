@@ -222,6 +222,7 @@ import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import MainLayout from '../components/layout/MainLayout.vue'
 import { useUserStore } from '../stores/userStore'
+import { getUserAvatarUrl } from '../utils/assets'
 
 const userStore = useUserStore()
 
@@ -264,7 +265,7 @@ const avatarUrl = computed(() => {
   if (profileForm.avatar) {
     return URL.createObjectURL(profileForm.avatar)
   }
-  return userStore.currentUser?.avatar || '/default-avatar.png'
+  return getUserAvatarUrl(userStore.currentUser?.avatar)
 })
 
 // 表单规则 - 优化验证时机

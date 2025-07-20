@@ -220,7 +220,7 @@
                     <h3 class="tip-title">{{ article.title }}</h3>
                   </router-link>
                   <h3 v-else class="tip-title">{{ article.title }}</h3>
-                  <p class="tip-excerpt">{{ truncateText(article.content, 100) }}</p>
+                  <p class="tip-excerpt">{{ truncateText(article.content, TEXT_CONFIG.COMMENT_PREVIEW_LENGTH) }}</p>
                   <div class="tip-meta">
                     <div class="tip-author">
                       <router-link
@@ -228,12 +228,12 @@
                         :to="{ name: 'userProfile', params: { id: article.user.id } }"
                         class="author-link"
                       >
-                        <img :src="article.user?.avatar || '/src/assets/default-avatar.png'" :alt="article.user?.username || '用户'" class="author-avatar">
+                        <img :src="getUserAvatarUrl(article.user?.avatar)" :alt="article.user?.username || '用户'" class="avatar avatar--small">
                         <span class="author-name">{{ article.user?.username }}</span>
                       </router-link>
                       <div v-else class="author-link">
-                        <img src="/src/assets/default-avatar.png" alt="用户" class="author-avatar">
-                        <span class="author-name">未知用户</span>
+                        <img :src="getUserAvatarUrl()" alt="用户" class="avatar avatar--small">
+                        <span class="author-name">{{ DEFAULT_TEXTS.UNKNOWN_USER }}</span>
                       </div>
                     </div>
                     <div class="tip-stats">
@@ -277,6 +277,9 @@ import { Search } from '@element-plus/icons-vue'
 import Sidebar from '../components/layout/Sidebar.vue'
 import { postApi } from '../services/api'
 import { safePost, safeUser, getUserDisplayName, getUserAvatar, hasValidId } from '../utils/dataValidation'
+import { truncateText, formatNumber, formatDate } from '../utils/format'
+import { CATEGORY_ICONS, DEFAULT_TEXTS, TEXT_CONFIG } from '../constants'
+import { getUserAvatarUrl } from '../utils/assets'
 
 const router = useRouter()
 const categoryStore = useCategoryStore()
@@ -518,37 +521,7 @@ watch(selectedTimeFrame, () => {
 
 // 获取分类图标
 const getCategoryIcon = (category: Category) => {
-  const iconMap: Record<string, string> = {
-    '生活技巧': 'icon-life',
-    '家居装饰': 'icon-home',
-    '美食烹饪': 'icon-food',
-    '旅行探索': 'icon-travel',
-    '健康养生': 'icon-health',
-    '职场技能': 'icon-work'
-  }
-  
-  return iconMap[category.name] || 'icon-default'
-}
-
-// 格式化数字
-const formatNumber = (num: number): string => {
-  if (num < 1000) return String(num)
-  if (num < 10000) return (num / 1000).toFixed(1) + 'k'
-  return (num / 10000).toFixed(1) + 'w'
-}
-
-// 格式化日期
-const formatDate = (dateString: string): string => {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
-}
-
-// 截断文本
-const truncateText = (text: string, maxLength: number): string => {
-  if (!text) return '';
-  if (text.length <= maxLength) return text;
-  return text.substring(0, maxLength) + '...';
+  return CATEGORY_ICONS[category.name] || 'category'
 }
 
 // 生命周期钩子

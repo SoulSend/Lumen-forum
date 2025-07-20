@@ -29,14 +29,14 @@
               :to="{ name: 'userProfile', params: { id: comment.user.id } }"
               class="user-link"
             >
-              <img :src="comment.user?.avatar || defaultAvatarUrl" :alt="comment.user?.username || '用户'" class="user-avatar">
+              <img :src="getUserAvatarUrl(comment.user?.avatar)" :alt="comment.user?.username || '用户'" class="avatar avatar--small">
               <span class="user-name">{{ comment.user.username }}</span>
             </router-link>
             <div v-else class="user-link">
-              <img :src="defaultAvatarUrl" alt="用户" class="user-avatar">
-              <span class="user-name">未知用户</span>
+              <img :src="getUserAvatarUrl()" alt="用户" class="avatar avatar--small">
+              <span class="user-name">{{ DEFAULT_TEXTS.UNKNOWN_USER }}</span>
             </div>
-            <span class="comment-time">{{ formatDate(comment.created_at) }}</span>
+            <span class="comment-time">{{ formatRelativeTime(comment.created_at) }}</span>
           </div>
           
           <div class="comment-content">
@@ -126,14 +126,14 @@
                 :to="{ name: 'userProfile', params: { id: comment.user.id } }"
                 class="user-link"
               >
-                <img :src="comment.user?.avatar || defaultAvatarUrl" :alt="comment.user?.username || '用户'" class="user-avatar">
+                <img :src="getUserAvatarUrl(comment.user?.avatar)" :alt="comment.user?.username || '用户'" class="avatar avatar--small">
                 <span class="user-name">{{ comment.user.username }}</span>
               </router-link>
               <div v-else class="user-link">
-                <img :src="defaultAvatarUrl" alt="用户" class="user-avatar">
-                <span class="user-name">未知用户</span>
+                <img :src="getUserAvatarUrl()" alt="用户" class="avatar avatar--small">
+                <span class="user-name">{{ DEFAULT_TEXTS.UNKNOWN_USER }}</span>
               </div>
-              <span class="comment-time">{{ formatDate(comment.created_at) }}</span>
+              <span class="comment-time">{{ formatRelativeTime(comment.created_at) }}</span>
             </div>
             
             <div class="comment-content drawer-comment-content">
@@ -188,7 +188,7 @@
                     <span class="reply-username">{{ reply.user.username }}</span>
                   </router-link>
                   <span v-else class="reply-username">未知用户</span>
-                  <span class="reply-time">{{ formatDate(reply.created_at) }}</span>
+                  <span class="reply-time">{{ formatRelativeTime(reply.created_at) }}</span>
                 </div>
                 <div class="reply-content">
                   {{ reply.content }}
@@ -227,8 +227,11 @@ import { useRouter } from 'vue-router'
 import { ElMessage, ElDrawer } from 'element-plus'
 import type { Comment } from '../../types/forum'
 import { useUserStore } from '../../stores/userStore'
-import defaultAvatarUrl from '../../assets/default-avatar.png?url'
+// 移除硬编码的头像导入，使用统一的资源管理
 // import { commentApi } from '../../services/api' // 🚧 评论API未完成，暂时注释
+import { formatRelativeTime } from '../../utils/format'
+import { getUserAvatarUrl } from '../../utils/assets'
+import { DEFAULT_TEXTS } from '../../constants'
 
 const props = defineProps<{
   postId: string | number
@@ -312,28 +315,7 @@ const toggleReplies = (commentId: number) => {
   }
 }
 
-// 格式化日期
-const formatDate = (dateString: string): string => {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24))
-  
-  if (diffDays < 1) {
-    // 显示几小时前或几分钟前
-    const diffHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
-    if (diffHours < 1) {
-      const diffMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60))
-      return `${diffMinutes}分钟前`
-    }
-    return `${diffHours}小时前`
-  } else if (diffDays < 30) {
-    // 显示几天前
-    return `${diffDays}天前`
-  } else {
-    // 显示具体日期
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
-  }
-}
+// 使用统一的格式化工具函数
 
 // 点赞评论
 const handleLike = async (commentId: number) => {

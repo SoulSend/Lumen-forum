@@ -2,6 +2,8 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { categoryApi, postApi } from '../services/api'
 import type { Category } from '../types/forum'
+import { ErrorHandler } from '../utils/errorHandler'
+import { ERROR_MESSAGES } from '../constants'
 
 export const useCategoryStore = defineStore('category', () => {
   const categories = ref<Category[]>([])
@@ -48,7 +50,9 @@ export const useCategoryStore = defineStore('category', () => {
       categories.value = (response || []).map(mapApiCategoryToCategory)
       return categories.value
     } catch (e: any) {
-      error.value = e?.message || '获取分类列表失败'
+      const errorInfo = ErrorHandler.handleApiError(e)
+      error.value = ERROR_MESSAGES.FETCH_CATEGORIES_FAILED
+      ErrorHandler.showError(errorInfo)
       return null
     } finally {
       loading.value = false

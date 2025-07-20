@@ -12,7 +12,7 @@
           </div>
           <div class="user-info-wrapper">
             <div class="avatar-container">
-              <img :src="user?.avatar || '/src/assets/default-avatar.png'" :alt="user?.username || '用户'" class="user-avatar">
+              <img :src="getUserAvatarUrl(user?.avatar)" :alt="user?.username || '用户'" class="avatar avatar--xlarge">
               <div v-if="isOnline" class="status-badge online"></div>
               <div v-if="isCurrentUser" class="avatar-edit-overlay" @click="openAvatarUpload">
                 <span class="material-icons-round">photo_camera</span>
@@ -370,6 +370,8 @@ import { usePostStore } from '../stores/postStore'
 import { useUserStore } from '../stores/userStore'
 import { postApi } from '../services/api'
 import type { Post, User } from '../types/forum'
+import { getUserAvatarUrl } from '../utils/assets'
+import { DEFAULT_TEXTS, UPLOAD_CONFIG, UI_CONFIG } from '../constants'
 
 const route = useRoute()
 const router = useRouter()
@@ -716,19 +718,34 @@ const formatWebsiteUrl = (url: string) => {
   }
 }
 
-// 获取技能标签类型
+// 获取技能标签类型 - 修复Element Plus type警告
 const getSkillTagType = (index: number) => {
-  const types = ['', 'success', 'warning', 'danger', 'info'];
+  const types = ['primary', 'success', 'warning', 'danger', 'info'];
   return types[index % types.length];
 }
 
-// 获取标签大小
-const getTagSize = (count: number) => {
-  const minSize = 12;
-  const maxSize = 20;
-  const maxCount = Math.max(...userTags.value.map(tag => tag.count));
-  const size = minSize + (count / maxCount) * (maxSize - minSize);
-  return `${size}px`;
+// 获取标签大小 - 添加防御式编程
+const getTagSize = (count: number | null | undefined) => {
+  const minSize = 12; // 可以考虑添加到UI_CONFIG中
+  const maxSize = 20; // 可以考虑添加到UI_CONFIG中
+
+  if (!count || count <= 0) return `${minSize}px`
+
+  if (!userTags.value || userTags.value.length === 0) return `${minSize}px`
+
+  try {
+    const validCounts = userTags.value.map(tag => tag?.count || 0).filter(c => c > 0)
+    if (validCounts.length === 0) return `${minSize}px`
+
+    const maxCount = Math.max(...validCounts)
+    if (maxCount === 0) return `${minSize}px`
+
+    const size = minSize + (count / maxCount) * (maxSize - minSize)
+    return `${Math.round(size)}px`
+  } catch (error) {
+    console.warn('计算标签大小失败:', count, error)
+    return `${minSize}px`
+  }
 }
 
 // 打开头像上传窗口

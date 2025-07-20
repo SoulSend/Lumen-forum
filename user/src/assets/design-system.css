@@ -1,0 +1,230 @@
+/**
+ * 设计系统 - 统一的样式规范
+ * 解决样式覆盖和重复定义问题
+ */
+
+/* ===== 图标系统 ===== */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-normal);
+}
+
+/* 图标尺寸 */
+.icon--small { font-size: 1rem; }
+.icon--medium { font-size: 1.2rem; }
+.icon--large { font-size: 1.5rem; }
+
+/* 图标颜色 - 使用语义化类名而不是强制覆盖 */
+.icon--primary { color: var(--primary-color); }
+.icon--secondary { color: var(--text-secondary); }
+.icon--inherit { color: inherit; }
+.icon--white { color: var(--white); }
+
+/* 图标状态 */
+.icon--interactive:hover {
+  transform: scale(1.1);
+  color: var(--primary-hover);
+}
+
+/* ===== 按钮系统 ===== */
+.btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-medium);
+  font-family: 'Nunito', 'Quicksand', 'HarmonyOS Sans', 'Noto Sans SC', sans-serif;
+  transition: all var(--transition-normal);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+/* 按钮尺寸 */
+.btn--small {
+  padding: var(--spacing-1) var(--spacing-3);
+  font-size: var(--font-size-xs);
+}
+
+.btn--medium {
+  padding: var(--spacing-2) var(--spacing-4);
+  font-size: var(--font-size-sm);
+}
+
+.btn--large {
+  padding: var(--spacing-3) var(--spacing-6);
+  font-size: var(--font-size-md);
+}
+
+/* 按钮变体 - 避免使用!important */
+.btn--primary {
+  background-color: var(--primary-color);
+  color: var(--white);
+  border-color: var(--primary-color);
+}
+
+.btn--primary:hover {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+.btn--primary .icon {
+  color: var(--white);
+}
+
+.btn--outline {
+  background-color: transparent;
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn--outline:hover {
+  background-color: var(--primary-color);
+  color: var(--white);
+}
+
+.btn--outline:hover .icon {
+  color: var(--white);
+}
+
+.btn--subtle {
+  background-color: var(--bg-subtle);
+  color: var(--text-secondary);
+  border-color: transparent;
+}
+
+.btn--subtle:hover {
+  background-color: var(--bg-muted);
+  color: var(--text-primary);
+}
+
+/* ===== 头像系统 ===== */
+.avatar {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border-light);
+  background-color: var(--bg-subtle);
+}
+
+.avatar--small { width: 28px; height: 28px; }
+.avatar--medium { width: 40px; height: 40px; }
+.avatar--large { width: 80px; height: 80px; }
+.avatar--xlarge { width: 120px; height: 120px; }
+
+/* ===== 徽章系统 ===== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--spacing-2);
+  height: 24px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  font-family: 'Quicksand', 'Varela Round', 'Nunito', sans-serif;
+  letter-spacing: 0.01em;
+  transition: all var(--transition-normal);
+}
+
+.badge--category {
+  background-color: rgba(249, 168, 38, 0.1);
+  color: var(--primary-color);
+}
+
+.badge--category:hover {
+  background-color: var(--primary-color);
+  color: var(--white);
+  transform: translateY(-1px);
+}
+
+.badge--pin {
+  background-color: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+}
+
+.badge--solved {
+  background-color: rgba(46, 204, 113, 0.1);
+  color: #2ecc71;
+}
+
+/* ===== 标签系统 ===== */
+.tag {
+  display: inline-block;
+  padding: 2px var(--spacing-2);
+  background-color: var(--bg-subtle);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all var(--transition-normal);
+  letter-spacing: 0.01em;
+}
+
+.tag:hover {
+  color: var(--primary-color);
+  background-color: rgba(249, 168, 38, 0.1);
+  transform: translateY(-1px);
+}
+
+/* ===== 文本系统 ===== */
+.text--primary { color: var(--text-primary); }
+.text--secondary { color: var(--text-secondary); }
+.text--tertiary { color: var(--text-tertiary); }
+.text--disabled { color: var(--text-disabled); }
+.text--inverse { color: var(--text-inverse); }
+
+.text--brand { color: var(--primary-color); }
+.text--success { color: var(--success); }
+.text--warning { color: var(--warning); }
+.text--error { color: var(--error); }
+.text--info { color: var(--info); }
+
+/* 字体家族 */
+.font--rounded {
+  font-family: 'Quicksand', 'Varela Round', 'Nunito', sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.font--chinese {
+  font-family: 'HarmonyOS Sans', 'Noto Sans SC', sans-serif;
+  letter-spacing: 0.02em;
+}
+
+/* ===== 状态指示器 ===== */
+.status-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.status--online { background-color: var(--success); }
+.status--offline { background-color: var(--gray-400); }
+.status--away { background-color: var(--warning); }
+.status--busy { background-color: var(--error); }
+
+/* ===== 交互状态 ===== */
+.interactive {
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.interactive:hover {
+  transform: translateY(-1px);
+}
+
+.interactive--subtle:hover {
+  background-color: var(--bg-subtle);
+}
+
+/* ===== 加载状态 ===== */
+.loading-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

@@ -142,7 +142,7 @@
           <template v-if="isAuthenticated">
             <el-dropdown trigger="click" class="user-dropdown">
               <div class="user-profile">
-                <img :src="currentUser?.avatar || '/default-avatar.png'" alt="用户头像" class="user-avatar">
+                <img :src="getUserAvatarUrl(currentUser?.avatar)" alt="用户头像" class="avatar avatar--small">
                 <span class="user-name hide-on-mobile">{{ currentUser?.username }}</span>
                 <span class="material-icons-round dropdown-icon">expand_more</span>
               </div>
@@ -291,6 +291,7 @@ import { Search, Loading } from '@element-plus/icons-vue'
 import { useUserStore } from '../../stores/userStore'
 import LoginModal from '../common/LoginModal.vue'
 import { ElMessage } from 'element-plus'
+import { getUserAvatarUrl } from '../../utils/assets'
 
 // 用户状态
 const userStore = useUserStore()

@@ -52,7 +52,7 @@ public class UserPO extends BaseEntity {
      * 头像URL，默认值/default-avatar.png
      */
     @Column(length = 255)
-    private String avatar = "/default-avatar.png";
+    private String avatar ;
     /**
      * 个人简介
      * @Lob - JPA注解，表示大文本字段

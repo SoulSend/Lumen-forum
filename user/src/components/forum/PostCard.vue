@@ -7,21 +7,21 @@
           <router-link
             v-if="post.category && post.category.id"
             :to="{ name: 'category', params: { id: post.category.id } }"
-            class="category-badge font-rounded"
+            class="badge badge--category font--rounded"
             @click.stop
           >
             {{ post.category.name }}
           </router-link>
-          <span v-if="post.isPinned || post.is_pinned" class="pin-badge font-rounded">
+          <span v-if="post.isPinned || post.is_pinned" class="badge badge--pin font--rounded">
             <i class="icon-pin"></i>置顶
           </span>
-          <span v-if="post.isSolved || post.is_solved" class="solved-badge font-rounded">
+          <span v-if="post.isSolved || post.is_solved" class="badge badge--solved font--rounded">
             <i class="icon-check"></i>已解决
           </span>
         </div>
         
         <!-- 帖子标题 -->
-        <h3 class="post-title font-rounded letter-tight">
+        <h3 class="post-title font--rounded">
           <router-link
             v-if="hasValidId(safePostData)"
             :to="{ name: 'postDetail', params: { id: safePostData.id } }"
@@ -33,7 +33,7 @@
       </div>
 
       <!-- 帖子摘要 -->
-      <p class="post-excerpt">{{ truncateContent(safePostData.content) }}</p>
+      <p class="post-excerpt">{{ truncateText(safePostData.content) }}</p>
       
       <!-- 帖子标签 -->
       <div class="post-tags" v-if="safePostData.tags && safePostData.tags.length">
@@ -41,7 +41,7 @@
           v-for="tag in safePostData.tags.slice(0, 3)"
           :key="tag.id"
           :to="{ name: 'search', query: { tag_id: tag.id } }"
-          class="post-tag font-rounded"
+          class="tag"
           @click.stop
         >
           {{ tag.name }}
@@ -62,24 +62,24 @@
           <img
             :src="getUserAvatar(safeUserData)"
             :alt="getUserDisplayName(safeUserData)"
-            class="author-avatar"
+            class="avatar avatar--small"
           >
-          <span class="author-name font-rounded">{{ getUserDisplayName(safeUserData) }}</span>
+          <span class="author-name font--rounded">{{ getUserDisplayName(safeUserData) }}</span>
         </router-link>
         <div v-else class="author-link">
           <img
             :src="getUserAvatar(null)"
             :alt="getUserDisplayName(null)"
-            class="author-avatar"
+            class="avatar avatar--small"
           >
-          <span class="author-name font-rounded">{{ getUserDisplayName(null) }}</span>
+          <span class="author-name font--rounded">{{ getUserDisplayName(null) }}</span>
         </div>
       </div>
       
       <!-- 时间和统计 -->
       <div class="post-stats">
         <span class="post-time">
-          <i class="icon-time"></i>{{ formatDate(safePostData.createdAt || safePostData.created_at) }}
+          <i class="icon-time"></i>{{ formatRelativeTime(safePostData.createdAt || safePostData.created_at) }}
         </span>
         <span class="stat views">
           <i class="icon-view"></i>{{ formatNumber(safeNumber(safePostData.viewCount)) }}
@@ -111,6 +111,7 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from '../../stores/userStore'
 import type { Post } from '../../types/forum'
 import { safePost, safeUser, getUserDisplayName, getUserAvatar, safeNumber, hasValidId } from '../../utils/dataValidation'
+import { truncateText, formatNumber, formatRelativeTime } from '../../utils/format'
 
 const props = defineProps<{
   post: Post
@@ -130,64 +131,18 @@ const isCurrentUserAuthor = computed(() => {
   return postUserId === userStore.currentUser.id && postUserId !== 0
 })
 
-// 截断内容，只显示前100个字符
-const truncateContent = (content: string): string => {
-  if (!content) return '';
-  if (content.length <= 120) {
-    return content;
-  }
-  return content.substring(0, 120) + '...';
-}
+// 使用统一的工具函数，避免重复代码
 
-// 格式化数字，例如1000显示为1k
-const formatNumber = (num: number): string => {
-  if (num < 1000) return String(num);
-  if (num < 10000) return (num / 1000).toFixed(1) + 'k';
-  return (num / 10000).toFixed(1) + 'w';
-}
-
-// 格式化日期
-const formatDate = (dateString: string): string => {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diff = now.getTime() - date.getTime();
-  
-  // 小于1小时，显示"xx分钟前"
-  if (diff < 3600000) {
-    const minutes = Math.floor(diff / 60000);
-    return `${minutes}分钟前`;
-  }
-  
-  // 小于24小时，显示"xx小时前"
-  if (diff < 86400000) {
-    const hours = Math.floor(diff / 3600000);
-    return `${hours}小时前`;
-  }
-  
-  // 小于7天，显示"xx天前"
-  if (diff < 604800000) {
-    const days = Math.floor(diff / 86400000);
-    return `${days}天前`;
-  }
-  
-  // 否则显示具体日期
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  
-  // 如果是当前年份，不显示年份
-  if (year === now.getFullYear()) {
-    return `${month}-${day}`;
-  }
-  
-  return `${year}-${month}-${day}`;
-}
-
-// 导航到帖子详情页
+// 导航到帖子详情页 - 添加防御式编程
 const navigateToPost = () => {
+  if (!props.post?.id) {
+    console.warn('无法导航：帖子ID不存在', props.post)
+    return
+  }
+
   router.push({
     name: 'postDetail',
-    params: { id: props.post.id }
+    params: { id: String(props.post.id) }
   });
 }
 </script>
