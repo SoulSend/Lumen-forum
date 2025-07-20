@@ -10,6 +10,8 @@ import App from './App.vue'
 import router from './router'
 import './assets/main.css'
 import { registerPermissionDirectives } from './directives/permission'
+import { registerLazyLoadDirective } from './directives/lazyLoad'
+import { setupGlobalErrorHandler } from './utils/errorHandler'
 
 const app = createApp(App)
 
@@ -20,6 +22,12 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 
 // 注册权限指令
 registerPermissionDirectives(app)
+
+// 注册懒加载指令
+registerLazyLoadDirective(app)
+
+// 设置全局错误处理
+setupGlobalErrorHandler()
 
 // 配置全局属性
 app.config.errorHandler = (err, instance, info) => {

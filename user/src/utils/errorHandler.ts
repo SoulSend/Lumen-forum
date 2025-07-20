@@ -6,7 +6,19 @@ export enum ErrorType {
   API = 'API',
   AUTH = 'AUTH',
   VALIDATION = 'VALIDATION',
+  PERMISSION = 'PERMISSION',
+  NOT_FOUND = 'NOT_FOUND',
+  SERVER = 'SERVER',
+  BUSINESS = 'BUSINESS',
   UNKNOWN = 'UNKNOWN'
+}
+
+// 错误级别枚举
+export enum ErrorLevel {
+  INFO = 'info',
+  WARNING = 'warning',
+  ERROR = 'error',
+  CRITICAL = 'critical'
 }
 
 // 错误信息接口
@@ -159,3 +171,23 @@ export class ErrorHandler {
 export const handleError = ErrorHandler.handleAndShow
 export const logError = ErrorHandler.logError
 export const createUserFriendlyMessage = ErrorHandler.createUserFriendlyMessage
+
+// 全局错误处理器设置
+export const setupGlobalErrorHandler = () => {
+  // 捕获未处理的Promise拒绝
+  window.addEventListener('unhandledrejection', (event) => {
+    handleError(event.reason, 'Unhandled Promise Rejection')
+    event.preventDefault()
+  })
+
+  // 捕获全局JavaScript错误
+  window.addEventListener('error', (event) => {
+    handleError({
+      message: event.message,
+      filename: event.filename,
+      lineno: event.lineno,
+      colno: event.colno,
+      error: event.error
+    }, 'Global Error')
+  })
+}

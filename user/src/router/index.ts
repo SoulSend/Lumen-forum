@@ -3,28 +3,48 @@ import type { RouteRecordRaw } from 'vue-router'
 import { useUserStore } from '../stores/userStore'
 import { ElMessage } from 'element-plus'
 
+// 路由懒加载函数，支持预加载和错误处理
+const lazyLoad = (componentPath: string, chunkName?: string) => {
+  return () => {
+    const componentImport = import(
+      /* webpackChunkName: "[request]" */
+      /* webpackPreload: true */
+      `../pages/${componentPath}.vue`
+    )
+
+    // 添加加载错误处理
+    return componentImport.catch((error) => {
+      console.error(`Failed to load component: ${componentPath}`, error)
+      // 返回错误页面组件
+      return import('../pages/NotFound.vue')
+    })
+  }
+}
+
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'home',
-    component: () => import('../pages/Home.vue'),
+    component: lazyLoad('Home', 'home'),
     meta: {
       title: 'Lumen论坛 - 首页',
+      preload: true, // 标记为需要预加载的页面
     },
   },
   {
     path: '/post/:id',
     name: 'postDetail',
-    component: () => import('../pages/PostDetail.vue'),
+    component: lazyLoad('PostDetail', 'post-detail'),
     props: true,
     meta: {
       title: '帖子详情 - Lumen论坛',
+      preload: true,
     },
   },
   {
     path: '/category/:id',
     name: 'category',
-    component: () => import('../pages/Category.vue'),
+    component: lazyLoad('Category', 'category'),
     props: true,
     meta: {
       title: '分类浏览 - Lumen论坛',
@@ -33,7 +53,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/user/:id',
     name: 'userProfile',
-    component: () => import('../pages/UserProfile.vue'),
+    component: lazyLoad('UserProfile', 'user-profile'),
     props: true,
     meta: {
       title: '用户资料 - Lumen论坛',
@@ -42,7 +62,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/create-post',
     name: 'createPost',
-    component: () => import('../pages/CreatePost.vue'),
+    component: lazyLoad('CreatePost', 'create-post'),
     meta: {
       title: '发布帖子 - Lumen论坛',
       requiresAuth: true,

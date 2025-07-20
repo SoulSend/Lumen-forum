@@ -121,20 +121,10 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import MainLayout from '../components/layout/MainLayout.vue'
-// import type { Notification } from '../types/forum' // 已删除：API文档中没有通知接口
+import type { ForumNotification } from '../types/forum'
 
-// 临时通知接口定义（API文档中没有通知接口，这里只是为了避免编译错误）
-interface TempNotification {
-  id: number
-  user_id: number
-  type: string
-  title?: string
-  content?: string
-  data: any
-  read_at: string | null
-  created_at: string
-  updated_at: string
-}
+// 使用ForumNotification类型
+type TempNotification = ForumNotification
 
 const router = useRouter()
 
@@ -147,7 +137,7 @@ const total = ref(0)
 const totalPages = ref(1)
 const activeFilter = ref('all')
 const deleteDialogVisible = ref(false)
-const notificationToDelete = ref<TempNotification | null>(null)
+const notificationToDelete = ref<ForumNotification | null>(null)
 const deleting = ref(false)
 
 // 计算未读通知数量
@@ -450,7 +440,7 @@ const handleFilterChange = (filter: string) => {
 }
 
 // 删除通知
-const deleteNotification = (notification: Notification) => {
+const deleteNotification = (notification: ForumNotification) => {
   notificationToDelete.value = notification
   deleteDialogVisible.value = true
 }

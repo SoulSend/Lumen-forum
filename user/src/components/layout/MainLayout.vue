@@ -1,7 +1,7 @@
 <template>
   <div class="app-layout">
     <Header />
-    
+
     <main class="main-content">
       <div class="container main-container">
         <div class="content-wrapper" :class="{ 'full-width': isFullWidthPage, 'post-detail-layout': isPostDetailPage }">
@@ -564,6 +564,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+
 // @ts-ignore
 import Header from './Header.vue'
 // @ts-ignore
@@ -962,7 +963,7 @@ const formatTime = (timestamp: number | string | null | undefined) => {
 }
 
 // 获取用户活动图标
-const getUserActivityIcon = (type) => {
+const getUserActivityIcon = (type: string) => {
   switch (type) {
     case 'post':
       return 'post_add'

@@ -238,7 +238,8 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage, FormInstance, FormRules } from 'element-plus'
+import { ElMessage } from 'element-plus'
+import type { FormInstance, FormRules } from 'element-plus'
 import MainLayout from '../components/layout/MainLayout.vue'
 import AuthRequired from '../components/common/AuthRequired.vue'
 import LoginPrompt from '../components/common/LoginPrompt.vue'

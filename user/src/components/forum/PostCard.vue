@@ -19,7 +19,7 @@
             <i class="icon-check"></i>已解决
           </span>
         </div>
-        
+
         <!-- 帖子标题 -->
         <h3 class="post-title font--rounded">
           <router-link
@@ -34,7 +34,7 @@
 
       <!-- 帖子摘要 -->
       <p class="post-excerpt">{{ truncateText(safePostData.content) }}</p>
-      
+
       <!-- 帖子标签 -->
       <div class="post-tags" v-if="safePostData.tags && safePostData.tags.length">
         <router-link
@@ -108,11 +108,11 @@
 <script setup lang="ts">
 import { defineProps, computed } from 'vue'
 import { useRouter } from 'vue-router'
+
 import { useUserStore } from '../../stores/userStore'
 import type { Post } from '../../types/forum'
 import { safePost, safeUser, getUserDisplayName, getUserAvatar, safeNumber, hasValidId } from '../../utils/dataValidation'
 import { truncateText, formatNumber, formatRelativeTime } from '../../utils/format'
-
 const props = defineProps<{
   post: Post
 }>()
