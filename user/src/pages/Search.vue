@@ -1,6 +1,5 @@
 <template>
-  <main-layout>
-    <div class="search-page">
+  <div class="search-page">
       <div class="container">
         <!-- 搜索结果头部 -->
         <div class="search-header">
@@ -106,15 +105,15 @@
         </div>
       </div>
     </div>
-  </main-layout>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { Search } from '@element-plus/icons-vue';
-import MainLayout from '../components/layout/MainLayout.vue';
+// @ts-ignore
 import PostCard from '../components/forum/PostCard.vue';
+// @ts-ignore
 import Sidebar from '../components/layout/Sidebar.vue';
 import { usePostStore } from '../stores/postStore';
 import { getUserAvatarUrl } from '../utils/assets';

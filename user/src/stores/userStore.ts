@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { User } from '../types/forum'
+import type { User, ApiUserResponse, LoginResponse } from '../types/forum'
 import { authApi, userApi } from '../services/api'
 import { ErrorHandler } from '../utils/errorHandler'
 import { ERROR_MESSAGES } from '../constants'
@@ -16,8 +16,12 @@ export const useUserStore = defineStore('user', () => {
   const isAdmin = computed(() => currentUser.value?.isAdmin ?? currentUser.value?.is_admin ?? false)
   const isModerator = computed(() => currentUser.value?.isModerator ?? currentUser.value?.is_moderator ?? false)
 
-  // 数据映射函数：将API响应映射为前端User对象
-  const mapApiUserToUser = (apiUser: any): User => {
+  /**
+   * 数据映射函数：将API响应映射为前端User对象
+   * @param apiUser API返回的用户数据
+   * @returns 标准化的User对象
+   */
+  const mapApiUserToUser = (apiUser: ApiUserResponse): User => {
     return {
       // API文档标准字段
       id: apiUser.id,
@@ -36,7 +40,7 @@ export const useUserStore = defineStore('user', () => {
       isAdmin: apiUser.isAdmin ?? false,
       isModerator: apiUser.isModerator ?? false,
 
-      // SQL表字段（如果API返回）
+      // 管理相关字段
       moderatedCategory: apiUser.moderatedCategory,
       emailVerifiedAt: apiUser.emailVerifiedAt,
       phoneVerifiedAt: apiUser.phoneVerifiedAt,
@@ -46,20 +50,10 @@ export const useUserStore = defineStore('user', () => {
       createdAt: apiUser.createdAt,
       updatedAt: apiUser.updatedAt,
 
-      // 兼容旧字段名
-      created_at: apiUser.created_at || apiUser.createdAt,
-      updated_at: apiUser.updated_at || apiUser.updatedAt,
-      last_active_at: apiUser.last_active_at || apiUser.lastActiveAt,
-      post_count: apiUser.post_count || apiUser.postCount,
-      comment_count: apiUser.comment_count || apiUser.commentCount,
-      is_admin: apiUser.is_admin || apiUser.isAdmin,
-      is_moderator: apiUser.is_moderator || apiUser.isModerator,
-      show_email: apiUser.show_email || apiUser.showEmail,
-
       // 扩展字段
-      cover_image: apiUser.cover_image,
+      coverImage: apiUser.coverImage || apiUser.cover_image,
       skills: apiUser.skills || [],
-      social_links: apiUser.social_links || []
+      socialLinks: apiUser.socialLinks || apiUser.social_links || []
     }
   }
 
@@ -94,13 +88,19 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  // 手机验证码登录
-  async function loginWithPhone(phone: string, code: string, remember: boolean = false) {
+  /**
+   * 手机验证码登录
+   * @param phone 手机号码
+   * @param code 验证码
+   * @param remember 是否记住登录状态
+   * @returns Promise<boolean> 登录是否成功
+   */
+  async function loginWithPhone(phone: string, code: string, remember: boolean = false): Promise<boolean> {
     loading.value = true
     error.value = null
 
     try {
-      const response = await authApi.login('SMS', phone, code, remember)
+      const response: LoginResponse = await authApi.login('SMS', phone, code, remember)
 
       // 后端返回格式: { token, userContext }
       const { token: authToken, userContext } = response
@@ -124,15 +124,9 @@ export const useUserStore = defineStore('user', () => {
         commentCount: 0,
         isAdmin: userContext.isAdmin || false,
         isModerator: userContext.isModerator || false,
-        // 兼容字段（向后兼容）
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        last_active_at: new Date().toISOString(),
-        post_count: 0,
-        comment_count: 0,
-        is_admin: userContext.isAdmin || false,
-        is_moderator: userContext.isModerator || false,
-        show_email: false
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        lastActiveAt: new Date().toISOString()
       } as User
 
       // 保存到本地存储
@@ -155,13 +149,19 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  // 邮箱验证码登录
-  async function loginWithEmail(email: string, code: string, remember: boolean = false) {
+  /**
+   * 邮箱验证码登录
+   * @param email 邮箱地址
+   * @param code 验证码
+   * @param remember 是否记住登录状态
+   * @returns Promise<boolean> 登录是否成功
+   */
+  async function loginWithEmail(email: string, code: string, remember: boolean = false): Promise<boolean> {
     loading.value = true
     error.value = null
 
     try {
-      const response = await authApi.login('EMAIL', email, code, remember)
+      const response: LoginResponse = await authApi.login('EMAIL', email, code, remember)
 
       // 后端返回格式: { token, userContext }
       const { token: authToken, userContext } = response
@@ -184,15 +184,9 @@ export const useUserStore = defineStore('user', () => {
         commentCount: 0,
         isAdmin: userContext.isAdmin || false,
         isModerator: userContext.isModerator || false,
-        // 兼容字段（向后兼容）
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        last_active_at: new Date().toISOString(),
-        post_count: 0,
-        comment_count: 0,
-        is_admin: userContext.isAdmin || false,
-        is_moderator: userContext.isModerator || false,
-        show_email: false
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        lastActiveAt: new Date().toISOString()
       } as User
 
       // 保存到本地存储

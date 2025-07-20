@@ -1,8 +1,20 @@
-// 通用UI组件库
+/**
+ * 通用UI组件库
+ * 提供项目中使用的所有基础UI组件
+ */
+
+// 基础交互组件
 export { default as BaseButton } from './BaseButton.vue'
 export { default as BaseCard } from './BaseCard.vue'
+
+// 状态组件
 export { default as LoadingSpinner } from './LoadingSpinner.vue'
+export { default as BaseEmpty } from './BaseEmpty.vue'
+export { default as BaseError } from './BaseError.vue'
 export { default as SkeletonLoader } from './SkeletonLoader.vue'
+
+// 性能优化组件
+export { default as VirtualList } from './VirtualList.vue'
 
 // 组件类型定义
 export interface UIComponentProps {

@@ -1,6 +1,5 @@
 <template>
-  <main-layout>
-    <div class="notifications-page">
+  <div class="notifications-page">
       <div class="page-header">
         <h1 class="page-title">通知中心</h1>
         <div class="header-actions">
@@ -113,14 +112,12 @@
         </span>
       </template>
     </el-dialog>
-  </main-layout>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import MainLayout from '../components/layout/MainLayout.vue'
 import type { ForumNotification } from '../types/forum'
 
 // 使用ForumNotification类型

@@ -1,6 +1,5 @@
 <template>
-  <main-layout>
-    <div class="settings-page">
+  <div class="settings-page">
       <div class="page-header">
         <h1 class="page-title">账号设置</h1>
       </div>
@@ -213,14 +212,12 @@
         </el-tabs>
       </div>
     </div>
-  </main-layout>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, computed, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
-import MainLayout from '../components/layout/MainLayout.vue'
 import { useUserStore } from '../stores/userStore'
 import { getUserAvatarUrl } from '../utils/assets'
 

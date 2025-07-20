@@ -1,6 +1,5 @@
 <template>
-  <main-layout>
-    <div class="user-profile-page" v-loading="loading">
+  <div class="user-profile-page" v-loading="loading">
       <!-- 用户信息卡片 -->
       <div v-if="user" class="profile-container">
         <div class="profile-header">
@@ -355,15 +354,12 @@
         </span>
       </template>
     </el-dialog>
-  </main-layout>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElUpload } from 'element-plus'
-// @ts-ignore
-import MainLayout from '../components/layout/MainLayout.vue'
 // @ts-ignore
 import PostCard from '../components/forum/PostCard.vue'
 import { usePostStore } from '../stores/postStore'

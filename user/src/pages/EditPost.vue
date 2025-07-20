@@ -1,6 +1,5 @@
 <template>
-  <main-layout>
-    <div class="edit-post-page" v-loading="initialLoading">
+  <div class="edit-post-page" v-loading="initialLoading">
       <div class="page-header">
         <h1 class="page-title">编辑帖子</h1>
       </div>
@@ -83,7 +82,6 @@
         </div>
       </div>
     </div>
-  </main-layout>
 </template>
 
 <script setup lang="ts">
@@ -91,7 +89,6 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
-import MainLayout from '../components/layout/MainLayout.vue'
 import { usePostStore } from '../stores/postStore'
 import { useCategoryStore } from '../stores/categoryStore'
 import { useUserStore } from '../stores/userStore'

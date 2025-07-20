@@ -1,6 +1,5 @@
 <template>
-  <main-layout>
-    <div class="category-page">
+  <div class="category-page">
       <!-- 分类标题区域 -->
       <div v-if="category" class="category-header">
         <div class="category-icon">
@@ -157,15 +156,12 @@
         </div>
       </div>
     </div>
-  </main-layout>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-// @ts-ignore
-import MainLayout from '../components/layout/MainLayout.vue'
 // @ts-ignore
 import PostCard from '../components/forum/PostCard.vue'
 import { useCategoryStore } from '../stores/categoryStore'

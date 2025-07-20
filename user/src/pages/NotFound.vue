@@ -1,20 +1,17 @@
 <template>
-  <main-layout>
-    <div class="not-found-page">
-      <div class="not-found-content">
-        <h1 class="error-code">404</h1>
-        <h2 class="error-title">页面不存在</h2>
-        <p class="error-message">您访问的页面可能已被删除、移动或从未存在过</p>
-        <router-link to="/">
-          <el-button type="primary">返回首页</el-button>
-        </router-link>
-      </div>
+  <div class="not-found-page">
+    <div class="not-found-content">
+      <h1 class="error-code">404</h1>
+      <h2 class="error-title">页面不存在</h2>
+      <p class="error-message">您访问的页面可能已被删除、移动或从未存在过</p>
+      <router-link to="/">
+        <el-button type="primary">返回首页</el-button>
+      </router-link>
     </div>
-  </main-layout>
+  </div>
 </template>
 
 <script setup lang="ts">
-import MainLayout from '../components/layout/MainLayout.vue'
 </script>
 
 <style scoped>

@@ -1,6 +1,5 @@
 <template>
-  <main-layout>
-    <div class="about-container">
+  <div class="about-container">
       <div class="about-header animate-fade-in">
         <h1 class="about-title">关于 Lumen 论坛</h1>
         <p class="about-subtitle">分享知识，连接世界</p>
@@ -159,12 +158,10 @@
         </section>
       </div>
     </div>
-  </main-layout>
 </template>
 
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue';
-import MainLayout from '../components/layout/MainLayout.vue';
 
 // 数字计数器动画
 onMounted(() => {

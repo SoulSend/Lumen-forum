@@ -1,8 +1,16 @@
+/**
+ * API服务模块
+ * 提供与后端API交互的统一接口，包含请求拦截、响应处理、错误处理等功能
+ */
+
 import axios from 'axios'
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { API_CONFIG } from '@/constants'
 
-// 创建axios实例
+/**
+ * 创建axios实例
+ * 配置基础URL、请求头、超时时间等全局设置
+ */
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_CONFIG.BASE_URL,
   headers: {
@@ -63,29 +71,55 @@ apiClient.interceptors.response.use(
   }
 )
 
-// 封装GET请求
+/**
+ * 封装GET请求
+ * @template T 响应数据类型
+ * @param url 请求URL
+ * @param params 查询参数
+ * @param config axios配置选项
+ * @returns Promise<T> 响应数据
+ */
 export const get = <T = any>(url: string, params = {}, config: AxiosRequestConfig = {}): Promise<T> => {
   return apiClient
     .get(url, { params, ...config })
     .then((response: AxiosResponse<T>) => response.data)
 }
 
-
-// 封装POST请求
+/**
+ * 封装POST请求
+ * @template T 响应数据类型
+ * @param url 请求URL
+ * @param data 请求体数据
+ * @param config axios配置选项
+ * @returns Promise<T> 响应数据
+ */
 export const post = <T = any>(url: string, data = {}, config: AxiosRequestConfig = {}): Promise<T> => {
   return apiClient
     .post(url, data, config)
     .then((response: AxiosResponse<T>) => response.data)
 }
 
-// 封装PUT请求
+/**
+ * 封装PUT请求
+ * @template T 响应数据类型
+ * @param url 请求URL
+ * @param data 请求体数据
+ * @param config axios配置选项
+ * @returns Promise<T> 响应数据
+ */
 export const put = <T = any>(url: string, data = {}, config: AxiosRequestConfig = {}): Promise<T> => {
   return apiClient
     .put(url, data, config)
     .then((response: AxiosResponse<T>) => response.data)
 }
 
-// 封装DELETE请求
+/**
+ * 封装DELETE请求
+ * @template T 响应数据类型
+ * @param url 请求URL
+ * @param config axios配置选项
+ * @returns Promise<T> 响应数据
+ */
 export const del = <T = any>(url: string, config: AxiosRequestConfig = {}): Promise<T> => {
   return apiClient
     .delete(url, config)

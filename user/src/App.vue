@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useUserStore } from './stores/userStore'
+import MainLayout from './components/layout/MainLayout.vue'
 
 const userStore = useUserStore()
 
@@ -16,7 +17,9 @@ onMounted(async () => {
 </script>
 
 <template>
-  <router-view />
+  <MainLayout>
+    <router-view />
+  </MainLayout>
 </template>
 
 <style>

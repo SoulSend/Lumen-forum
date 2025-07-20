@@ -1,6 +1,5 @@
 <template>
-  <main-layout>
-    <div class="post-detail-page">
+  <div class="post-detail-page">
       <div class="container">
         <!-- 左侧内容区 -->
         <div class="content-main">
@@ -232,7 +231,6 @@
         </div>
       </div>
     </div>
-  </main-layout>
 </template>
 
 <script setup lang="ts">
@@ -240,8 +238,9 @@ import { ref, onMounted, reactive, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
-import MainLayout from '../components/layout/MainLayout.vue'
+// @ts-ignore
 import AuthRequired from '../components/common/AuthRequired.vue'
+// @ts-ignore
 import LoginPrompt from '../components/common/LoginPrompt.vue'
 import { usePostStore } from '../stores/postStore'
 // import { useCommentStore } from '../stores/commentStore' // 已删除：API文档中没有评论接口

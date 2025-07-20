@@ -1,6 +1,5 @@
 <template>
-  <main-layout>
-    <div class="home-page">
+  <div class="home-page">
       <!-- 顶部横幅 - 重新设计为更简洁的风格 -->
       <section class="forum-banner">
         <div class="banner-content">
@@ -257,15 +256,12 @@
         </div>
       </div>
     </div>
-  </main-layout>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-// @ts-ignore
-import MainLayout from '../components/layout/MainLayout.vue'
 // @ts-ignore
 import PostCard from '../components/forum/PostCard.vue'
 import { useCategoryStore } from '../stores/categoryStore'

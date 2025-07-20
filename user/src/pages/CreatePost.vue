@@ -1,6 +1,5 @@
 <template>
-  <main-layout>
-    <auth-required level="user" type="level" custom-message="您需要登录才能发布帖子">
+  <auth-required level="user" type="level" custom-message="您需要登录才能发布帖子">
       <div class="create-post-page">
         <div class="page-header">
           <h1 class="page-title">发布帖子</h1>
@@ -267,7 +266,7 @@
         草稿已自动保存
       </div>
     </transition>
-  </main-layout>
+  </auth-required>
 </template>
 
 <script setup lang="ts">
@@ -276,14 +275,15 @@ import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Edit, Document, Picture, DocumentCopy, Setting, Close, ArrowDown, Check, DocumentChecked } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import MainLayout from '../components/layout/MainLayout.vue'
 import { usePostStore } from '../stores/postStore'
 import { useCategoryStore } from '../stores/categoryStore'
 import type { Category, Tag } from '../types/forum'
 // 导入Quill编辑器
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
+// @ts-ignore
 import AuthRequired from '../components/common/AuthRequired.vue'
+// @ts-ignore
 import LoginPrompt from '../components/common/LoginPrompt.vue'
 
 const router = useRouter()
