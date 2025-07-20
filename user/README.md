@@ -290,7 +290,6 @@ user/                              # 项目根目录
     │
     ├── stores/                    # Pinia状态管理
     │   ├── categoryStore.ts       # 分类数据状态管理
-    │   ├── commentStore.ts        # 评论数据状态管理
     │   ├── postStore.ts           # 帖子数据状态管理
     │   └── userStore.ts           # 用户数据和认证状态管理
     │
@@ -373,8 +372,7 @@ user/                              # 项目根目录
 
 ### 状态管理
 - **src/stores/userStore.ts**: 用户状态管理，处理登录、注册和用户信息
-- **src/stores/postStore.ts**: 帖子状态管理，处理帖子的获取、创建和更新
-- **src/stores/commentStore.ts**: 评论状态管理，处理评论的获取和操作
+- **src/stores/postStore.ts**: 帖子状态管理，处理帖子的获取
 - **src/stores/categoryStore.ts**: 分类状态管理，处理分类数据的获取和缓存
 
 ### 工具和服务

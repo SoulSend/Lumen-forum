@@ -23,11 +23,14 @@ public class PostController {
 
     /**
      * 获取最新创建的帖子 也就是一般展示的帖子 根据创建时间排序
-     * @param pageQueryDTO
+     * @param
      * @return
      */
     @GetMapping
-    public Result<Page<PostVO>> getPosts(@RequestBody @Valid PageQueryDTO pageQueryDTO){
+    public Result<Page<PostVO>> getPosts(@RequestParam int page,@RequestParam int size){
+        PageQueryDTO pageQueryDTO=new PageQueryDTO();
+        pageQueryDTO.setPage(page);
+        pageQueryDTO.setSize(size);
         Page<PostPO> postPO=postService.getPosts(pageQueryDTO);
         Page<PostVO> res= PostMapper.INSTANCE.pagePostPOToPagePostVO(postPO);
         return  Result.success(res);
@@ -46,17 +49,25 @@ public class PostController {
     }
     /**
      * 获取对应用户id的文章列表
-     * @param pageQueryDTO
+     * @param
      * @return
      */
     @GetMapping("/user")
-    public Result<Page<PostVO>> getUsersPosts(@RequestBody @Valid PageQueryDTO pageQueryDTO){
+    public Result<Page<PostVO>> getUsersPosts(@RequestParam Long id,@RequestParam int page,@RequestParam int size){
+        PageQueryDTO pageQueryDTO=new PageQueryDTO();
+        pageQueryDTO.setId(id);
+        pageQueryDTO.setPage(page);
+        pageQueryDTO.setSize(size);
         Page<PostPO> postPO= postService.getUsersPosts(pageQueryDTO);
         Page<PostVO> res= PostMapper.INSTANCE.pagePostPOToPagePostVO(postPO);
         return  Result.success(res);
     }
     @GetMapping("/categories")
-    public Result<Page<PostVO>> getCategoriesPosts(@RequestBody @Valid PageQueryDTO pageQueryDTO){
+    public Result<Page<PostVO>> getCategoriesPosts(@RequestParam Long id,@RequestParam int page,@RequestParam int size){
+        PageQueryDTO pageQueryDTO=new PageQueryDTO();
+        pageQueryDTO.setId(id);
+        pageQueryDTO.setPage(page);
+        pageQueryDTO.setSize(size);
         Page<PostPO> postPO= postService.getCategoriesPosts(pageQueryDTO);
         Page<PostVO> res= PostMapper.INSTANCE.pagePostPOToPagePostVO(postPO);
         return  Result.success(res);
@@ -64,11 +75,14 @@ public class PostController {
 
     /**
      * 获取首页热门文章
-     * @param pageQueryDTO
+     * @param
      * @return
      */
     @GetMapping("/hot")
-    public Result<Page<PostVO>> getHotPosts(@RequestBody @Valid PageQueryDTO pageQueryDTO){
+    public Result<Page<PostVO>> getHotPosts(@RequestParam int page,@RequestParam int size){
+        PageQueryDTO pageQueryDTO=new PageQueryDTO();
+        pageQueryDTO.setPage(page);
+        pageQueryDTO.setSize(size);
         Page<PostPO> postPO= postService.getHotPosts(pageQueryDTO);
         Page<PostVO> res= PostMapper.INSTANCE.pagePostPOToPagePostVO(postPO);
         return  Result.success(res);
@@ -76,11 +90,14 @@ public class PostController {
 
     /**
      * 获取侧边栏的热门文章
-     * @param pageQueryDTO
+     * @param
      * @return
      */
     @GetMapping("/hot/side")
-    public Result<List<PostVO>> getHotSidePosts(@RequestBody @Valid PageQueryDTO pageQueryDTO){
+    public Result<List<PostVO>> getHotSidePosts(@RequestParam int page,@RequestParam int size){
+        PageQueryDTO pageQueryDTO=new PageQueryDTO();
+        pageQueryDTO.setPage(page);
+        pageQueryDTO.setSize(size);
         List<PostPO> postPO= postService.getHotSidePosts(pageQueryDTO);
         List<PostVO> res= PostMapper.INSTANCE.postListToPostVOList(postPO);
         return  Result.success(res);
@@ -88,11 +105,14 @@ public class PostController {
 
     /**
      * 获取首页推荐的文章
-     * @param pageQueryDTO
+     * @param
      * @return
      */
     @GetMapping("/recommended")
-    public Result<Page<PostVO>> getRecommendedPosts(@RequestBody @Valid PageQueryDTO pageQueryDTO){
+    public Result<Page<PostVO>> getRecommendedPosts(@RequestParam int page,@RequestParam int size){
+        PageQueryDTO pageQueryDTO=new PageQueryDTO();
+        pageQueryDTO.setPage(page);
+        pageQueryDTO.setSize(size);
         Page<PostPO> postPO= postService.getRecommendedPosts(pageQueryDTO);
         Page<PostVO> res= PostMapper.INSTANCE.pagePostPOToPagePostVO(postPO);
         return  Result.success(res);
@@ -100,11 +120,14 @@ public class PostController {
 
     /**
      * 获取首页轮播的推荐文章
-     * @param pageQueryDTO
+     * @param
      * @return
      */
     @GetMapping("/recommended/side")
-    public Result<List<PostVO>> getRecommendedSidePosts(@RequestBody @Valid PageQueryDTO pageQueryDTO){
+    public Result<List<PostVO>> getRecommendedSidePosts(@RequestParam int page,@RequestParam int size){
+        PageQueryDTO pageQueryDTO=new PageQueryDTO();
+        pageQueryDTO.setPage(page);
+        pageQueryDTO.setSize(size);
         List<PostPO> postPO= postService.getRecommendedSidePosts(pageQueryDTO);
         List<PostVO> res= PostMapper.INSTANCE.postListToPostVOList(postPO);
         return  Result.success(res);

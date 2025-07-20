@@ -11,16 +11,28 @@
                 <h1 class="post-title">{{ post.title }}</h1>
                 <div class="post-meta">
                   <div class="author-info">
-                    <router-link :to="{ name: 'userProfile', params: { id: post.user.id } }" class="author-link">
-                      <img :src="post.user.avatar || '/default-avatar.png'" :alt="post.user.username" class="author-avatar">
+                    <router-link
+                      v-if="post.user && post.user.id"
+                      :to="{ name: 'userProfile', params: { id: post.user.id } }"
+                      class="author-link"
+                    >
+                      <img :src="post.user?.avatar || '/src/assets/default-avatar.png'" :alt="post.user?.username || '用户'" class="author-avatar">
                       <span class="author-name">{{ post.user.username }}</span>
                     </router-link>
-                    <span class="post-time">{{ formatDate(post.created_at) }}</span>
+                    <div v-else class="author-link">
+                      <img src="/src/assets/default-avatar.png" alt="用户" class="author-avatar">
+                      <span class="author-name">未知用户</span>
+                    </div>
+                    <span class="post-time">{{ formatDate(post.createdAt || post.created_at) }}</span>
                   </div>
-                  <div class="category-tag">
-                    <router-link :to="{ name: 'category', params: { id: post.category.id } }">
+                  <div class="category-tag" v-if="post.category">
+                    <router-link
+                      v-if="post.category.id"
+                      :to="{ name: 'category', params: { id: post.category.id } }"
+                    >
                       {{ post.category.name }}
                     </router-link>
+                    <span v-else>{{ post.category.name || '未知分类' }}</span>
                   </div>
                 </div>
                 
@@ -176,7 +188,7 @@
                   {{ replyingTo ? '回复评论' : '发表评论' }}
                   <span v-if="replyingTo" class="replying-to">
                     回复给：{{ replyingTo.username }}
-                    <el-button type="text" @click="cancelReply" class="cancel-reply">
+                    <el-button link @click="cancelReply" class="cancel-reply">
                       <i class="icon-close"></i> 取消回复
                     </el-button>
                   </span>
@@ -231,7 +243,7 @@ import MainLayout from '../components/layout/MainLayout.vue'
 import AuthRequired from '../components/common/AuthRequired.vue'
 import LoginPrompt from '../components/common/LoginPrompt.vue'
 import { usePostStore } from '../stores/postStore'
-import { useCommentStore } from '../stores/commentStore'
+// import { useCommentStore } from '../stores/commentStore' // 已删除：API文档中没有评论接口
 import { useUserStore } from '../stores/userStore'
 // import { useBookmarkStore } from '../stores/bookmarkStore' // 🚧 收藏功能未完成，暂时注释
 import type { Post } from '../types/forum'
@@ -239,7 +251,7 @@ import type { Post } from '../types/forum'
 const route = useRoute()
 const router = useRouter()
 const postStore = usePostStore()
-const commentStore = useCommentStore()
+// const commentStore = useCommentStore() // 已删除：API文档中没有评论接口
 const userStore = useUserStore()
 // const bookmarkStore = useBookmarkStore() // 🚧 收藏功能未完成，暂时注释
 
@@ -255,7 +267,8 @@ const shareLink = ref('')
 // 判断当前用户是否为帖子作者
 const isCurrentUserAuthor = computed(() => {
   if (!post.value || !userStore.currentUser) return false
-  return post.value.user_id === userStore.currentUser.id
+  const postUserId = post.value.userId || post.value.user_id
+  return postUserId === userStore.currentUser.id
 })
 
 // 评论表单数据
@@ -291,7 +304,11 @@ const fetchPostDetail = async () => {
       
       // 模拟增加浏览量
       if (post.value) {
-        post.value.view_count += 1
+        if (post.value.viewCount !== undefined) {
+          post.value.viewCount += 1
+        } else if (post.value.view_count !== undefined) {
+          post.value.view_count += 1
+        }
       }
       
       // 模拟收藏数据
@@ -333,13 +350,23 @@ const handleLike = async () => {
   }
 
   // 🚧 暂时只做UI更新，等后端完成后替换为真实API调用
-  post.value.is_liked = !post.value.is_liked
+  if (post.value) {
+    post.value.is_liked = !post.value.is_liked
+  }
 
   if (post.value.is_liked) {
-    post.value.like_count++
+    if (post.value.likeCount !== undefined) {
+      post.value.likeCount++
+    } else if (post.value.like_count !== undefined) {
+      post.value.like_count++
+    }
     ElMessage.success('点赞成功')
   } else {
-    post.value.like_count--
+    if (post.value.likeCount !== undefined) {
+      post.value.likeCount--
+    } else if (post.value.like_count !== undefined) {
+      post.value.like_count--
+    }
     ElMessage.info('已取消点赞')
   }
 

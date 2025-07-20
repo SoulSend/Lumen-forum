@@ -7,7 +7,7 @@ CREATE TABLE users (
     email VARCHAR(100) UNIQUE COMMENT '邮箱地址',
     phone VARCHAR(20) UNIQUE COMMENT '手机号码',
     password_hash VARCHAR(255) COMMENT '密码哈希值',
-    avatar VARCHAR(255) DEFAULT '/default-avatar.png' COMMENT '头像URL',
+    avatar VARCHAR(255) COMMENT '头像URL',
     bio TEXT COMMENT '个人简介',
     website VARCHAR(255) COMMENT '个人网站',
     location VARCHAR(255) COMMENT '所在地',
@@ -28,12 +28,12 @@ CREATE TABLE users (
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
 ) COMMENT='用户表';
 -- 初始化用户表数据
-INSERT INTO users (username, email, phone, password_hash, avatar, bio, website, location, title, show_email, reputation, post_count, comment_count, is_admin, is_moderator, moderated_category, email_verified_at, phone_verified_at, last_active_at, remember_token, deleted)
+INSERT INTO users (username, email, phone, password_hash,  bio, website, location, title, show_email, reputation, post_count, comment_count, is_admin, is_moderator, moderated_category, email_verified_at, phone_verified_at, last_active_at, remember_token, deleted)
 VALUES
-    ('管理员', 'admin@example.com', '13800000000', 'hashed_password_admin', '/default-avatar.png', 'Site Administrator', 'http://example.com', 'Beijing', 'Admin', false, 1000, 50, 100, true, false, NULL, '2025-07-08 10:00:00', '2025-07-08 10:05:00', '2025-07-08 10:10:00', 'token_admin', false),
-    ('版主', 'moderator@example.com', '13900000000', 'hashed_password_moderator', '/default-avatar.png', 'Community Moderator', 'http://moderator.com', 'Shanghai', 'Moderator', false, 500, 30, 50, false, true, 1, '2025-07-08 11:00:00', '2025-07-08 11:05:00', '2025-07-08 11:10:00', 'token_moderator', false),
-    ('用户1', 'user1@example.com', '13700000000', 'hashed_password_user1', '/default-avatar.png', 'Just a regular user', 'http://user1.com', 'Guangzhou', 'User', false, 100, 10, 20, false, false, NULL, '2025-07-08 12:00:00', '2025-07-08 12:05:00', '2025-07-08 12:10:00', 'token_user1', false),
-    ('用户2', 'user2@example.com', '13600000000', 'hashed_password_user2', '/default-avatar.png', 'Another regular user', 'http://user2.com', 'Shenzhen', 'User', false, 150, 15, 25, false, false, NULL, '2025-07-08 13:00:00', '2025-07-08 13:05:00', '2025-07-08 13:10:00', 'token_user2', false);
+    ('管理员', 'admin@example.com', '13800000000', 'hashed_password_admin', 'Site Administrator', 'http://example.com', 'Beijing', 'Admin', false, 1000, 50, 100, true, false, NULL, '2025-07-08 10:00:00', '2025-07-08 10:05:00', '2025-07-08 10:10:00', 'token_admin', false),
+    ('版主', 'moderator@example.com', '13900000000', 'hashed_password_moderator', 'Community Moderator', 'http://moderator.com', 'Shanghai', 'Moderator', false, 500, 30, 50, false, true, 1, '2025-07-08 11:00:00', '2025-07-08 11:05:00', '2025-07-08 11:10:00', 'token_moderator', false),
+    ('用户1', 'user1@example.com', '13700000000', 'hashed_password_user1', 'Just a regular user', 'http://user1.com', 'Guangzhou', 'User', false, 100, 10, 20, false, false, NULL, '2025-07-08 12:00:00', '2025-07-08 12:05:00', '2025-07-08 12:10:00', 'token_user1', false),
+    ('用户2', 'user2@example.com', '13600000000', 'hashed_password_user2', 'Another regular user', 'http://user2.com', 'Shenzhen', 'User', false, 150, 15, 25, false, false, NULL, '2025-07-08 13:00:00', '2025-07-08 13:05:00', '2025-07-08 13:10:00', 'token_user2', false);
 
 -- 分类表
 CREATE TABLE categories (

@@ -12,15 +12,15 @@
             <div class="category-stats">
               <div class="stat-item">
                 <span class="material-icons-round">description</span>
-                <span>{{ category.post_count || 0 }} 帖子</span>
+                <span>{{ category.postCount || category.post_count || 0 }} 帖子</span>
               </div>
               <div class="stat-item">
                 <span class="material-icons-round">comment</span>
-                <span>{{ category.comment_count || 0 }} 评论</span>
+                <span>{{ category.commentCount || category.comment_count || 0 }} 评论</span>
               </div>
               <div class="stat-item">
                 <span class="material-icons-round">person</span>
-                <span>{{ category.follower_count || 0 }} 关注者</span>
+                <span>{{ category.followerCount || category.follower_count || 0 }} 关注者</span>
               </div>
             </div>
           </div>
@@ -45,9 +45,9 @@
           <div class="filter-bar">
             <div class="filter-options">
               <el-radio-group v-model="filterOption" size="small">
-                <el-radio-button label="all">全部</el-radio-button>
-                <el-radio-button label="featured">精华</el-radio-button>
-                <el-radio-button label="solved">已解决</el-radio-button>
+                <el-radio-button value="all">全部</el-radio-button>
+                <el-radio-button value="featured">精华</el-radio-button>
+                <el-radio-button value="solved">已解决</el-radio-button>
               </el-radio-group>
             </div>
             <div class="sort-options">
@@ -63,7 +63,7 @@
           
           <!-- 帖子列表 -->
           <div v-loading="loading" class="posts-container">
-            <div v-if="!loading && posts.length === 0" class="empty-state">
+            <div v-if="!loading && (!posts || posts.length === 0)" class="empty-state">
               <el-empty description="暂无帖子">
                 <template #description>
                   <p>该分类下暂无帖子</p>
@@ -108,7 +108,7 @@
                   <div v-html="category.rules"></div>
                 </div>
                 <div class="category-created">
-                  创建于 {{ formatDate(category?.created_at) }}
+                  创建于 {{ formatDate(category?.createdAt || category?.created_at) }}
                 </div>
               </div>
             </div>
@@ -164,10 +164,13 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+// @ts-ignore
 import MainLayout from '../components/layout/MainLayout.vue'
+// @ts-ignore
 import PostCard from '../components/forum/PostCard.vue'
 import { useCategoryStore } from '../stores/categoryStore'
 import { usePostStore } from '../stores/postStore'
+import { postApi } from '../services/api'
 import type { Category, Post } from '../types/forum'
 
 const route = useRoute()
@@ -256,20 +259,22 @@ const fetchCategory = async () => {
 // 获取帖子列表
 const fetchPosts = async () => {
   loading.value = true
-  const categoryId = route.params.id as string
-  
+  const categoryId = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
+
+  if (!categoryId) {
+    ElMessage.error('分类ID无效')
+    loading.value = false
+    return
+  }
+
   try {
-    const result = await postStore.fetchPosts({
-      category_id: categoryId,
-      page: currentPage.value,
-      per_page: pageSize.value,
-      filter: filterOption.value,
-      sort_by: sortOption.value
-    })
+    // 使用分类帖子API
+    const result = await postApi.getCategoryPosts(categoryId, currentPage.value, pageSize.value)
     
     if (result) {
-      posts.value = result.data
-      totalPosts.value = result.total || posts.value.length
+      // 根据API文档，返回的是分页数据结构
+      posts.value = result.content || result.data || []
+      totalPosts.value = result.totalElements || result.total || (posts.value ? posts.value.length : 0)
     }
   } catch (error) {
     console.error('Failed to fetch posts:', error)

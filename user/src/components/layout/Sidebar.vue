@@ -7,7 +7,7 @@
         <div v-for="(activity, index) in recentActivities.slice(0, 3)" :key="index" class="activity-item">
           <div class="activity-header">
             <router-link :to="{ name: 'userProfile', params: { id: activity.user.id } }" class="user-avatar-link">
-              <img :src="activity.user.avatar || '/default-avatar.png'" :alt="activity.user.username" class="activity-avatar">
+              <img :src="activity.user?.avatar || '/src/assets/default-avatar.png'" :alt="activity.user?.username || '用户'" class="activity-avatar">
             </router-link>
             <div class="activity-info">
               <div class="activity-content">

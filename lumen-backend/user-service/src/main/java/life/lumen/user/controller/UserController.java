@@ -58,11 +58,14 @@ public class UserController {
 
     /**
      * 获取活跃用户
-     * @param pageQueryDTO
+     * @param
      * @return
      */
     @GetMapping("/active")
-    public Result<List<UserVO>> getActiveUsers(@RequestBody @Valid PageQueryDTO  pageQueryDTO){
+    public Result<List<UserVO>> getActiveUsers(@RequestParam int page,@RequestParam int size){
+        PageQueryDTO pageQueryDTO=new PageQueryDTO();
+        pageQueryDTO.setPage(page);
+        pageQueryDTO.setSize(size);
         List<UserVO> res=userService.getActiveUsers(pageQueryDTO);
         return Result.success(res);
     }

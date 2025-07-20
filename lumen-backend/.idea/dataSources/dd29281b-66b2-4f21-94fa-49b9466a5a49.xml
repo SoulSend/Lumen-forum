@@ -1175,7 +1175,6 @@ content</ColNames>
     </column>
     <column id="337" parent="300" name="avatar">
       <Comment>头像URL</Comment>
-      <DefaultExpression>&apos;/default-avatar.png&apos;</DefaultExpression>
       <Position>6</Position>
       <StoredType>varchar(255)|0s</StoredType>
     </column>

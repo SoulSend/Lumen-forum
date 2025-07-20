@@ -7,14 +7,14 @@
           <!-- 通知过滤器 -->
           <div class="notification-filters">
             <el-radio-group v-model="activeFilter" size="small" @change="handleFilterChange">
-              <el-radio-button label="all">全部</el-radio-button>
-              <el-radio-button label="unread">
+              <el-radio-button value="all">全部</el-radio-button>
+              <el-radio-button value="unread">
                 未读
                 <el-badge v-if="unreadCount > 0" :value="unreadCount" class="unread-badge" />
               </el-radio-button>
-              <el-radio-button label="comment">评论</el-radio-button>
-              <el-radio-button label="like">点赞</el-radio-button>
-              <el-radio-button label="system">系统</el-radio-button>
+              <el-radio-button value="comment">评论</el-radio-button>
+              <el-radio-button value="like">点赞</el-radio-button>
+              <el-radio-button value="system">系统</el-radio-button>
             </el-radio-group>
           </div>
           
@@ -121,11 +121,24 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import MainLayout from '../components/layout/MainLayout.vue'
-import type { Notification } from '../types/forum'
+// import type { Notification } from '../types/forum' // 已删除：API文档中没有通知接口
+
+// 临时通知接口定义（API文档中没有通知接口，这里只是为了避免编译错误）
+interface TempNotification {
+  id: number
+  user_id: number
+  type: string
+  title?: string
+  content?: string
+  data: any
+  read_at: string | null
+  created_at: string
+  updated_at: string
+}
 
 const router = useRouter()
 
-const notifications = ref<Notification[]>([])
+const notifications = ref<TempNotification[]>([])
 const loading = ref(true)
 const markingAllAsRead = ref(false)
 const currentPage = ref(1)
@@ -134,7 +147,7 @@ const total = ref(0)
 const totalPages = ref(1)
 const activeFilter = ref('all')
 const deleteDialogVisible = ref(false)
-const notificationToDelete = ref<Notification | null>(null)
+const notificationToDelete = ref<TempNotification | null>(null)
 const deleting = ref(false)
 
 // 计算未读通知数量
@@ -159,7 +172,7 @@ const hasUnread = computed(() => {
 })
 
 // 获取通知图标
-const getNotificationIcon = (notification: Notification) => {
+const getNotificationIcon = (notification: TempNotification) => {
   switch (notification.type) {
     case 'comment':
       return 'comment'
@@ -175,12 +188,12 @@ const getNotificationIcon = (notification: Notification) => {
 }
 
 // 获取通知图标类名
-const getNotificationIconClass = (notification: Notification) => {
+const getNotificationIconClass = (notification: TempNotification) => {
   return `icon-bg ${notification.type}-icon`
 }
 
 // 格式化通知消息
-const formatNotificationMessage = (notification: Notification) => {
+const formatNotificationMessage = (notification: TempNotification) => {
   switch (notification.type) {
     case 'comment':
       return `<strong>${notification.data.user_name}</strong> 在您的帖子 <strong>${notification.data.post_title}</strong> 中发表了评论`
@@ -248,7 +261,7 @@ const fetchNotifications = async (page = 1, filter = 'all') => {
     await new Promise(resolve => setTimeout(resolve, 500))
     
     // 模拟数据
-    const mockData = [
+    const mockData: TempNotification[] = [
       {
         id: 1,
         user_id: 1,
@@ -346,7 +359,7 @@ const fetchNotifications = async (page = 1, filter = 'all') => {
 }
 
 // 处理通知点击事件
-const handleNotificationClick = async (notification: Notification) => {
+const handleNotificationClick = async (notification: TempNotification) => {
   // 标记已读
   if (!notification.read_at) {
     await markAsRead(notification)
@@ -374,7 +387,7 @@ const handleNotificationClick = async (notification: Notification) => {
 }
 
 // 标记单个通知为已读
-const markAsRead = async (notification: Notification) => {
+const markAsRead = async (notification: TempNotification) => {
   try {
     // 模拟API调用
     await new Promise(resolve => setTimeout(resolve, 200))

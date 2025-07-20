@@ -11,8 +11,55 @@ export const useUserStore = defineStore('user', () => {
 
   // 计算属性
   const isAuthenticated = computed(() => !!token.value)
-  const isAdmin = computed(() => currentUser.value?.is_admin ?? false)
-  const isModerator = computed(() => currentUser.value?.is_moderator ?? false)
+  const isAdmin = computed(() => currentUser.value?.isAdmin ?? currentUser.value?.is_admin ?? false)
+  const isModerator = computed(() => currentUser.value?.isModerator ?? currentUser.value?.is_moderator ?? false)
+
+  // 数据映射函数：将API响应映射为前端User对象
+  const mapApiUserToUser = (apiUser: any): User => {
+    return {
+      // API文档标准字段
+      id: apiUser.id,
+      username: apiUser.username,
+      email: apiUser.email,
+      phone: apiUser.phone,
+      avatar: apiUser.avatar || '/img/avatar-default.png',
+      bio: apiUser.bio || '',
+      website: apiUser.website || '',
+      location: apiUser.location || '',
+      title: apiUser.title || '',
+      showEmail: apiUser.showEmail ?? false,
+      reputation: apiUser.reputation ?? 0,
+      postCount: apiUser.postCount ?? 0,
+      commentCount: apiUser.commentCount ?? 0,
+      isAdmin: apiUser.isAdmin ?? false,
+      isModerator: apiUser.isModerator ?? false,
+
+      // SQL表字段（如果API返回）
+      moderatedCategory: apiUser.moderatedCategory,
+      emailVerifiedAt: apiUser.emailVerifiedAt,
+      phoneVerifiedAt: apiUser.phoneVerifiedAt,
+      lastActiveAt: apiUser.lastActiveAt,
+      rememberToken: apiUser.rememberToken,
+      deleted: apiUser.deleted,
+      createdAt: apiUser.createdAt,
+      updatedAt: apiUser.updatedAt,
+
+      // 兼容旧字段名
+      created_at: apiUser.created_at || apiUser.createdAt,
+      updated_at: apiUser.updated_at || apiUser.updatedAt,
+      last_active_at: apiUser.last_active_at || apiUser.lastActiveAt,
+      post_count: apiUser.post_count || apiUser.postCount,
+      comment_count: apiUser.comment_count || apiUser.commentCount,
+      is_admin: apiUser.is_admin || apiUser.isAdmin,
+      is_moderator: apiUser.is_moderator || apiUser.isModerator,
+      show_email: apiUser.show_email || apiUser.showEmail,
+
+      // 扩展字段
+      cover_image: apiUser.cover_image,
+      skills: apiUser.skills || [],
+      social_links: apiUser.social_links || []
+    }
+  }
 
   // 从本地存储初始化状态
   function initFromLocalStorage() {
@@ -57,6 +104,8 @@ export const useUserStore = defineStore('user', () => {
       const { token: authToken, userContext } = response
 
       token.value = authToken
+      // 根据API文档，登录时只返回基本的userContext信息
+      // 需要调用getCurrentUser获取完整用户信息
       currentUser.value = {
         id: userContext.userId,
         username: userContext.username,
@@ -64,14 +113,24 @@ export const useUserStore = defineStore('user', () => {
         email: '',
         phone: phone,
         bio: '',
+        website: '',
+        location: '',
+        title: '',
+        showEmail: false,
+        reputation: 0,
+        postCount: 0,
+        commentCount: 0,
+        isAdmin: userContext.isAdmin || false,
+        isModerator: userContext.isModerator || false,
+        // 兼容字段（向后兼容）
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        reputation: 0,
+        last_active_at: new Date().toISOString(),
         post_count: 0,
         comment_count: 0,
         is_admin: userContext.isAdmin || false,
         is_moderator: userContext.isModerator || false,
-        last_active_at: new Date().toISOString()
+        show_email: false
       } as User
 
       // 保存到本地存储
@@ -104,20 +163,32 @@ export const useUserStore = defineStore('user', () => {
       const { token: authToken, userContext } = response
 
       token.value = authToken
+      // 根据API文档，登录时只返回基本的userContext信息
+      // 需要调用getCurrentUser获取完整用户信息
       currentUser.value = {
         id: userContext.userId,
         username: userContext.username,
         avatar: userContext.avatar || '/img/avatar-default.png',
         email: email,
         bio: '',
+        website: '',
+        location: '',
+        title: '',
+        showEmail: false,
+        reputation: 0,
+        postCount: 0,
+        commentCount: 0,
+        isAdmin: userContext.isAdmin || false,
+        isModerator: userContext.isModerator || false,
+        // 兼容字段（向后兼容）
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        reputation: 0,
+        last_active_at: new Date().toISOString(),
         post_count: 0,
         comment_count: 0,
         is_admin: userContext.isAdmin || false,
         is_moderator: userContext.isModerator || false,
-        last_active_at: new Date().toISOString()
+        show_email: false
       } as User
 
       // 保存到本地存储
@@ -138,17 +209,7 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  // 直接设置用户信息（用于模拟登录）
-  async function login(userData: User & { token: string }) {
-    token.value = userData.token
-    currentUser.value = userData
-    
-    // 保存到本地存储
-    localStorage.setItem('token', userData.token)
-    localStorage.setItem('user', JSON.stringify(userData))
-    
-    return true
-  }
+
 
   // 登出方法
   async function logout() {
@@ -180,7 +241,8 @@ export const useUserStore = defineStore('user', () => {
     error.value = null
 
     try {
-      const user = await userApi.getCurrentUser()
+      const apiUser = await userApi.getCurrentUser()
+      const user = mapApiUserToUser(apiUser)
       currentUser.value = user
 
       // 更新本地存储中的用户信息
@@ -292,7 +354,6 @@ export const useUserStore = defineStore('user', () => {
     initFromLocalStorage,
     loginWithPhone,
     loginWithEmail,
-    login,
     logout,
     fetchCurrentUser,
     updateProfile,

@@ -65,9 +65,9 @@
               </h2>
               <div class="section-actions">
                 <el-radio-group v-model="selectedTimeFrame" size="small" class="time-filter">
-                  <el-radio-button label="day">今日</el-radio-button>
-                  <el-radio-button label="week">本周</el-radio-button>
-                  <el-radio-button label="month">本月</el-radio-button>
+                  <el-radio-button value="day">今日</el-radio-button>
+                  <el-radio-button value="week">本周</el-radio-button>
+                  <el-radio-button value="month">本月</el-radio-button>
                 </el-radio-group>
               </div>
             </div>
@@ -79,7 +79,7 @@
             </div>
             
             <!-- 空状态 -->
-            <div v-else-if="posts.length === 0" class="no-posts">
+            <div v-else-if="posts && posts.length === 0" class="no-posts">
               <el-empty description="暂无帖子" />
             </div>
             
@@ -88,7 +88,7 @@
               <post-card v-for="post in posts" :key="post.id" :post="post" class="animated-post-card" />
               
               <!-- 加载更多 -->
-              <div class="load-more" v-if="posts.length > 0">
+              <div class="load-more" v-if="posts && posts.length > 0">
                 <el-button 
                   type="primary"
                   :loading="loadingMore" 
@@ -123,44 +123,52 @@
             </div>
 
             <!-- 空状态 -->
-            <div v-else-if="featuredPosts.length === 0" class="no-content">
+            <div v-else-if="featuredPosts && featuredPosts.length === 0" class="no-content">
               <el-empty description="暂无推荐内容" />
             </div>
 
             <!-- 内容区域 -->
             <div v-else class="featured-grid">
-              <div class="featured-main" v-if="featuredPosts.length > 0">
+              <div class="featured-main" v-if="safeFeaturedPosts && safeFeaturedPosts.length > 0">
                 <div class="featured-card main-feature">
                   <div class="featured-image">
-                    <img :src="featuredPosts[0]?.image || '../assets/default-avatar.png'" :alt="featuredPosts[0]?.title">
+                    <img :src="safeFeaturedPosts[0]?.image || '../assets/default-avatar.png'" :alt="safeFeaturedPosts[0]?.title">
                   </div>
                   <div class="featured-content">
-                    <div class="featured-category">{{ featuredPosts[0]?.category?.name }}</div>
-                    <h3 class="featured-title">{{ featuredPosts[0]?.title }}</h3>
-                    <p class="featured-excerpt">{{ truncateText(featuredPosts[0]?.content, 120) }}</p>
+                    <div class="featured-category">{{ safeFeaturedPosts[0]?.category?.name }}</div>
+                    <h3 class="featured-title">{{ safeFeaturedPosts[0]?.title }}</h3>
+                    <p class="featured-excerpt">{{ truncateText(safeFeaturedPosts[0]?.content, 120) }}</p>
                     <div class="featured-meta">
                       <div class="featured-author">
-                        <img :src="featuredPosts[0]?.user?.avatar || '../assets/default-avatar.png'" :alt="featuredPosts[0]?.user?.username" class="author-avatar">
-                        <span class="author-name">{{ featuredPosts[0]?.user?.username }}</span>
+                        <img :src="getUserAvatar(safeFeaturedPosts[0]?.user)" :alt="getUserDisplayName(safeFeaturedPosts[0]?.user)" class="author-avatar">
+                        <span class="author-name">{{ getUserDisplayName(safeFeaturedPosts[0]?.user) }}</span>
                       </div>
-                      <div class="featured-date">{{ formatDate(featuredPosts[0]?.created_at) }}</div>
+                      <div class="featured-date">{{ formatDate(safeFeaturedPosts[0]?.createdAt || safeFeaturedPosts[0]?.created_at) }}</div>
                     </div>
-                    <router-link :to="{ name: 'postDetail', params: { id: featuredPosts[0]?.id } }" class="read-more-link">
+                    <router-link
+                      v-if="hasValidId(safeFeaturedPosts[0])"
+                      :to="{ name: 'postDetail', params: { id: safeFeaturedPosts[0].id } }"
+                      class="read-more-link"
+                    >
                       阅读全文 <i class="icon-arrow-right"></i>
                     </router-link>
                   </div>
                 </div>
               </div>
-              <div class="featured-side" v-if="featuredPosts.length > 1">
-                <div v-for="(post, index) in featuredPosts.slice(1, 4)" :key="post.id" class="featured-card side-feature">
+              <div class="featured-side" v-if="safeFeaturedPosts && safeFeaturedPosts.length > 1">
+                <div v-for="post in safeFeaturedPosts.slice(1, 4)" :key="post.id" class="featured-card side-feature">
                   <div class="side-feature-content">
                     <div class="featured-category small">{{ post.category?.name }}</div>
                     <h4 class="featured-title small">{{ post.title }}</h4>
                     <div class="featured-meta small">
-                      <span class="author-name">{{ post.user?.username }}</span>
-                      <span class="featured-date">{{ formatDate(post.created_at) }}</span>
+                      <span class="author-name">{{ getUserDisplayName(post.user) }}</span>
+                      <span class="featured-date">{{ formatDate(post.createdAt || post.created_at) }}</span>
                     </div>
-                    <router-link :to="{ name: 'postDetail', params: { id: post.id } }" class="read-more-link small">
+                    <router-link
+                      v-if="hasValidId(post)"
+                      :to="{ name: 'postDetail', params: { id: post.id } }"
+                      class="read-more-link small"
+                    >
                       阅读全文
                     </router-link>
                   </div>
@@ -193,27 +201,40 @@
             </div>
 
             <!-- 空状态 -->
-            <div v-else-if="lifeTipsArticles.length === 0" class="no-content">
+            <div v-else-if="lifeTipsArticles && lifeTipsArticles.length === 0" class="no-content">
               <el-empty description="暂无生活技巧内容" />
             </div>
 
             <!-- 内容区域 -->
             <div v-else class="life-tips-grid">
-              <div v-for="article in lifeTipsArticles" :key="article.id" class="life-tip-card card">
+              <div v-for="article in safeLifeTipsArticles" :key="article.id" class="life-tip-card card">
                 <div class="tip-card-image">
                   <img :src="article.image || '../assets/default-avatar.png'" :alt="article.title" class="tip-image">
                 </div>
                 <div class="tip-card-content">
-                  <router-link :to="{ name: 'postDetail', params: { id: article.id } }" class="tip-title-link">
+                  <router-link
+                    v-if="hasValidId(article)"
+                    :to="{ name: 'postDetail', params: { id: article.id } }"
+                    class="tip-title-link"
+                  >
                     <h3 class="tip-title">{{ article.title }}</h3>
                   </router-link>
+                  <h3 v-else class="tip-title">{{ article.title }}</h3>
                   <p class="tip-excerpt">{{ truncateText(article.content, 100) }}</p>
                   <div class="tip-meta">
                     <div class="tip-author">
-                      <router-link :to="{ name: 'userProfile', params: { id: article.user?.id } }" class="author-link">
-                        <img :src="article.user?.avatar || '../assets/default-avatar.png'" :alt="article.user?.username" class="author-avatar">
+                      <router-link
+                        v-if="article.user?.id"
+                        :to="{ name: 'userProfile', params: { id: article.user.id } }"
+                        class="author-link"
+                      >
+                        <img :src="article.user?.avatar || '/src/assets/default-avatar.png'" :alt="article.user?.username || '用户'" class="author-avatar">
                         <span class="author-name">{{ article.user?.username }}</span>
                       </router-link>
+                      <div v-else class="author-link">
+                        <img src="/src/assets/default-avatar.png" alt="用户" class="author-avatar">
+                        <span class="author-name">未知用户</span>
+                      </div>
                     </div>
                     <div class="tip-stats">
                       <span class="stat views">
@@ -240,18 +261,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, reactive, onMounted, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+// @ts-ignore
 import MainLayout from '../components/layout/MainLayout.vue'
+// @ts-ignore
 import PostCard from '../components/forum/PostCard.vue'
 import { useCategoryStore } from '../stores/categoryStore'
 import { usePostStore } from '../stores/postStore'
 // import { useStatsStore } from '../stores/statsStore' // 🚧 统计功能未完成，暂时注释
 import type { Category, Post } from '../types/forum'
 import { Search } from '@element-plus/icons-vue'
+// @ts-ignore
 import Sidebar from '../components/layout/Sidebar.vue'
 import { postApi } from '../services/api'
+import { safePost, safeUser, getUserDisplayName, getUserAvatar, hasValidId } from '../utils/dataValidation'
 
 const router = useRouter()
 const categoryStore = useCategoryStore()
@@ -286,12 +311,16 @@ const pagination = reactive({
 })
 
 // 推荐阅读帖子
-const featuredPosts = ref([])
+const featuredPosts = ref<Post[]>([])
 const featuredPostsLoading = ref(false)
 
 // 生活技巧文章
-const lifeTipsArticles = ref([])
+const lifeTipsArticles = ref<Post[]>([])
 const lifeTipsLoading = ref(false)
+
+// 安全的数据访问
+const safeFeaturedPosts = computed(() => featuredPosts.value.map(post => safePost(post)))
+const safeLifeTipsArticles = computed(() => lifeTipsArticles.value.map(post => safePost(post)))
 
 // 最新活动
 const recentActivities = ref([])
@@ -353,9 +382,9 @@ const fetchPosts = async (page = 1) => {
     console.error('Failed to fetch posts:', error)
     ElMessage.error('获取帖子失败')
 
-    // 使用模拟数据作为后备
+    // 确保在错误情况下 posts 是空数组而不是 undefined
     if (page === 1) {
-      posts.value = [] // 暂时使用空数组，避免类型错误
+      posts.value = []
       pagination.currentPage = 1
       pagination.totalPages = 5
       pagination.total = 50
@@ -370,8 +399,8 @@ const fetchPosts = async (page = 1) => {
 const fetchFeaturedPosts = async () => {
   featuredPostsLoading.value = true
   try {
-    const response = await postApi.getRecommendedPosts(0, 4)
-    featuredPosts.value = response?.content || []
+    const response = await postApi.getRecommendedPostsSide(0, 4)
+    featuredPosts.value = response || []
   } catch (error) {
     // API不可用时使用模拟数据
     featuredPosts.value = [

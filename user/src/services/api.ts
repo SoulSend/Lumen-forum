@@ -17,7 +17,7 @@ apiClient.interceptors.request.use(
     // 从localStorage或sessionStorage获取token并添加到请求头
     const token = localStorage.getItem('token') || sessionStorage.getItem('token')
     if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`
+      config.headers.Authorization = `${token}`
     }
     return config
   },
@@ -37,7 +37,7 @@ apiClient.interceptors.response.use(
       return { ...response, data }
     } else {
       // 业务错误，抛出异常
-      const error = new Error(message || '请求失败')
+      const error = new Error(message || '请求失败') as Error & { code: number }
       error.code = code
       throw error
     }
@@ -69,6 +69,7 @@ export const get = <T = any>(url: string, params = {}, config: AxiosRequestConfi
     .then((response: AxiosResponse<T>) => response.data)
 }
 
+
 // 封装POST请求
 export const post = <T = any>(url: string, data = {}, config: AxiosRequestConfig = {}): Promise<T> => {
   return apiClient
@@ -90,66 +91,62 @@ export const del = <T = any>(url: string, config: AxiosRequestConfig = {}): Prom
     .then((response: AxiosResponse<T>) => response.data)
 }
 
-// 分类API
+// 分类API - 根据API文档实现
 export const categoryApi = {
+  // 获取所有分类
   getCategories: () => get('/content/categories'),
+
+  // 获取指定分类
   getCategoryById: (id: string | number) => get(`/content/categories/${id}`),
 }
 
-// 用户API
+// 用户API - 根据API文档实现
 export const userApi = {
+  // 获取当前用户信息
   getCurrentUser: () => get('/users/me'),
+
+  // 获取指定用户信息
   getUserById: (id: string | number) => get(`/users/${id}`),
+
+  // 更新用户资料
   updateProfile: (data: any) => put('/users/profile', data),
-  getActiveUsers: (page = 0, size = 10) => get('/users/active', { id: -1, page, size }),
+
+  // 获取活跃用户列表 - 修正为使用查询参数
+  getActiveUsers: (page = 0, size = 10) => get('/users/active', { page, size }),
 }
 
-// 帖子API
+// 帖子API - 根据API文档实现
 export const postApi = {
-  // ✅ 已完成的API
-  getPosts: (page = 0, size = 10) => get('/content/posts', { id: -1, page, size }),
-  getPostById: (id: string | number) => get(`/content/posts/${id}`),
-  getUserPosts: (userId: string | number, page = 0, size = 10) => get('/content/posts/user', { id: userId, page, size }),
-  getCategoryPosts: (categoryId: string | number, page = 0, size = 10) => get('/content/posts/categories', { id: categoryId, page, size }),
-  getHotPosts: (page = 0, size = 10) => get('/content/posts/hot', { id: -1, page, size }),
-  getRecommendedPosts: (page = 0, size = 10) => get('/content/posts/recommended', { id: -1, page, size }),
+  // 获取帖子列表 (最新) - 修正为使用查询参数
+  getPosts: (page = 0, size = 10) => get('/content/posts', { page, size }),
 
-  // 🚧 未完成的API - 暂时注释
-  // getHotPostsSide: (page = 0, size = 5) => get('/content/posts/hot/side', { id: -1, page, size }),
-  // getRecommendedPostsSide: (page = 0, size = 5) => get('/content/posts/recommended/side', { id: -1, page, size }),
-  // createPost: (data: any) => post('/content/posts', data),
-  // updatePost: (id: string | number, data: any) => put(`/content/posts/${id}`, data),
-  // deletePost: (id: string | number) => del(`/content/posts/${id}`),
-  // likePost: (id: string | number) => post(`/content/posts/${id}/like`),
-  // bookmarkPost: (id: string | number) => post(`/content/posts/${id}/bookmark`),
+  // 获取帖子详情
+  getPostById: (id: string | number) => get(`/content/posts/${id}`),
+
+  // 获取用户的帖子列表 - 修正为使用查询参数
+  getUserPosts: (userId: string | number, page = 0, size = 10) =>
+    get('/content/posts/user', { id: userId, page, size }),
+
+  // 获取分类下的帖子列表 - 修正为使用查询参数
+  getCategoryPosts: (categoryId: string | number, page = 0, size = 10) =>
+    get('/content/posts/categories', { id: categoryId, page, size }),
+
+  // 获取热门帖子列表 - 修正为使用查询参数
+  getHotPosts: (page = 0, size = 10) => get('/content/posts/hot', { page, size }),
+
+  // 获取侧边栏热门帖子 - 修正为使用查询参数
+  getHotPostsSide: (page = 0, size = 5) => get('/content/posts/hot/side', { page, size }),
+
+  // 获取推荐帖子列表 - 修正为使用查询参数
+  getRecommendedPosts: (page = 0, size = 10) => get('/content/posts/recommended', { page, size }),
+
+  // 获取轮播推荐帖子 - 修正为使用查询参数
+  getRecommendedPostsSide: (page = 0, size = 5) => get('/content/posts/recommended/side', { page, size }),
 }
 
 
 
-// 🚧 评论API - 未完成，暂时注释
-// export const commentApi = {
-//   getPostComments: (postId: string | number, params = {}) => get(`/content/posts/${postId}/comments`, params),
-//   createComment: (postId: string | number, data: any) => post(`/content/posts/${postId}/comments`, data),
-//   updateComment: (id: string | number, data: any) => put(`/content/comments/${id}`, data),
-//   deleteComment: (id: string | number) => del(`/content/comments/${id}`),
-//   likeComment: (id: string | number) => post(`/content/comments/${id}/like`),
-//   markAsSolution: (id: string | number) => post(`/content/comments/${id}/solution`),
-// }
-
-// 🚧 标签API - 未完成，暂时注释
-// export const tagApi = {
-//   getTags: (params = {}) => get('/content/tags', params),
-//   searchTags: (query: string, limit = 10) => get('/content/tags/search', { query, limit }),
-//   getTagPosts: (id: string | number, params = {}) => get(`/content/tags/${id}/posts`, params),
-// }
-
-// 🚧 搜索API - 未完成，暂时注释
-// export const searchApi = {
-//   search: (params: any) => get('/content/search', params),
-//   advancedSearch: (params: any) => get('/content/search/advanced', params),
-// }
-
-// ✅ 认证API - 已完成
+// 认证API - 根据API文档实现
 export const authApi = {
   // 发送验证码
   sendCode: (loginType: 'EMAIL' | 'SMS', identifier: string) =>
@@ -163,74 +160,15 @@ export const authApi = {
   logout: () => post('/auth/logout'),
 }
 
-// 🚧 通知API - 未完成，暂时注释
-// export const notificationApi = {
-//   getNotifications: (params = {}) => get('/notifications', params),
-//   markAsRead: (id: string | number) => put(`/notifications/${id}/read`),
-//   markAllAsRead: () => put('/notifications/read-all'),
-//   deleteNotification: (id: string | number) => del(`/notifications/${id}`),
-//   getUnreadCount: () => get('/notifications/unread-count'),
-// }
 
-// 🚧 用户关系API - 未完成，暂时注释
-// export const relationshipApi = {
-//   followUser: (id: string | number) => post(`/users/${id}/follow`),
-//   getFollowing: (id: string | number, params = {}) => get(`/users/${id}/following`, params),
-//   getFollowers: (id: string | number, params = {}) => get(`/users/${id}/followers`, params),
-//   getFollowStatus: (id: string | number) => get(`/users/${id}/follow-status`),
-// }
-
-// 🚧 文件上传API - 未完成，暂时注释
-// export const fileApi = {
-//   uploadAvatar: (file: File) => {
-//     const formData = new FormData()
-//     formData.append('file', file)
-//     return post('/files/avatar', formData, {
-//       headers: { 'Content-Type': 'multipart/form-data' }
-//     })
-//   },
-//   uploadImage: (file: File, type = 'post') => {
-//     const formData = new FormData()
-//     formData.append('file', file)
-//     formData.append('type', type)
-//     return post('/files/images', formData, {
-//       headers: { 'Content-Type': 'multipart/form-data' }
-//     })
-//   },
-//   deleteFile: (filename: string) => del(`/files/${filename}`),
-// }
-
-// 🚧 统计API - 未完成，暂时注释
-// export const statsApi = {
-//   getForumStats: () => get('/stats/forum'),
-//   getUserStats: (id: string | number) => get(`/stats/users/${id}`),
-//   getTrendingStats: (params = {}) => get('/stats/trending', params),
-// }
-
-// 🚧 收藏API - 未完成，暂时注释
-// export const bookmarkApi = {
-//   getBookmarks: (params = {}) => get('/bookmarks', params),
-//   checkBookmark: (postId: string | number) => get(`/bookmarks/check/${postId}`),
-//   deleteBookmark: (id: string | number) => del(`/bookmarks/${id}`),
-// }
 
 export default {
   get,
   post,
   put,
   del,
-  // ✅ 已完成的API
   authApi,
-  categoryApi,
   userApi,
+  categoryApi,
   postApi,
-  // 🚧 未完成的API暂时注释
-  // commentApi,
-  // tagApi,
-  // searchApi,
-  // notificationApi,
-  // relationshipApi,
-  // fileApi,
-  // statsApi,
-  // bookmarkApi,
 }

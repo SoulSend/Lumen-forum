@@ -40,7 +40,6 @@ public class UserService {
                 newUser.setEmail(createUserDTO.getIdentifier());
             }
             newUser.setUsername("user_"+createUserDTO.getIdentifier());
-            newUser.setAvatar("/default-avatar.png");
             return userRepository.save(newUser);
         } catch (Exception e) {
             throw new CustomException(ErrorCode.SERVICE_CALL_ERROR);

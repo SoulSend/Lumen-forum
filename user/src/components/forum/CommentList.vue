@@ -24,22 +24,30 @@
       <div v-else class="comments-list">
         <div v-for="comment in hotComments" :key="comment.id" class="comment-item">
           <div class="comment-header">
-            <router-link :to="{ name: 'userProfile', params: { id: comment.user.id } }" class="user-link">
-              <img :src="comment.user.avatar || '/default-avatar.png'" :alt="comment.user.username" class="user-avatar">
+            <router-link
+              v-if="comment.user && comment.user.id"
+              :to="{ name: 'userProfile', params: { id: comment.user.id } }"
+              class="user-link"
+            >
+              <img :src="comment.user?.avatar || defaultAvatarUrl" :alt="comment.user?.username || '用户'" class="user-avatar">
               <span class="user-name">{{ comment.user.username }}</span>
             </router-link>
+            <div v-else class="user-link">
+              <img :src="defaultAvatarUrl" alt="用户" class="user-avatar">
+              <span class="user-name">未知用户</span>
+            </div>
             <span class="comment-time">{{ formatDate(comment.created_at) }}</span>
           </div>
           
           <div class="comment-content">
             <div 
               :class="['comment-text', {'expanded': expandedCommentTexts.includes(comment.id)}]"
-              :style="!expandedCommentTexts.includes(comment.id) && comment.content.length > 100 ? 'max-height: 80px;' : ''"
+              :style="!expandedCommentTexts.includes(comment.id) && comment.content && comment.content.length > 100 ? 'max-height: 80px;' : ''"
             >
               {{ comment.content }}
             </div>
-            <div 
-              v-if="comment.content.length > 100" 
+            <div
+              v-if="comment.content && comment.content.length > 100"
               class="expand-toggle"
               @click="toggleCommentText(comment.id)"
             >
@@ -113,22 +121,30 @@
         <div v-else class="drawer-comments-list">
           <div v-for="comment in comments" :key="comment.id" class="comment-item">
             <div class="comment-header">
-              <router-link :to="{ name: 'userProfile', params: { id: comment.user.id } }" class="user-link">
-                <img :src="comment.user.avatar || '/default-avatar.png'" :alt="comment.user.username" class="user-avatar">
+              <router-link
+                v-if="comment.user && comment.user.id"
+                :to="{ name: 'userProfile', params: { id: comment.user.id } }"
+                class="user-link"
+              >
+                <img :src="comment.user?.avatar || defaultAvatarUrl" :alt="comment.user?.username || '用户'" class="user-avatar">
                 <span class="user-name">{{ comment.user.username }}</span>
               </router-link>
+              <div v-else class="user-link">
+                <img :src="defaultAvatarUrl" alt="用户" class="user-avatar">
+                <span class="user-name">未知用户</span>
+              </div>
               <span class="comment-time">{{ formatDate(comment.created_at) }}</span>
             </div>
             
             <div class="comment-content drawer-comment-content">
               <div 
                 :class="['comment-text', {'expanded': expandedDrawerTexts.includes(comment.id)}]"
-                :style="!expandedDrawerTexts.includes(comment.id) && comment.content.length > 250 ? 'max-height: 120px;' : ''"
+                :style="!expandedDrawerTexts.includes(comment.id) && comment.content && comment.content.length > 250 ? 'max-height: 120px;' : ''"
               >
                 {{ comment.content }}
               </div>
-              <div 
-                v-if="comment.content.length > 250" 
+              <div
+                v-if="comment.content && comment.content.length > 250"
                 class="expand-toggle"
                 @click="toggleDrawerText(comment.id)"
               >
@@ -155,7 +171,7 @@
                 
                 <el-tooltip content="查看此评论的所有回复" placement="top" :hide-after="0" v-if="comment.replies && comment.replies.length > 0">
                   <el-button size="small" text @click="toggleReplies(comment.id)">
-                    <span class="material-icons-round">forum</span> {{ comment.replies.length }}
+                    <span class="material-icons-round">forum</span> {{ comment.replies?.length || 0 }}
                   </el-button>
                 </el-tooltip>
               </div>
@@ -164,9 +180,14 @@
             <div v-if="expandedComments.includes(comment.id) && comment.replies && comment.replies.length > 0" class="comment-replies">
               <div v-for="reply in comment.replies" :key="reply.id" class="reply-item">
                 <div class="reply-header">
-                  <router-link :to="{ name: 'userProfile', params: { id: reply.user.id } }" class="user-link">
+                  <router-link
+                    v-if="reply.user && reply.user.id"
+                    :to="{ name: 'userProfile', params: { id: reply.user.id } }"
+                    class="user-link"
+                  >
                     <span class="reply-username">{{ reply.user.username }}</span>
                   </router-link>
+                  <span v-else class="reply-username">未知用户</span>
                   <span class="reply-time">{{ formatDate(reply.created_at) }}</span>
                 </div>
                 <div class="reply-content">
@@ -204,10 +225,10 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElDrawer } from 'element-plus'
-import { useCommentStore } from '../../stores/commentStore'
 import type { Comment } from '../../types/forum'
 import { useUserStore } from '../../stores/userStore'
-import { commentApi } from '../../services/api'
+import defaultAvatarUrl from '../../assets/default-avatar.png?url'
+// import { commentApi } from '../../services/api' // 🚧 评论API未完成，暂时注释
 
 const props = defineProps<{
   postId: string | number
@@ -215,7 +236,6 @@ const props = defineProps<{
 
 const emit = defineEmits(['scrollToComments', 'scrollToCommentForm', 'replyToComment'])
 
-const commentStore = useCommentStore()
 const comments = ref<Comment[]>([])
 const loading = ref(true)
 const drawerVisible = ref(false)
@@ -242,153 +262,12 @@ const hotComments = computed(() => {
     .slice(0, displayCount);
 })
 
-// 获取评论列表
+// 获取评论列表 - API文档中没有评论接口，返回空数据
 const fetchComments = async () => {
   loading.value = true
   try {
-    const result = await commentStore.fetchPostComments(props.postId)
-    if (result) {
-      comments.value = result
-    } else {
-      // 添加测试评论数据
-      comments.value = [
-        {
-          id: 1,
-          content: '这篇文章写得非常详细，对我学习这个知识点很有帮助。我特别喜欢作者对于核心概念的解释方式，简单明了又不失深度。希望能看到更多类似的高质量内容！这篇文章写得非常详细，对我学习这个知识点很有帮助。我特别喜欢作者对于核心概念的解释方式，简单明了又不失深度。希望能看到更多类似的高质量内容！',
-          user_id: 1,
-          user: {
-            id: 1,
-            username: '技术探索者',
-            email: 'tech@example.com',
-            avatar: '',
-            bio: '热爱技术与分享',
-            created_at: '2023-02-15T12:30:00',
-            updated_at: '2023-08-20T18:45:00',
-            reputation: 280,
-            post_count: 15,
-            comment_count: 68,
-            is_admin: false,
-            is_moderator: false,
-            last_active_at: '2023-09-10T09:15:00'
-          },
-          post_id: Number(props.postId),
-          parent_id: null,
-          created_at: '2023-09-05T10:28:00',
-          updated_at: '2023-09-05T10:28:00',
-          like_count: 24,
-          is_solution: true,
-          replies: [
-            {
-              id: 3,
-              content: '非常同意你的观点，我也从这篇文章中获益良多！',
-              user_id: 3,
-              user: {
-                id: 3,
-                username: '学习达人',
-                email: 'learner@example.com',
-                avatar: '',
-                bio: '不断学习，不断成长',
-                created_at: '2023-01-10T08:20:00',
-                updated_at: '2023-08-15T14:30:00',
-                reputation: 156,
-                post_count: 8,
-                comment_count: 42,
-                is_admin: false,
-                is_moderator: false,
-                last_active_at: '2023-09-09T17:40:00'
-              },
-              post_id: Number(props.postId),
-              parent_id: 1,
-              created_at: '2023-09-05T15:42:00',
-              updated_at: '2023-09-05T15:42:00',
-              like_count: 7,
-              is_solution: false
-            }
-          ]
-        },
-        {
-          id: 2,
-          content: '我对文章中提到的第三点有一些疑问，是否可以进一步解释一下实现细节？特别是关于性能优化的部分，我在实际项目中遇到了类似的问题，但是作者提出的解决方案感觉不太适用于我的场景。',
-          user_id: 2,
-          user: {
-            id: 2,
-            username: '问题思考者',
-            email: 'thinker@example.com',
-            avatar: '',
-            bio: '善于发现问题，勇于解决问题',
-            created_at: '2023-03-05T09:15:00',
-            updated_at: '2023-07-18T11:20:00',
-            reputation: 178,
-            post_count: 12,
-            comment_count: 53,
-            is_admin: false,
-            is_moderator: false,
-            last_active_at: '2023-09-08T13:25:00'
-          },
-          post_id: Number(props.postId),
-          parent_id: null,
-          created_at: '2023-09-06T08:15:00',
-          updated_at: '2023-09-06T08:15:00',
-          like_count: 8,
-          is_solution: false,
-          replies: []
-        },
-        {
-          id: 4,
-          content: '这篇文章的思路清晰，但我认为还可以进一步探讨在实际生产环境中可能遇到的边界情况。例如，当数据量特别大时，这种方法是否还能保持良好的性能？',
-          user_id: 4,
-          user: {
-            id: 4,
-            username: '实践者',
-            email: 'practitioner@example.com',
-            avatar: '',
-            bio: '理论结合实践，知行合一',
-            created_at: '2023-04-12T14:25:00',
-            updated_at: '2023-08-05T16:30:00',
-            reputation: 215,
-            post_count: 18,
-            comment_count: 62,
-            is_admin: false,
-            is_moderator: false,
-            last_active_at: '2023-09-07T11:20:00'
-          },
-          post_id: Number(props.postId),
-          parent_id: null,
-          created_at: '2023-09-07T13:42:00',
-          updated_at: '2023-09-07T13:42:00',
-          like_count: 15,
-          is_solution: false,
-          replies: []
-        },
-        {
-          id: 5,
-          content: '文章提到的技术路线非常前沿，我已经在自己的项目中尝试了类似的方法，确实能够有效提高开发效率。不过，我想补充一点，在多人协作的环境中，代码规范和文档记录显得尤为重要。特别是在大型项目中，良好的代码组织和文档能够帮助团队成员更快理解和协作。我们团队在实践中发现，结合代码审查和自动化测试，可以进一步提高开发质量和效率。希望作者能在后续的文章中分享更多关于团队协作的最佳实践。',
-          user_id: 5,
-          user: {
-            id: 5,
-            username: '团队领导',
-            email: 'teamlead@example.com',
-            avatar: '',
-            bio: '专注团队协作与技术管理',
-            created_at: '2023-01-20T10:15:00',
-            updated_at: '2023-07-25T09:30:00',
-            reputation: 320,
-            post_count: 25,
-            comment_count: 78,
-            is_admin: false,
-            is_moderator: true,
-            last_active_at: '2023-09-06T15:45:00'
-          },
-          post_id: Number(props.postId),
-          parent_id: null,
-          created_at: '2023-09-08T09:18:00',
-          updated_at: '2023-09-08T09:18:00',
-          like_count: 19,
-          is_solution: false,
-          replies: []
-        }
-      ]
-    }
+    // API文档中没有评论相关接口，返回空数据
+    comments.value = []
   } catch (error) {
     console.error('Failed to fetch comments:', error)
   } finally {
@@ -470,13 +349,15 @@ const handleLike = async (commentId: number) => {
     if (commentIndex === -1) return
     
     const comment = comments.value[commentIndex]
-    const isLiked = comment.is_liked || false
-    
+    const isLiked = comment.is_liked || comment.isLiked || false
+
     // 更新UI状态
     comments.value[commentIndex] = {
       ...comment,
       is_liked: !isLiked,
-      like_count: isLiked ? comment.like_count - 1 : comment.like_count + 1
+      isLiked: !isLiked,
+      like_count: isLiked ? (comment.like_count || comment.likeCount || 0) - 1 : (comment.like_count || comment.likeCount || 0) + 1,
+      likeCount: isLiked ? (comment.like_count || comment.likeCount || 0) - 1 : (comment.like_count || comment.likeCount || 0) + 1
     }
     
     // 在实际项目中，应调用API来实现点赞/取消点赞
@@ -494,10 +375,13 @@ const handleLike = async (commentId: number) => {
     const commentIndex = comments.value.findIndex(c => c.id === commentId)
     if (commentIndex !== -1) {
       const comment = comments.value[commentIndex]
+      const isLiked = comment.is_liked || comment.isLiked || false
       comments.value[commentIndex] = {
         ...comment,
-        is_liked: !comment.is_liked,
-        like_count: comment.is_liked ? comment.like_count - 1 : comment.like_count + 1
+        is_liked: !isLiked,
+        isLiked: !isLiked,
+        like_count: isLiked ? (comment.like_count || comment.likeCount || 0) - 1 : (comment.like_count || comment.likeCount || 0) + 1,
+        likeCount: isLiked ? (comment.like_count || comment.likeCount || 0) - 1 : (comment.like_count || comment.likeCount || 0) + 1
       }
     }
   }
@@ -513,7 +397,7 @@ const handleReply = (commentId: number, replyToUserId?: number) => {
   const event = new CustomEvent('replyToComment', {
     detail: {
       commentId: commentId,
-      username: comment.user.username
+      username: comment.user?.username || '未知用户'
     }
   });
   window.dispatchEvent(event);

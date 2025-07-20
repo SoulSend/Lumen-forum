@@ -5,12 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8c4dc304-a7bf-4794-8f0b-38e820559f14" name="更改" comment="初步完成项目架构搭建，服务间通信，配置，完整的登录/登出流程，redis缓存，简单api">
+      <change beforePath="$PROJECT_DIR$/../user/API_INTEGRATION_SUMMARY.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/API_STATUS_CHECKLIST.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/api.md" beforeDir="false" afterPath="$PROJECT_DIR$/../user/api.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/src/components/forum/CommentList.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/components/forum/CommentList.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/src/components/forum/PostCard.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/components/forum/PostCard.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/src/components/layout/Header.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/components/layout/Header.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/src/components/layout/MainLayout.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/components/layout/MainLayout.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/src/components/layout/Sidebar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/components/layout/Sidebar.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/src/pages/CreatePost.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/pages/CreatePost.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../user/src/pages/Home.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/pages/Home.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../user/src/pages/PostDetail.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/pages/PostDetail.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/src/pages/Search.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/pages/Search.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/src/pages/UserProfile.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/pages/UserProfile.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../user/src/services/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/services/api.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../user/src/stores/categoryStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/stores/categoryStore.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../user/src/stores/commentStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/stores/commentStore.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../user/src/stores/postStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/stores/postStore.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -214,6 +222,8 @@
       <workItem from="1752686428495" duration="1001000" />
       <workItem from="1752757438859" duration="149000" />
       <workItem from="1752892365685" duration="5434000" />
+      <workItem from="1752941188095" duration="729000" />
+      <workItem from="1752990623982" duration="8307000" />
     </task>
     <task id="LOCAL-00001" summary="初步完成项目架构搭建，服务间通信，配置，完整的登录/登出流程，redis缓存，简单api">
       <option name="closed" value="true" />

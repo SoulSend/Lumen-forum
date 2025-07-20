@@ -597,11 +597,16 @@ const handleSubmit = async () => {
           ElMessage.success(message)
           
           if (postForm.save_draft) {
-            router.push({
-              name: 'userProfile',
-              params: { id: 'me' },
-              query: { tab: 'drafts' }
-            })
+            const currentUserId = userStore.currentUser?.id
+            if (currentUserId) {
+              router.push({
+                name: 'userProfile',
+                params: { id: currentUserId },
+                query: { tab: 'drafts' }
+              })
+            } else {
+              router.push({ name: 'home' })
+            }
           } else {
             router.push({
               name: 'postDetail',

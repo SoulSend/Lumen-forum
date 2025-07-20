@@ -4,82 +4,96 @@
       <div class="post-header">
         <!-- 帖子分类和置顶标记 -->
         <div class="category-wrapper">
-          <router-link 
-            :to="{ name: 'category', params: { id: post.category.id } }" 
+          <router-link
+            v-if="post.category && post.category.id"
+            :to="{ name: 'category', params: { id: post.category.id } }"
             class="category-badge font-rounded"
             @click.stop
           >
             {{ post.category.name }}
           </router-link>
-          <span v-if="post.is_pinned" class="pin-badge font-rounded">
+          <span v-if="post.isPinned || post.is_pinned" class="pin-badge font-rounded">
             <i class="icon-pin"></i>置顶
           </span>
-          <span v-if="post.is_solved" class="solved-badge font-rounded">
+          <span v-if="post.isSolved || post.is_solved" class="solved-badge font-rounded">
             <i class="icon-check"></i>已解决
           </span>
         </div>
         
         <!-- 帖子标题 -->
         <h3 class="post-title font-rounded letter-tight">
-          <router-link :to="{ name: 'postDetail', params: { id: post.id } }">
-            {{ post.title }}
+          <router-link
+            v-if="hasValidId(safePostData)"
+            :to="{ name: 'postDetail', params: { id: safePostData.id } }"
+          >
+            {{ safePostData.title }}
           </router-link>
+          <span v-else>{{ safePostData.title }}</span>
         </h3>
       </div>
 
       <!-- 帖子摘要 -->
-      <p class="post-excerpt">{{ truncateContent(post.content) }}</p>
+      <p class="post-excerpt">{{ truncateContent(safePostData.content) }}</p>
       
       <!-- 帖子标签 -->
-      <div class="post-tags" v-if="post.tags && post.tags.length">
-        <router-link 
-          v-for="tag in post.tags.slice(0, 3)" 
-          :key="tag.id" 
+      <div class="post-tags" v-if="safePostData.tags && safePostData.tags.length">
+        <router-link
+          v-for="tag in safePostData.tags.slice(0, 3)"
+          :key="tag.id"
           :to="{ name: 'search', query: { tag_id: tag.id } }"
           class="post-tag font-rounded"
           @click.stop
         >
           {{ tag.name }}
         </router-link>
-        <span v-if="post.tags.length > 3" class="more-tags">+{{ post.tags.length - 3 }}</span>
+        <span v-if="safePostData.tags.length > 3" class="more-tags">+{{ safePostData.tags.length - 3 }}</span>
       </div>
     </div>
     
     <div class="post-meta">
       <!-- 作者信息 -->
       <div class="author-info">
-        <router-link 
-          :to="{ name: 'userProfile', params: { id: post.user.id } }" 
+        <router-link
+          v-if="hasValidId(safeUserData)"
+          :to="{ name: 'userProfile', params: { id: safeUserData.id } }"
           class="author-link"
           @click.stop
         >
-          <img 
-            :src="post.user.avatar || '/default-avatar.png'" 
-            :alt="post.user.username" 
+          <img
+            :src="getUserAvatar(safeUserData)"
+            :alt="getUserDisplayName(safeUserData)"
             class="author-avatar"
           >
-          <span class="author-name font-rounded">{{ post.user.username }}</span>
+          <span class="author-name font-rounded">{{ getUserDisplayName(safeUserData) }}</span>
         </router-link>
+        <div v-else class="author-link">
+          <img
+            :src="getUserAvatar(null)"
+            :alt="getUserDisplayName(null)"
+            class="author-avatar"
+          >
+          <span class="author-name font-rounded">{{ getUserDisplayName(null) }}</span>
+        </div>
       </div>
       
       <!-- 时间和统计 -->
       <div class="post-stats">
         <span class="post-time">
-          <i class="icon-time"></i>{{ formatDate(post.created_at) }}
+          <i class="icon-time"></i>{{ formatDate(safePostData.createdAt || safePostData.created_at) }}
         </span>
         <span class="stat views">
-          <i class="icon-view"></i>{{ formatNumber(post.view_count) }}
+          <i class="icon-view"></i>{{ formatNumber(safeNumber(safePostData.viewCount)) }}
         </span>
         <span class="stat comments">
-          <i class="icon-comment"></i>{{ formatNumber(post.comment_count) }}
+          <i class="icon-comment"></i>{{ formatNumber(safeNumber(safePostData.commentCount)) }}
         </span>
         <span class="stat likes">
-          <i class="icon-like"></i>{{ formatNumber(post.like_count) }}
+          <i class="icon-like"></i>{{ formatNumber(safeNumber(safePostData.likeCount)) }}
         </span>
         <!-- 添加编辑按钮，仅当前用户是作者时显示 -->
-        <router-link 
-          v-if="isCurrentUserAuthor" 
-          :to="{ name: 'editPost', params: { id: post.id } }"
+        <router-link
+          v-if="isCurrentUserAuthor && hasValidId(safePostData)"
+          :to="{ name: 'editPost', params: { id: safePostData.id } }"
           class="edit-link"
           @click.stop
         >
@@ -96,6 +110,7 @@ import { defineProps, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../../stores/userStore'
 import type { Post } from '../../types/forum'
+import { safePost, safeUser, getUserDisplayName, getUserAvatar, safeNumber, hasValidId } from '../../utils/dataValidation'
 
 const props = defineProps<{
   post: Post
@@ -104,10 +119,15 @@ const props = defineProps<{
 const router = useRouter()
 const userStore = useUserStore()
 
+// 确保post数据的安全性
+const safePostData = computed(() => safePost(props.post))
+const safeUserData = computed(() => safeUser(props.post.user))
+
 // 判断当前用户是否为帖子作者
 const isCurrentUserAuthor = computed(() => {
   if (!userStore.currentUser) return false
-  return props.post.user_id === userStore.currentUser.id
+  const postUserId = safePostData.value.userId
+  return postUserId === userStore.currentUser.id && postUserId !== 0
 })
 
 // 截断内容，只显示前100个字符

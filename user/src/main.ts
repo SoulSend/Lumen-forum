@@ -4,6 +4,7 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+import { useUserStore } from '@/stores/userStore'
 
 import App from './App.vue'
 import router from './router'
@@ -24,12 +25,15 @@ registerPermissionDirectives(app)
 app.config.errorHandler = (err, instance, info) => {
   console.error('全局错误处理:', err, instance, info)
 }
-
 app.use(createPinia())
    .use(router)
    .use(ElementPlus, {
      locale: zhCn,
      size: 'default'
    })
+
+// 初始化/持久化用户状态
+const userStore = useUserStore()
+userStore.initFromLocalStorage()
 
 app.mount('#app')

@@ -80,9 +80,9 @@
               <div v-if="!searchQuery && searchHistory.length > 0" class="suggestion-section">
                 <h4 class="section-title">
                   <i class="icon-history"></i>最近搜索
-                  <el-button 
-                    type="text" 
-                    class="clear-button" 
+                  <el-button
+                    link
+                    class="clear-button"
                     @click.stop="clearSearchHistory"
                     @mousedown.prevent
                   >
@@ -99,9 +99,9 @@
                   >
                     <i class="icon-history-item"></i>
                     <span>{{ item }}</span>
-                    <el-button 
-                      type="text" 
-                      class="remove-button" 
+                    <el-button
+                      link
+                      class="remove-button"
                       @click.stop="removeHistoryItem(index)"
                       @mousedown.prevent
                     >

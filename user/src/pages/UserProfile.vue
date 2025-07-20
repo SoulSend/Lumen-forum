@@ -12,7 +12,7 @@
           </div>
           <div class="user-info-wrapper">
             <div class="avatar-container">
-              <img :src="user.avatar || '/default-avatar.png'" :alt="user.username" class="user-avatar">
+              <img :src="user?.avatar || '/src/assets/default-avatar.png'" :alt="user?.username || '用户'" class="user-avatar">
               <div v-if="isOnline" class="status-badge online"></div>
               <div v-if="isCurrentUser" class="avatar-edit-overlay" @click="openAvatarUpload">
                 <span class="material-icons-round">photo_camera</span>
@@ -23,10 +23,10 @@
             <div class="user-info">
               <div class="name-row">
                 <h1 class="user-name">{{ user.username }}</h1>
-                <div v-if="user.is_admin" class="role-badge admin">
+                <div v-if="user.isAdmin || user.is_admin" class="role-badge admin">
                   <span class="material-icons-round">verified</span> 管理员
                 </div>
-                <div v-else-if="user.is_moderator" class="role-badge moderator">
+                <div v-else-if="user.isModerator || user.is_moderator" class="role-badge moderator">
                   <span class="material-icons-round">shield</span> 版主
                 </div>
               </div>
@@ -34,11 +34,11 @@
               <div class="user-meta">
                 <div class="meta-item">
                   <span class="material-icons-round">calendar_today</span>
-                  <span>加入于 {{ formatDate(user.created_at) }}</span>
+                  <span>加入于 {{ formatDate(user.createdAt || user.created_at) }}</span>
                 </div>
                 <div class="meta-item">
                   <span class="material-icons-round">schedule</span>
-                  <span>最后活跃 {{ formatRelativeTime(user.last_active_at) }}</span>
+                  <span>最后活跃 {{ formatRelativeTime(user.lastActiveAt || user.last_active_at) }}</span>
                 </div>
               </div>
               
@@ -129,8 +129,8 @@
                     <h2 class="content-title">{{ user.username }} 的帖子</h2>
                     <div class="content-filters">
                       <el-radio-group v-model="postSortBy" size="small">
-                        <el-radio-button label="recent">最新</el-radio-button>
-                        <el-radio-button label="popular">热门</el-radio-button>
+                        <el-radio-button value="recent">最新</el-radio-button>
+                        <el-radio-button value="popular">热门</el-radio-button>
                       </el-radio-group>
                     </div>
                   </div>
@@ -140,7 +140,7 @@
                     <el-skeleton :rows="3" animated class="mt-4" />
                   </div>
                   
-                  <div v-else-if="posts.length === 0" class="empty-content">
+                  <div v-else-if="posts && posts.length === 0" class="empty-content">
                     <el-empty description="暂无帖子" :image-size="120">
                       <template #description>
                         <p>该用户尚未发布任何帖子</p>
@@ -304,7 +304,7 @@
         action="#"
         :auto-upload="false"
         :show-file-list="false"
-        :on-change="(file) => handleAvatarChange(file.raw as File)"
+        :on-change="handleAvatarUpload"
         accept="image/jpeg,image/png"
       >
         <el-button type="primary" plain>选择图片</el-button>
@@ -340,7 +340,7 @@
         action="#"
         :auto-upload="false"
         :show-file-list="false"
-        :on-change="(file) => handleCoverChange(file.raw as File)"
+        :on-change="handleCoverUpload"
         accept="image/jpeg,image/png"
       >
         <el-button type="primary" plain>选择图片</el-button>
@@ -362,10 +362,13 @@
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElUpload } from 'element-plus'
+// @ts-ignore
 import MainLayout from '../components/layout/MainLayout.vue'
+// @ts-ignore
 import PostCard from '../components/forum/PostCard.vue'
 import { usePostStore } from '../stores/postStore'
 import { useUserStore } from '../stores/userStore'
+import { postApi } from '../services/api'
 import type { Post, User } from '../types/forum'
 
 const route = useRoute()
@@ -608,14 +611,24 @@ const fetchUserProfile = async () => {
       email: 'user@example.com',
       avatar: '',
       bio: '这是一个示例用户资料，用于展示页面布局和设计。喜欢分享生活技巧和美食烹饪经验。',
+      showEmail: false,
+      reputation: 150,
+      postCount: 12,
+      commentCount: 45,
+      isAdmin: false,
+      isModerator: true,
+      // 兼容字段
       created_at: '2023-01-01T00:00:00Z',
       updated_at: '2023-01-01T00:00:00Z',
-      reputation: 150,
       post_count: 12,
       comment_count: 45,
       is_admin: false,
       is_moderator: true,
-      last_active_at: new Date().toISOString()
+      last_active_at: new Date().toISOString(),
+      // 新字段
+      createdAt: '2023-01-01T00:00:00Z',
+      updatedAt: '2023-01-01T00:00:00Z',
+      lastActiveAt: new Date().toISOString()
     }
     
     // 模拟关注者数量
@@ -646,19 +659,18 @@ const fetchUserPosts = async () => {
     // 模拟API调用延迟
     await new Promise(resolve => setTimeout(resolve, 300))
     
-    const result = await postStore.fetchPosts({
-      user_id: userId,
-      page: currentPage.value,
-      per_page: pageSize.value,
-      sort_by: postSortBy.value
-    })
+    // 使用正确的API调用获取用户帖子
+    const result = await postApi.getUserPosts(userId, currentPage.value, pageSize.value)
     
-    if (result) {
+    if (result && result.data) {
       posts.value = result.data
+    } else {
+      posts.value = []
     }
   } catch (error) {
     console.error('Failed to fetch user posts:', error)
     ElMessage.error('获取用户帖子失败')
+    posts.value = [] // 确保在错误情况下 posts 是空数组而不是 undefined
   } finally {
     postsLoading.value = false
   }
@@ -733,6 +745,13 @@ const openCoverUpload = () => {
   coverFile.value = null
 }
 
+// 处理头像上传包装函数
+const handleAvatarUpload = (file: any) => {
+  if (file && file.raw) {
+    handleAvatarChange(file.raw as File)
+  }
+}
+
 // 处理头像文件上传
 const handleAvatarChange = (file: File) => {
   if (!file) return
@@ -759,6 +778,13 @@ const handleAvatarChange = (file: File) => {
   }
   reader.readAsDataURL(file)
   return false // 阻止自动上传
+}
+
+// 处理封面上传包装函数
+const handleCoverUpload = (file: any) => {
+  if (file && file.raw) {
+    handleCoverChange(file.raw as File)
+  }
 }
 
 // 处理封面文件上传

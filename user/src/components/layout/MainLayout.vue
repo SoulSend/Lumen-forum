@@ -19,9 +19,12 @@
                 </div>
                 <ul v-else class="sidebar-menu">
                   <li v-for="category in categories" :key="category.id">
-                    <router-link :to="{ name: 'category', params: { id: category.id } }">
-                      <span class="material-icons-round menu-icon">{{ getCategoryIcon(category.name) }}</span>
-                      {{ category.name }}
+                    <router-link
+                      v-if="category.id"
+                      :to="{ name: 'category', params: { id: category.id } }"
+                    >
+                      <span class="material-icons-round menu-icon">{{ getCategoryIcon(category.name || '') }}</span>
+                      {{ category.name || '未知分类' }}
                     </router-link>
                   </li>
                 </ul>
@@ -475,10 +478,15 @@
                   <div v-else class="categories-list">
                     <div v-for="(category, index) in userActiveCategories" :key="index" class="category-item">
                       <div class="category-info">
-                        <router-link :to="{ name: 'category', params: { id: category.id } }" class="category-name">
-                          {{ category.name }}
+                        <router-link
+                          v-if="category.id"
+                          :to="{ name: 'category', params: { id: category.id } }"
+                          class="category-name"
+                        >
+                          {{ category.name || '未知分类' }}
                         </router-link>
-                        <div class="category-count">{{ category.post_count }} 帖子</div>
+                        <span v-else class="category-name">{{ category.name || '未知分类' }}</span>
+                        <div class="category-count">{{ (category.postCount || category.post_count || 0) }} 帖子</div>
                       </div>
                       <el-progress 
                         :percentage="calculateCategoryPercentage(category)" 
@@ -556,9 +564,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+// @ts-ignore
 import Header from './Header.vue'
+// @ts-ignore
 import Footer from './Footer.vue'
+// @ts-ignore
 import CommentList from '../forum/CommentList.vue'
+// @ts-ignore
 import LoginModal from '../common/LoginModal.vue'
 import { useCategoryStore } from '../../stores/categoryStore'
 import { useUserStore } from '../../stores/userStore'
@@ -723,8 +735,8 @@ const hotTopics = ref([])
 const fetchHotTopics = async () => {
   loading.value.hotTopics = true
   try {
-    const response = await postApi.getHotPosts(0, 5)
-    hotTopics.value = response?.content || []
+    const response = await postApi.getHotPostsSide(0, 5)
+    hotTopics.value = response || []
   } catch (error) {
     // API不可用时使用模拟数据
     hotTopics.value = [
@@ -744,8 +756,8 @@ const recommendedPosts = ref([])
 const fetchRecommendedPosts = async () => {
   loading.value.recommendedPosts = true
   try {
-    const response = await postApi.getRecommendedPosts(0, 3)
-    recommendedPosts.value = response?.content || []
+    const response = await postApi.getRecommendedPostsSide(0, 3)
+    recommendedPosts.value = response || []
   } catch (error) {
     // API不可用时使用模拟数据
     recommendedPosts.value = [
@@ -1009,7 +1021,9 @@ const formatUserActivity = (activity) => {
 
 // 计算分类百分比
 const calculateCategoryPercentage = (category) => {
-  return Math.round((category.post_count / category.total_posts) * 100)
+  const postCount = category.postCount || category.post_count || 0
+  const totalPosts = category.totalPosts || category.total_posts || 1
+  return Math.round((postCount / totalPosts) * 100)
 }
 
 // 获取分类颜色
@@ -1100,13 +1114,15 @@ onMounted(async () => {
   
   // 如果是用户详情页，获取用户数据
   if (isUserProfilePage.value) {
-    const userId = route.params.id
-    try {
-      const response = await userApi.getUserById(userId)
-      profileUser.value = response.data || null
-    } catch (error) {
-      // 记录错误信息，但不影响整体页面加载
-      console.error('获取用户数据失败:', error)
+    const userId = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
+    if (userId) {
+      try {
+        const response = await userApi.getUserById(Number(userId))
+        profileUser.value = response.data || null
+      } catch (error) {
+        // 记录错误信息，但不影响整体页面加载
+        console.error('获取用户数据失败:', error)
+      }
     }
   }
 })

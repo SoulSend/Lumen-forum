@@ -37,7 +37,7 @@
               <el-skeleton :rows="3" animated class="skeleton-card" />
             </div>
             
-            <div v-else-if="searchResults.length === 0" class="no-results card">
+            <div v-else-if="searchResults && searchResults.length === 0" class="no-results card">
               <el-empty description="未找到相关结果" />
               <div class="search-tips">
                 <h3>搜索建议：</h3>
@@ -59,7 +59,7 @@
               <template v-if="activeTab === 'all' || activeTab === 'users'">
                 <div v-for="user in userResults" :key="user.id" class="user-card card">
                   <router-link :to="{ name: 'userProfile', params: { id: user.id } }" class="user-link">
-                    <img :src="user.avatar || '/default-avatar.png'" :alt="user.username" class="user-avatar">
+                    <img :src="user?.avatar || '/src/assets/default-avatar.png'" :alt="user?.username || '用户'" class="user-avatar">
                     <div class="user-info">
                       <h3 class="user-name">{{ user.username }}</h3>
                       <p class="user-bio">{{ user.bio || '这个用户很懒，还没有填写个人简介' }}</p>

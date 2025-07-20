@@ -1,22 +1,44 @@
-// 用户相关类型
+// 用户相关类型 - 根据SQL表和API文档精确定义
 export interface User {
+  // 基础字段 - 与API文档完全一致
   id: number
   username: string
   email: string
+  phone?: string
   avatar: string
-  bio: string
-  created_at: string
-  updated_at: string
-  reputation: number
-  post_count: number
-  comment_count: number
-  is_admin: boolean
-  is_moderator: boolean
-  last_active_at: string
+  bio?: string
   website?: string
   location?: string
-  show_email?: boolean
   title?: string
+  showEmail: boolean
+  reputation: number
+  postCount: number
+  commentCount: number
+  isAdmin: boolean
+  isModerator: boolean
+
+  // SQL表中存在但API可能不返回的字段
+  moderatedCategory?: number
+  emailVerifiedAt?: string
+  phoneVerifiedAt?: string
+  lastActiveAt?: string
+  rememberToken?: string
+  deleted?: boolean
+  createdAt?: string
+  updatedAt?: string
+
+  // 兼容旧字段名（向后兼容，逐步移除）
+  created_at?: string
+  updated_at?: string
+  last_active_at?: string
+  post_count?: number
+  comment_count?: number
+  is_admin?: boolean
+  is_moderator?: boolean
+  show_email?: boolean
+
+  // 扩展字段（前端使用）
+  cover_image?: string
   skills?: UserSkill[]
   social_links?: SocialLink[]
 }
@@ -34,54 +56,106 @@ export interface SocialLink {
   url: string
 }
 
-// 帖子相关类型
+// 帖子相关类型 - 根据SQL表和API文档精确定义
 export interface Post {
+  // 基础字段 - 与API文档完全一致
   id: number
   title: string
   content: string
-  user_id: number
-  user: User
-  category_id: number
-  category: Category
-  created_at: string
-  updated_at: string
-  view_count: number
-  like_count: number
-  comment_count: number
-  is_pinned: boolean
-  is_featured: boolean
-  tags: Tag[]
-  is_solved: boolean
-  solution_comment_id: number | null
+  userId: number
+  categoryId: number
+  viewCount: number
+  likeCount: number
+  commentCount: number
+  isPinned: boolean
+  isFeatured: boolean
+  isSolved: boolean
+  isRecommended: boolean
+  solutionCommentId: number | null
+
+  // SQL表中存在但API可能不返回的字段
+  deleted?: boolean
+  createdAt?: string
+  updatedAt?: string
+
+  // 关联对象（前端扩展，可能通过JOIN查询获得）
+  user?: User
+  category?: Category
+  tags?: Tag[]
+
+  // 前端状态字段
+  is_liked?: boolean
+  is_bookmarked?: boolean
+
+  // 兼容旧字段名（向后兼容，逐步移除）
+  created_at?: string
+  updated_at?: string
+  user_id?: number
+  category_id?: number
+  view_count?: number
+  like_count?: number
+  comment_count?: number
+  is_pinned?: boolean
+  is_featured?: boolean
+  is_solved?: boolean
+  solution_comment_id?: number | null
+}
+
+// 分类相关类型 - 根据SQL表和API文档精确定义
+export interface Category {
+  // 基础字段 - 与API文档完全一致
+  id: number
+  name: string
+  description?: string
+  icon?: string
+  parent: Category | null
+  postCount: number
+  displayOrder: number
+
+  // SQL表中存在但API可能不返回的字段
+  deleted?: boolean
+  createdAt?: string
+  updatedAt?: string
+
+  // 前端扩展字段
+  children?: Category[]
+  slug?: string
+
+  // 兼容旧字段名（向后兼容，逐步移除）
+  created_at?: string
+  updated_at?: string
+  post_count?: number
+  parent_id?: number | null
 }
 
 // 评论相关类型
 export interface Comment {
   id: number
   content: string
-  user_id: number
-  user: User
-  post_id: number
-  parent_id: number | null
-  created_at: string
-  updated_at: string
-  like_count: number
-  is_solution: boolean
-  replies?: Comment[]
-}
+  userId: number
+  postId: number
+  parentId?: number
+  likeCount: number
+  replyCount: number
+  isLiked?: boolean
+  deleted?: boolean
+  createdAt?: string
+  updatedAt?: string
 
-// 分类相关类型
-export interface Category {
-  id: number
-  name: string
-  description: string
-  icon: string
-  slug: string
-  post_count: number
-  parent_id: number | null
-  children?: Category[]
-  created_at: string
-  updated_at: string
+  // 关联对象
+  user?: User
+  post?: Post
+  replies?: Comment[]
+
+  // 兼容旧字段名
+  created_at?: string
+  updated_at?: string
+  user_id?: number
+  post_id?: number
+  parent_id?: number
+  like_count?: number
+  reply_count?: number
+  is_liked?: boolean
 }
 
 // 标签相关类型
@@ -95,80 +169,15 @@ export interface Tag {
   updated_at: string
 }
 
-// 通知相关类型
-export interface Notification {
-  id: number
-  user_id: number
-  type: string
-  data: any
-  read_at: string | null
-  created_at: string
-  updated_at: string
-}
-
-// 分页相关类型
-export interface Pagination {
-  current_page: number
-  last_page: number
-  per_page: number
-  total: number
-}
-
-// 分页响应结构
+// 分页响应结构 - 根据API文档定义
 export interface PaginatedResponse<T> {
-  data: T[]
-  meta: Pagination
+  content: T[]
+  pageable: {
+    pageNumber: number
+    pageSize: number
+  }
+  totalElements: number
+  totalPages: number
+  first: boolean
+  last: boolean
 }
-
-// API响应基本结构
-export interface ApiResponse<T = any> {
-  success: boolean
-  message?: string
-  data?: T
-  errors?: Record<string, string[]>
-}
-
-// 登录请求参数
-export interface LoginRequest {
-  email?: string
-  phone?: string
-  code: string
-  remember_me?: boolean
-}
-
-// 创建帖子请求参数
-export interface CreatePostRequest {
-  title: string
-  content: string
-  category_id: number
-  tags?: number[]
-}
-
-// 创建评论请求参数
-export interface CreateCommentRequest {
-  content: string
-  post_id: number
-  parent_id?: number
-}
-
-// 用户设置请求参数
-export interface UpdateUserSettingsRequest {
-  username?: string
-  email?: string
-  bio?: string
-  avatar?: File | null
-  current_password?: string
-  new_password?: string
-  new_password_confirmation?: string
-}
-
-// 搜索请求参数
-export interface SearchRequest {
-  query: string
-  category_id?: number
-  tag_id?: number
-  sort_by?: 'latest' | 'oldest' | 'most_liked' | 'most_commented'
-  user_id?: number
-  page?: number
-  per_page?: number
-} 
