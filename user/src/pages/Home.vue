@@ -266,6 +266,7 @@ import { ElMessage } from 'element-plus'
 import PostCard from '../components/forum/PostCard.vue'
 import { useCategoryStore } from '../stores/categoryStore'
 import { usePostStore } from '../stores/postStore'
+import { useGlobalDataStore } from '../stores/globalDataStore'
 // import { useStatsStore } from '../stores/statsStore' // 🚧 统计功能未完成，暂时注释
 import type { Category, Post } from '../types/forum'
 import { Search } from '@element-plus/icons-vue'
@@ -280,6 +281,7 @@ import { getUserAvatarUrl } from '../utils/assets'
 const router = useRouter()
 const categoryStore = useCategoryStore()
 const postStore = usePostStore()
+const globalDataStore = useGlobalDataStore()
 // const statsStore = useStatsStore() // 🚧 统计功能未完成，暂时注释
 
 // 搜索
@@ -292,9 +294,9 @@ const communityStats = reactive({
   solutions: 0
 })
 
-// 分类相关
-const categories = ref<Category[]>([])
-const categoryLoading = ref(false)
+// 使用全局数据store中的分类数据
+const categories = computed(() => globalDataStore.categories)
+const categoryLoading = computed(() => globalDataStore.categoriesLoading)
 const selectedCategory = ref('all')
 
 // 帖子相关
@@ -335,17 +337,9 @@ const handleSearch = () => {
   }
 }
 
-// 获取分类列表
+// 获取分类列表（使用全局store）
 const fetchCategories = async () => {
-  categoryLoading.value = true
-  try {
-    const result = await categoryStore.fetchCategories()
-    if (result) {
-      categories.value = result
-    }
-  } finally {
-    categoryLoading.value = false
-  }
+  await globalDataStore.fetchCategories()
 }
 
 // 获取热门帖子
@@ -459,33 +453,61 @@ const fetchLifeTipsArticles = async () => {
         id: 1,
         title: '厨房收纳的5个小技巧',
         content: '让你的厨房空间利用率翻倍...',
+        userId: 1,
+        categoryId: 1,
         viewCount: 856,
         likeCount: 45,
-        commentCount: 12
+        commentCount: 12,
+        isPinned: false,
+        isFeatured: false,
+        isSolved: false,
+        isRecommended: false,
+        solutionCommentId: null
       },
       {
         id: 2,
         title: '衣物保养实用指南',
         content: '延长衣物寿命的小窍门...',
+        userId: 1,
+        categoryId: 1,
         viewCount: 723,
         likeCount: 38,
-        commentCount: 9
+        commentCount: 9,
+        isPinned: false,
+        isFeatured: false,
+        isSolved: false,
+        isRecommended: false,
+        solutionCommentId: null
       },
       {
         id: 3,
         title: '家居清洁的高效方法',
         content: '省时省力的清洁技巧分享...',
+        userId: 1,
+        categoryId: 1,
         viewCount: 645,
         likeCount: 32,
-        commentCount: 7
+        commentCount: 7,
+        isPinned: false,
+        isFeatured: false,
+        isSolved: false,
+        isRecommended: false,
+        solutionCommentId: null
       },
       {
         id: 4,
         title: '节能环保生活小贴士',
         content: '从小事做起，保护我们的地球...',
+        userId: 1,
+        categoryId: 1,
         viewCount: 567,
         likeCount: 28,
-        commentCount: 6
+        commentCount: 6,
+        isPinned: false,
+        isFeatured: false,
+        isSolved: false,
+        isRecommended: false,
+        solutionCommentId: null
       }
     ]
   } finally {
@@ -521,8 +543,12 @@ const getCategoryIcon = (category: Category) => {
 }
 
 // 生命周期钩子
-onMounted(() => {
-  fetchCategories()
+onMounted(async () => {
+  // 确保全局数据已初始化（如果还没有的话）
+  if (!globalDataStore.categoriesLoaded) {
+    await fetchCategories()
+  }
+
   fetchPosts()
   fetchFeaturedPosts()
   fetchCommunityStats()

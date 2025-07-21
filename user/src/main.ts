@@ -40,8 +40,4 @@ app.use(createPinia())
      size: 'default'
    })
 
-// 初始化/持久化用户状态
-const userStore = useUserStore()
-userStore.initFromLocalStorage()
-
 app.mount('#app')

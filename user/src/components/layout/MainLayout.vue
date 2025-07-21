@@ -13,7 +13,7 @@
                   <span class="material-icons-round">category</span>
                   分类导航
                 </h3>
-                <div v-if="loading.categories" class="sidebar-loading">
+                <div v-if="categoriesLoading" class="sidebar-loading">
                   <span class="material-icons-round loading-icon">sync</span>
                   <span>加载中...</span>
                 </div>
@@ -36,7 +36,7 @@
                   <span class="material-icons-round">local_fire_department</span>
                   热门话题
                 </h3>
-                <div v-if="loading.popularTags" class="sidebar-loading">
+                <div v-if="false" class="sidebar-loading">
                   <span class="material-icons-round loading-icon">sync</span>
                   <span>加载中...</span>
                 </div>
@@ -58,7 +58,7 @@
                   <span class="material-icons-round">analytics</span>
                   社区统计
                 </h3>
-                <div v-if="loading.stats" class="sidebar-loading">
+                <div v-if="globalDataStore.forumStatsLoading" class="sidebar-loading">
                   <span class="material-icons-round loading-icon">sync</span>
                   <span>加载中...</span>
                 </div>
@@ -68,21 +68,21 @@
                       <span class="material-icons-round stat-icon">people</span>
                       <span class="stat-label">用户</span>
                     </div>
-                    <span class="stat-value font-rounded">{{ stats.users }}</span>
+                    <span class="stat-value font-rounded">{{ forumStats.users }}</span>
                   </div>
                   <div class="stat-item">
                     <div class="stat-icon-wrapper">
                       <span class="material-icons-round stat-icon">article</span>
                       <span class="stat-label">帖子</span>
                     </div>
-                    <span class="stat-value font-rounded">{{ stats.posts }}</span>
+                    <span class="stat-value font-rounded">{{ forumStats.posts }}</span>
                   </div>
                   <div class="stat-item">
                     <div class="stat-icon-wrapper">
                       <span class="material-icons-round stat-icon">comment</span>
                       <span class="stat-label">评论</span>
                     </div>
-                    <span class="stat-value font-rounded">{{ stats.comments }}</span>
+                    <span class="stat-value font-rounded">{{ forumStats.comments }}</span>
                   </div>
                 </div>
               </div>
@@ -103,7 +103,7 @@
                   <span class="material-icons-round">group</span>
                   活跃用户
                 </h3>
-                <div v-if="loading.activeUsers" class="sidebar-loading">
+                <div v-if="globalDataStore.activeUsersLoading" class="sidebar-loading">
                   <span class="material-icons-round loading-icon">sync</span>
                   <span>加载中...</span>
                 </div>
@@ -126,7 +126,7 @@
                   <span class="material-icons-round">trending_up</span>
                   热门话题
                 </h3>
-                <div v-if="loading.hotTopics" class="sidebar-loading">
+                <div v-if="globalDataStore.hotTopicsLoading" class="sidebar-loading">
                   <span class="material-icons-round loading-icon">sync</span>
                   <span>加载中...</span>
                 </div>
@@ -158,7 +158,7 @@
                   <span class="material-icons-round">bookmark</span>
                   推荐阅读
                 </h3>
-                <div v-if="loading.recommendedPosts" class="sidebar-loading">
+                <div v-if="globalDataStore.recommendedPostsLoading" class="sidebar-loading">
                   <span class="material-icons-round loading-icon">sync</span>
                   <span>加载中...</span>
                 </div>
@@ -196,7 +196,7 @@
                   <span class="material-icons-round">history</span>
                   最近活动
                 </h3>
-                <div v-if="loading.recentActivities" class="sidebar-loading">
+                <div v-if="recentActivitiesLoading" class="sidebar-loading">
                   <span class="material-icons-round loading-icon">sync</span>
                   <span>加载中...</span>
                 </div>
@@ -285,15 +285,15 @@
                 </h3>
                 <div class="data-grid">
                   <div class="data-item">
-                    <div class="data-value">{{ stats.users }}</div>
+                    <div class="data-value">{{ forumStats.users }}</div>
                     <div class="data-label">注册用户</div>
                   </div>
                   <div class="data-item">
-                    <div class="data-value">{{ stats.posts }}</div>
+                    <div class="data-value">{{ forumStats.posts }}</div>
                     <div class="data-label">发布帖子</div>
                   </div>
                   <div class="data-item">
-                    <div class="data-value">{{ stats.comments }}</div>
+                    <div class="data-value">{{ forumStats.comments }}</div>
                     <div class="data-label">回复评论</div>
                   </div>
                   <div class="data-item">
@@ -575,11 +575,13 @@ import CommentList from '../forum/CommentList.vue'
 import LoginModal from '../common/LoginModal.vue'
 import { useCategoryStore } from '../../stores/categoryStore'
 import { useUserStore } from '../../stores/userStore'
-import { categoryApi, userApi, postApi } from '../../services/api'
+import { useGlobalDataStore } from '../../stores/globalDataStore'
+import { userApi } from '../../services/api'
 import { formatNumber, formatRelativeTime, formatDate } from '../../utils/format'
 
 const categoryStore = useCategoryStore()
 const userStore = useUserStore()
+const globalDataStore = useGlobalDataStore()
 const route = useRoute()
 const showLoginModal = ref(false)
 
@@ -629,80 +631,16 @@ const isCurrentUserProfile = computed(() => {
   return userStore.currentUser && profileUser.value && userStore.currentUser.id === profileUser.value.id
 })
 
-// API数据
-const loading = ref({
-  categories: false,
-  popularTags: false,
-  stats: false,
-  activeUsers: false,
-  recentActivities: false,
-  hotTopics: false,
-  recommendedPosts: false
-})
+// 使用全局数据store中的数据
+const categories = computed(() => globalDataStore.categories)
+const categoriesLoading = computed(() => globalDataStore.categoriesLoading)
+const popularTags = computed(() => globalDataStore.popularTags)
+const forumStats = computed(() => globalDataStore.forumStats)
+const activeUsers = computed(() => globalDataStore.activeUsers)
+const hotTopics = computed(() => globalDataStore.hotTopics)
+const recommendedPosts = computed(() => globalDataStore.recommendedPosts)
 
-// 分类数据
-const categories = ref([])
-const fetchCategories = async () => {
-  loading.value.categories = true
-  try {
-    const response = await categoryApi.getCategories()
-    categories.value = response || []
-  } catch (error) {
-    // 获取分类列表失败
-  } finally {
-    loading.value.categories = false
-  }
-}
 
-// 热门标签
-const popularTags = ref([
-  { name: '生活技巧', count: 156 },
-  { name: '美食推荐', count: 89 },
-  { name: '户外探险', count: 67 },
-  { name: '职场经验', count: 45 },
-  { name: '装修攻略', count: 34 },
-  { name: '养生健康', count: 28 },
-  { name: '旅游景点', count: 23 },
-  { name: '学习方法', count: 19 }
-])
-const fetchPopularTags = async () => {
-  loading.value.popularTags = true
-  setTimeout(() => {
-    loading.value.popularTags = false
-  }, 500)
-}
-
-// 论坛统计数据
-const stats = ref({
-  users: '0',
-  posts: '0',
-  comments: '0'
-})
-const fetchForumStats = async () => {
-  loading.value.stats = true
-  setTimeout(() => {
-    stats.value = {
-      users: '1.2K',
-      posts: '3.5K',
-      comments: '8.9K'
-    }
-    loading.value.stats = false
-  }, 500)
-}
-
-// 活跃用户
-const activeUsers = ref([])
-const fetchActiveUsers = async () => {
-  loading.value.activeUsers = true
-  try {
-    const response = await userApi.getActiveUsers(0, 5)
-    activeUsers.value = response || []
-  } catch (error) {
-    // 获取活跃用户失败
-  } finally {
-    loading.value.activeUsers = false
-  }
-}
 
 // 最近活动
 const recentActivities = ref([
@@ -725,51 +663,13 @@ const recentActivities = ref([
     time: '10分钟前'
   }
 ])
+// 最近活动相关状态
+const recentActivitiesLoading = ref(false)
 const fetchRecentActivities = async () => {
-  loading.value.recentActivities = true
+  recentActivitiesLoading.value = true
   setTimeout(() => {
-    loading.value.recentActivities = false
+    recentActivitiesLoading.value = false
   }, 500)
-}
-
-// 热门话题
-const hotTopics = ref([])
-const fetchHotTopics = async () => {
-  loading.value.hotTopics = true
-  try {
-    const response = await postApi.getHotPostsSide(0, 5)
-    hotTopics.value = response || []
-  } catch (error) {
-    // API不可用时使用模拟数据
-    hotTopics.value = [
-      { id: 1, title: '生活小技巧分享', viewCount: 1200, commentCount: 45 },
-      { id: 2, title: '美食制作心得', viewCount: 980, commentCount: 32 },
-      { id: 3, title: '旅游攻略推荐', viewCount: 756, commentCount: 28 },
-      { id: 4, title: '健康养生知识', viewCount: 634, commentCount: 21 },
-      { id: 5, title: '职场经验分享', viewCount: 523, commentCount: 18 }
-    ]
-  } finally {
-    loading.value.hotTopics = false
-  }
-}
-
-// 推荐阅读（使用已完成的推荐帖子接口）
-const recommendedPosts = ref([])
-const fetchRecommendedPosts = async () => {
-  loading.value.recommendedPosts = true
-  try {
-    const response = await postApi.getRecommendedPostsSide(0, 3)
-    recommendedPosts.value = response || []
-  } catch (error) {
-    // API不可用时使用模拟数据
-    recommendedPosts.value = [
-      { id: 1, title: '新手必看：论坛使用指南', category: { name: '新手指南' } },
-      { id: 2, title: '精选：最实用的生活技巧合集', category: { name: '生活技巧' } },
-      { id: 3, title: '社区规则与发帖须知', category: { name: '社区公告' } }
-    ]
-  } finally {
-    loading.value.recommendedPosts = false
-  }
 }
 
 // 社区公告数据
@@ -1095,19 +995,15 @@ const emitScrollToCommentForm = () => {
 }
 
 onMounted(async () => {
-  // 获取数据
-  fetchCategories()
-  fetchPopularTags()
-  fetchForumStats()
-  
+  // 初始化全局数据
+  await globalDataStore.initializeGlobalData()
+
   // 如果是常规页面，获取右侧边栏数据
   if (showRightSidebar.value) {
-    fetchActiveUsers()
+    await globalDataStore.initializeSidebarData()
     fetchRecentActivities()
-    fetchHotTopics()
-    fetchRecommendedPosts()
   }
-  
+
   // 如果是用户详情页，获取用户数据
   if (isUserProfilePage.value) {
     const userId = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
