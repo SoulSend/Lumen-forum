@@ -5,9 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8c4dc304-a7bf-4794-8f0b-38e820559f14" name="更改" comment="初步完成项目架构搭建，服务间通信，配置，完整的登录/登出流程，redis缓存，简单api">
-      <change beforePath="$PROJECT_DIR$/../user/src/components/layout/MainLayout.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/components/layout/MainLayout.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/node_modules/.vite/deps/_metadata.json" beforeDir="false" afterPath="$PROJECT_DIR$/../user/node_modules/.vite/deps/_metadata.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/node_modules/.vite/deps/element-plus.js" beforeDir="false" afterPath="$PROJECT_DIR$/../user/node_modules/.vite/deps/element-plus.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/node_modules/.vite/deps/element-plus.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../user/node_modules/.vite/deps/element-plus.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/src/App.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/App.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/src/assets/default-avatar.png" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/assets/default-avatar.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/src/assets/main.css" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/assets/main.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../user/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/main.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../user/src/pages/Home.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/pages/Home.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/src/router/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/router/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/vite.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../user/vite.config.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

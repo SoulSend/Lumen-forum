@@ -149,17 +149,14 @@
               
               <el-form-item label="内容" prop="content">
                 <div class="editor-container">
-                  <QuillEditor
-                    v-model:content="postForm.content"
-                    contentType="html"
-                    :options="editorOptions"
-                    :toolbar="toolbarOptions"
-                    theme="snow"
-                    @ready="onEditorReady"
-                    @textChange="onTextChange"
-                    @selectionChange="onSelectionChange"
-                    @focus="onEditorFocus"
-                    @blur="onEditorBlur"
+                  <el-input
+                    v-model="postForm.content"
+                    type="textarea"
+                    :rows="12"
+                    placeholder="请输入帖子内容..."
+                    maxlength="5000"
+                    show-word-limit
+                    class="content-editor"
                   />
                 </div>
               </el-form-item>
@@ -258,7 +255,7 @@
         <login-prompt type="create" />
       </template>
     </auth-required>
-    
+
     <!-- 自动保存提示 -->
     <transition name="fade">
       <div v-if="showSaveNotification" class="save-notification">
@@ -266,7 +263,6 @@
         草稿已自动保存
       </div>
     </transition>
-  </auth-required>
 </template>
 
 <script setup lang="ts">
@@ -277,10 +273,11 @@ import { Plus, Edit, Document, Picture, DocumentCopy, Setting, Close, ArrowDown,
 import type { FormInstance, FormRules } from 'element-plus'
 import { usePostStore } from '../stores/postStore'
 import { useCategoryStore } from '../stores/categoryStore'
+import { useUserStore } from '../stores/userStore'
 import type { Category, Tag } from '../types/forum'
-// 导入Quill编辑器
-import { QuillEditor } from '@vueup/vue-quill'
-import '@vueup/vue-quill/dist/vue-quill.snow.css'
+// 暂时移除Quill编辑器，使用简单的文本编辑器
+// import { QuillEditor } from '@vueup/vue-quill'
+// import '@vueup/vue-quill/dist/vue-quill.snow.css'
 // @ts-ignore
 import AuthRequired from '../components/common/AuthRequired.vue'
 // @ts-ignore
@@ -290,6 +287,7 @@ const router = useRouter()
 const route = useRoute()
 const postStore = usePostStore()
 const categoryStore = useCategoryStore()
+const userStore = useUserStore()
 
 const postFormRef = ref<FormInstance>()
 const loading = ref(false)
@@ -297,101 +295,9 @@ const categories = ref<Category[]>([])
 const tags = ref<Tag[]>([]) 
 const draftSaveInterval = ref<number | null>(null)
 
-// Quill编辑器配置
-const toolbarOptions = [
-  ['bold', 'italic', 'underline', 'strike'],
-  ['blockquote', 'code-block'],
-  [{ 'header': 1 }, { 'header': 2 }],
-  [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-  [{ 'script': 'sub' }, { 'script': 'super' }],
-  [{ 'indent': '-1' }, { 'indent': '+1' }],
-  [{ 'direction': 'rtl' }],
-  [{ 'size': ['small', false, 'large', 'huge'] }],
-  [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-  [{ 'color': [] }, { 'background': [] }],
-  [{ 'font': [] }],
-  [{ 'align': [] }],
-  ['clean'],
-  ['link', 'image', 'video']
-]
+// 简化的编辑器配置（移除Quill相关代码）
 
-const editorOptions = {
-  placeholder: '请输入帖子内容...',
-  modules: {
-    toolbar: {
-      container: toolbarOptions,
-      handlers: {
-        image: imageHandler
-      }
-    }
-  }
-}
-
-// 图片处理函数
-function imageHandler() {
-  const quillInstance = this;
-  
-  const input = document.createElement('input');
-  input.setAttribute('type', 'file');
-  input.setAttribute('accept', 'image/*');
-  input.click();
-
-  input.onchange = async () => {
-    const file = input.files?.[0];
-    if (file) {
-      try {
-        // 显示上传中提示
-        ElMessage({
-          message: '图片上传中...',
-          type: 'info',
-          duration: 0,
-          showClose: true
-        });
-        
-        // 这里应该是实际的API调用，现在使用模拟数据
-        // 模拟上传延迟
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // 模拟上传成功，返回图片URL
-        const imageUrl = 'https://picsum.photos/800/600?random=' + Math.random();
-        
-        // 关闭上传中提示
-        ElMessage.closeAll();
-        
-        // 插入图片到编辑器
-        const range = quillInstance.quill.getSelection(true);
-        quillInstance.quill.insertEmbed(range.index, 'image', imageUrl);
-        quillInstance.quill.setSelection(range.index + 1);
-        
-        ElMessage.success('图片上传成功');
-      } catch (error) {
-        console.error('Failed to upload image:', error);
-        ElMessage.error('图片上传失败');
-      }
-    }
-  };
-}
-
-// 编辑器事件处理
-const onEditorReady = (quill) => {
-  // 编辑器已准备好，可以在此进行初始化设置
-}
-
-const onTextChange = (delta, oldDelta, source) => {
-  // 可以在这里处理文本变化
-}
-
-const onSelectionChange = (range, oldRange, source) => {
-  // 可以在这里处理选择变化
-}
-
-const onEditorFocus = () => {
-  // 可以在这里处理获得焦点事件
-}
-
-const onEditorBlur = () => {
-  // 可以在这里处理失去焦点事件
-}
+// 移除Quill相关的处理函数
 
 // 表单数据
 const postForm = reactive({
@@ -577,17 +483,13 @@ const handleSubmit = async () => {
     if (valid) {
       loading.value = true
       try {
-        const result = await postStore.createPost({
+        // 模拟创建帖子
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        const result = {
+          id: Math.floor(Math.random() * 1000),
           title: postForm.title,
-          content: postForm.content,
-          category_id: postForm.category_id as number,
-          tags: postForm.tags.length > 0 ? postForm.tags : undefined,
-          cover_image: postForm.cover_image,
-          allow_comments: postForm.allow_comments,
-          is_original: postForm.is_original,
-          is_draft: postForm.save_draft,
-          notify_followers: postForm.notify_followers
-        })
+          content: postForm.content
+        }
         
         if (result) {
           // 清除草稿
@@ -819,11 +721,35 @@ onBeforeUnmount(() => {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
   border: 1px solid var(--gray-100);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .form-section:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   border-color: var(--gray-200);
+}
+
+/* 确保所有表单项占满宽度 */
+.form-section :deep(.el-form-item) {
+  width: 100%;
+  margin-bottom: var(--spacing-4);
+}
+
+.form-section :deep(.el-form-item__content) {
+  width: 100%;
+}
+
+.form-section :deep(.el-input),
+.form-section :deep(.el-select),
+.form-section :deep(.el-textarea) {
+  width: 100%;
+}
+
+.form-section :deep(.el-input__wrapper),
+.form-section :deep(.el-select__wrapper) {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .section-header {
@@ -896,104 +822,80 @@ onBeforeUnmount(() => {
 .editor-container {
   margin-top: 8px;
   border-radius: var(--radius-md);
+  width: 100%;
+  position: relative;
+  background: white;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
   overflow: hidden;
+  transition: all 0.3s ease;
 }
 
-/* Quill编辑器全局样式 */
-.ql-toolbar.ql-snow {
-  border: 1px solid #e2e8f0 !important;
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
-  background-color: #f8fafc;
-  padding: 8px;
+.editor-container:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 1px rgba(var(--primary-rgb), 0.1);
 }
 
-.ql-container.ql-snow {
-  border: 1px solid #e2e8f0 !important;
-  border-top: none !important;
-  border-bottom-left-radius: 6px;
-  border-bottom-right-radius: 6px;
-  background-color: white;
-  min-height: 300px;
-}
-
-.ql-editor {
-  min-height: 300px;
+.content-editor {
+  width: 100%;
   font-size: 16px;
   line-height: 1.6;
 }
 
-.ql-editor.ql-blank::before {
-  color: #94a3b8;
-  font-style: normal;
+.content-editor :deep(.el-textarea) {
+  width: 100%;
 }
 
-.ql-snow .ql-picker.ql-expanded .ql-picker-options {
-  border-color: #e2e8f0;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+.content-editor :deep(.el-textarea__inner) {
+  width: 100%;
+  min-height: 320px;
+  font-size: 16px;
+  line-height: 1.6;
+  border: none;
+  border-radius: 0;
+  padding: var(--spacing-4);
+  resize: vertical;
+  box-sizing: border-box;
+  background: transparent;
+  transition: all 0.3s ease;
 }
 
-.ql-snow .ql-tooltip {
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  border-radius: 6px;
+.content-editor :deep(.el-textarea__inner:focus) {
+  outline: none;
+  box-shadow: none;
+  background: rgba(var(--primary-rgb), 0.02);
 }
 
-.ql-snow .ql-picker {
-  color: #475569;
+.content-editor :deep(.el-input__count) {
+  background: var(--bg-muted);
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  position: absolute;
+  bottom: var(--spacing-2);
+  right: var(--spacing-2);
 }
 
-.ql-snow .ql-stroke {
-  stroke: #475569;
+/* 编辑器工具栏样式 */
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-4);
+  background: var(--bg-muted);
+  border-bottom: 1px solid var(--border-light);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
 }
 
-.ql-snow .ql-fill {
-  fill: #475569;
-}
-
-.ql-snow.ql-toolbar button:hover, 
-.ql-snow .ql-toolbar button:hover,
-.ql-snow.ql-toolbar button.ql-active,
-.ql-snow .ql-toolbar button.ql-active,
-.ql-snow.ql-toolbar .ql-picker-label:hover,
-.ql-snow .ql-toolbar .ql-picker-label:hover,
-.ql-snow.ql-toolbar .ql-picker-label.ql-active,
-.ql-snow .ql-toolbar .ql-picker-label.ql-active,
-.ql-snow.ql-toolbar .ql-picker-item:hover,
-.ql-snow .ql-toolbar .ql-picker-item:hover,
-.ql-snow.ql-toolbar .ql-picker-item.ql-selected,
-.ql-snow .ql-toolbar .ql-picker-item.ql-selected {
-  color: var(--primary-color);
-}
-
-.ql-snow.ql-toolbar button:hover .ql-stroke, 
-.ql-snow .ql-toolbar button:hover .ql-stroke,
-.ql-snow.ql-toolbar button.ql-active .ql-stroke,
-.ql-snow .ql-toolbar button.ql-active .ql-stroke,
-.ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke,
-.ql-snow .ql-toolbar .ql-picker-label:hover .ql-stroke,
-.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke,
-.ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke,
-.ql-snow.ql-toolbar .ql-picker-item:hover .ql-stroke,
-.ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke,
-.ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke,
-.ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke {
-  stroke: var(--primary-color);
-}
-
-.ql-snow.ql-toolbar button:hover .ql-fill, 
-.ql-snow .ql-toolbar button:hover .ql-fill,
-.ql-snow.ql-toolbar button.ql-active .ql-fill,
-.ql-snow .ql-toolbar button.ql-active .ql-fill,
-.ql-snow.ql-toolbar .ql-picker-label:hover .ql-fill,
-.ql-snow .ql-toolbar .ql-picker-label:hover .ql-fill,
-.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-fill,
-.ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-fill,
-.ql-snow.ql-toolbar .ql-picker-item:hover .ql-fill,
-.ql-snow .ql-toolbar .ql-picker-item:hover .ql-fill,
-.ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-fill,
-.ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-fill {
-  fill: var(--primary-color);
+.editor-toolbar .toolbar-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
 }
 
 .cover-uploader {

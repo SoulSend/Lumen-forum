@@ -640,6 +640,9 @@ onUnmounted(() => {
   max-width: 1600px;
   margin: 0 auto;
   padding: 0 1rem;
+  width: 100%;
+  /* 确保容器宽度稳定 */
+  box-sizing: border-box;
 }
 
 .header-content {
@@ -647,6 +650,9 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  /* 防止内容变化导致布局移动 */
+  min-height: var(--header-height);
+  box-sizing: border-box;
 }
 
 .logo-container {
@@ -1044,11 +1050,17 @@ onUnmounted(() => {
 .user-actions {
   display: flex;
   align-items: center;
+  /* 确保用户操作区域有固定的最小宽度 */
+  min-width: 200px;
+  justify-content: flex-end;
 }
 
 .auth-buttons {
   display: flex;
+  align-items: center;
   gap: var(--spacing-3);
+  /* 确保按钮区域宽度稳定 */
+  min-width: 120px;
 }
 
 .create-post-btn {

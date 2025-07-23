@@ -72,8 +72,8 @@
   --radius-xl: 12px;
   --radius-full: 9999px;
   
-  /* 字体 */
-  --font-family: 'HarmonyOS Sans', 'Noto Sans SC', 'Quicksand', 'Nunito', 'Varela Round', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  /* 字体 - 使用稳定的字体栈 */
+  --font-family: 'Nunito', 'Quicksand', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', '微软雅黑', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-md: 1rem;
@@ -98,6 +98,13 @@
   --transition-fast: 150ms;
   --transition-normal: 250ms;
   --transition-slow: 350ms;
+
+  /* 头像尺寸 */
+  --avatar-xs: 24px;
+  --avatar-sm: 32px;
+  --avatar-md: 40px;
+  --avatar-lg: 48px;
+  --avatar-xl: 64px;
 }
 
 @media (prefers-color-scheme: dark) {

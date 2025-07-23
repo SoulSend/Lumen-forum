@@ -3,6 +3,9 @@ import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import { visualizer } from 'rollup-plugin-visualizer'
+import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
 // https://vite.dev/config/
 export default defineConfig(({ command, mode }) => {
@@ -11,6 +14,17 @@ export default defineConfig(({ command, mode }) => {
   return {
     plugins: [
       vue(),
+      // 自动导入Vue API
+      AutoImport({
+        imports: ['vue', 'vue-router'],
+        resolvers: [ElementPlusResolver()],
+        dts: true
+      }),
+      // 自动导入组件
+      Components({
+        resolvers: [ElementPlusResolver()],
+        dts: true
+      }),
       // 只在开发环境启用开发工具
       ...(command === 'serve' ? [vueDevTools()] : []),
       // 打包分析工具
@@ -38,12 +52,24 @@ export default defineConfig(({ command, mode }) => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '')
         }
+      },
+      // 开发服务器优化
+      hmr: {
+        overlay: false // 减少HMR覆盖层的性能影响
+      },
+      // 预热常用文件
+      warmup: {
+        clientFiles: ['./src/main.ts', './src/App.vue', './src/pages/Home.vue']
       }
     },
     build: {
       // 生产环境构建优化
       target: 'es2015',
       minify: 'esbuild',
+      // 启用 gzip 压缩
+      reportCompressedSize: false, // 禁用压缩大小报告以加快构建
+      // 调整 chunk 大小警告限制
+      chunkSizeWarningLimit: 1000,
       // 代码分割
       rollupOptions: {
         output: {
@@ -98,11 +124,15 @@ export default defineConfig(({ command, mode }) => {
         'vue-router',
         'pinia',
         'element-plus',
-        '@element-plus/icons-vue',
+        'element-plus/es/locale/lang/zh-cn',
         'axios',
         '@vueuse/core'
       ],
-      exclude: ['@vueup/vue-quill']
+      exclude: ['@vueup/vue-quill'],
+      // 强制预构建某些依赖
+      force: false,
+      // 设置预构建的入口
+      entries: ['./src/main.ts']
     },
 
     // 定义全局常量

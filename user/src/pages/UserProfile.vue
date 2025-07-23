@@ -957,6 +957,9 @@ onMounted(() => {
   position: relative;
   margin-right: var(--spacing-5);
   flex-shrink: 0;
+  /* 确保容器尺寸与头像一致 */
+  width: 100px;
+  height: 100px;
 }
 
 .user-avatar {
@@ -977,7 +980,7 @@ onMounted(() => {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -986,6 +989,8 @@ onMounted(() => {
   transition: opacity 0.3s ease;
   cursor: pointer;
   color: white;
+  /* 确保悬浮层与头像完全对齐 */
+  box-sizing: border-box;
 }
 
 .avatar-container:hover .avatar-edit-overlay {
@@ -993,12 +998,15 @@ onMounted(() => {
 }
 
 .avatar-edit-overlay .material-icons-round {
-  font-size: 24px;
-  margin-bottom: 4px;
+  font-size: 20px;
+  margin-bottom: 2px;
 }
 
 .edit-text {
-  font-size: 12px;
+  font-size: 10px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.2;
 }
 
 .status-badge {

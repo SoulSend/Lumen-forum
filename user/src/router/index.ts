@@ -3,12 +3,11 @@ import type { RouteRecordRaw } from 'vue-router'
 import { useUserStore } from '../stores/userStore'
 import { ElMessage } from 'element-plus'
 
-// 路由懒加载函数，支持预加载和错误处理
+// 优化的路由懒加载函数，移除预加载以减少初始加载时间
 const lazyLoad = (componentPath: string, chunkName?: string) => {
   return () => {
     const componentImport = import(
       /* webpackChunkName: "[request]" */
-      /* webpackPreload: true */
       `../pages/${componentPath}.vue`
     )
 
@@ -71,7 +70,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/edit-post/:id',
     name: 'editPost',
-    component: () => import('../pages/EditPost.vue'),
+    component: lazyLoad('EditPost', 'edit-post'),
     props: true,
     meta: {
       title: '编辑帖子 - Lumen论坛',
@@ -81,7 +80,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/search',
     name: 'search',
-    component: () => import('../pages/Search.vue'),
+    component: lazyLoad('Search', 'search'),
     meta: {
       title: '搜索结果 - Lumen论坛',
     },
@@ -89,7 +88,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/settings',
     name: 'settings',
-    component: () => import('../pages/Settings.vue'),
+    component: lazyLoad('Settings', 'settings'),
     meta: {
       title: '设置 - Lumen论坛',
       requiresAuth: true,
@@ -98,7 +97,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/notifications',
     name: 'notifications',
-    component: () => import('../pages/Notifications.vue'),
+    component: lazyLoad('Notifications', 'notifications'),
     meta: {
       title: '通知 - Lumen论坛',
       requiresAuth: true,
@@ -107,7 +106,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/about',
     name: 'about',
-    component: () => import('../pages/About.vue'),
+    component: lazyLoad('About', 'about'),
     meta: {
       title: '关于我们 - Lumen论坛',
     },
@@ -115,7 +114,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/404',
     name: 'notFound',
-    component: () => import('../pages/NotFound.vue'),
+    component: lazyLoad('NotFound', 'not-found'),
     meta: {
       title: '页面未找到 - Lumen论坛',
     },

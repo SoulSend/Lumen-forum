@@ -9,7 +9,7 @@ html, body {
 }
 
 body {
-  overflow-y: auto;
+  overflow-y: scroll; /* 强制显示滚动条，避免布局跳动 */
   overflow-x: hidden;
 }
 
@@ -19,14 +19,28 @@ body {
   flex-direction: column;
 }
 
-/* 字体增强 */
+/* 防止布局跳动的全局样式 */
+html {
+  /* 为滚动条预留空间，防止内容跳动 */
+  overflow-y: scroll;
+}
+
+/* 确保所有对话框和弹出层不会导致布局移动 */
+.el-dialog__wrapper,
+.el-drawer__wrapper,
+.el-message-box__wrapper {
+  /* 防止弹出层影响滚动条 */
+  overflow: hidden;
+}
+
+/* 字体增强 - 简化字体栈 */
 h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.01em;
   font-weight: var(--font-weight-semibold);
-  font-family: 'Quicksand', 'Varela Round', 'Nunito', 'HarmonyOS Sans', 'Noto Sans SC', sans-serif;
+  font-family: var(--font-family);
 }
 
-.btn, 
+.btn,
 .el-button,
 .el-tabs__item,
 .el-menu-item,
@@ -34,41 +48,23 @@ h1, h2, h3, h4, h5, h6 {
 .el-checkbox__label {
   font-weight: var(--font-weight-medium);
   letter-spacing: 0.01em;
-  font-family: 'Nunito', 'Quicksand', 'HarmonyOS Sans', 'Noto Sans SC', sans-serif;
+  font-family: var(--font-family);
 }
 
-/* 圆润文本样式 - 使用设计系统 */
-.rounded-text {
-  font-family: 'Quicksand', 'Varela Round', 'Nunito', sans-serif;
-  letter-spacing: 0.02em;
-}
-
-/* 中文优化 */
-.cn-text {
-  font-family: 'HarmonyOS Sans', 'Noto Sans SC', sans-serif;
-  letter-spacing: 0.02em;
-}
-
-/* Material Icons 全局样式 - 使用设计系统 */
-.material-icons-round {
+/* 图标样式优化 */
+.icon {
   font-size: 1.2rem;
   vertical-align: middle;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: var(--primary-color);
-  transition: all var(--transition-normal);
+  transition: color var(--transition-normal);
 }
 
-/* 在按钮中的图标继承颜色 */
-.btn .material-icons-round,
-.el-button .material-icons-round {
+.btn .icon,
+.el-button .icon {
   color: inherit;
-}
-
-/* 交互状态 */
-.material-icons-round:hover {
-  transform: scale(1.1);
 }
 
 /* 容器样式 */
@@ -447,68 +443,64 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--gray-400);
 }
 
-/* 字体辅助类 - 移除!important */
-.font-rounded {
-  font-family: 'Quicksand', 'Varela Round', 'Nunito', sans-serif;
-}
-
-.font-cn {
-  font-family: 'HarmonyOS Sans', 'Noto Sans SC', sans-serif;
-}
-
-.text-smooth {
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-.letter-tight {
-  letter-spacing: -0.01em;
-}
-
-.letter-normal {
-  letter-spacing: 0.01em;
-}
-
-.letter-wide {
-  letter-spacing: 0.03em;
-}
-
-/* 文本装饰辅助类 */
-.text-shadow-sm {
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.text-gradient {
-  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-}
-
+/* 文本辅助类 - 简化版本 */
 .text-truncate {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.text-balance {
-  text-wrap: balance;
+/* 头像样式 */
+.avatar {
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  background-color: var(--bg-muted);
+  transition: transform var(--transition-fast);
 }
 
-/* 确保元素使用圆润字体 */
-.post-title,
-.category-name,
-.tag-name,
-.welcome-text,
-.section-title {
-  font-family: 'Quicksand', 'Varela Round', 'Nunito', 'OPPO Sans', 'HarmonyOS Sans', 'Noto Sans SC', sans-serif;
-  letter-spacing: -0.01em;
+.avatar--xs {
+  width: var(--avatar-xs);
+  height: var(--avatar-xs);
 }
 
-/* 确保按钮文本使用圆润字体 */
-.el-button,
-.btn {
-  font-family: 'Nunito', 'Quicksand', 'OPPO Sans', 'HarmonyOS Sans', 'Noto Sans SC', sans-serif;
+.avatar--small {
+  width: var(--avatar-sm);
+  height: var(--avatar-sm);
+}
+
+.avatar--medium {
+  width: var(--avatar-md);
+  height: var(--avatar-md);
+}
+
+.avatar--large {
+  width: var(--avatar-lg);
+  height: var(--avatar-lg);
+}
+
+.avatar--xl {
+  width: var(--avatar-xl);
+  height: var(--avatar-xl);
+}
+
+.avatar:hover {
+  transform: scale(1.05);
+}
+
+/* 作者头像特殊样式 */
+.author-avatar {
+  width: var(--avatar-xs);
+  height: var(--avatar-xs);
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  margin-right: var(--spacing-2);
+}
+
+/* 活动头像样式 */
+.activity-avatar {
+  width: var(--avatar-sm);
+  height: var(--avatar-sm);
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  margin-right: var(--spacing-3);
 }

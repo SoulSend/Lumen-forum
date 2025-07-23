@@ -259,7 +259,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, watch, computed } from 'vue'
+import { ref, reactive, onMounted, watch, computed, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 // @ts-ignore
@@ -542,18 +542,25 @@ const getCategoryIcon = (category: Category) => {
   return CATEGORY_ICONS[category.name] || 'category'
 }
 
-// 生命周期钩子
+// 生命周期钩子 - 优化为渐进式加载
 onMounted(async () => {
-  // 确保全局数据已初始化（如果还没有的话）
+  // 优先加载核心内容
+  fetchPosts()
+
+  // 使用 nextTick 确保首屏渲染完成后再加载次要内容
+  await nextTick()
+
+  // 延迟加载分类数据
   if (!globalDataStore.categoriesLoaded) {
-    await fetchCategories()
+    setTimeout(() => fetchCategories(), 100)
   }
 
-  fetchPosts()
-  fetchFeaturedPosts()
-  fetchCommunityStats()
-  // 等待分类加载完成后再获取生活技巧文章
-  fetchLifeTipsArticles()
+  // 进一步延迟加载非关键内容
+  setTimeout(() => {
+    fetchFeaturedPosts()
+    fetchCommunityStats()
+    fetchLifeTipsArticles()
+  }, 200)
 })
 </script>
 

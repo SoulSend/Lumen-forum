@@ -3,7 +3,23 @@ import { createPinia } from 'pinia'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
-import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+// 按需导入常用图标，而不是全量导入
+import {
+  Search,
+  User,
+  Bell,
+  Setting,
+  Plus,
+  Edit,
+  Delete,
+  ArrowRight,
+  ArrowLeft,
+  Star,
+  ChatDotRound,
+  View,
+  Share,
+  Download
+} from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/userStore'
 
 import App from './App.vue'
@@ -15,8 +31,25 @@ import { setupGlobalErrorHandler } from './utils/errorHandler'
 
 const app = createApp(App)
 
-// 注册Element Plus图标
-for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+// 只注册常用的Element Plus图标，减少初始包大小
+const icons = {
+  Search,
+  User,
+  Bell,
+  Setting,
+  Plus,
+  Edit,
+  Delete,
+  ArrowRight,
+  ArrowLeft,
+  Star,
+  ChatDotRound,
+  View,
+  Share,
+  Download
+}
+
+for (const [key, component] of Object.entries(icons)) {
   app.component(key, component)
 }
 
