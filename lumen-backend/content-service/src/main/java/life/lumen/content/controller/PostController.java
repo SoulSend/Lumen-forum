@@ -3,6 +3,7 @@ package life.lumen.content.controller;
 import jakarta.validation.Valid;
 import life.lumen.common.model.Result;
 import life.lumen.common.model.dto.PageQueryDTO;
+import life.lumen.common.model.dto.post.CreatePostDTO;
 import life.lumen.common.model.entity.post.PostPO;
 import life.lumen.common.model.vo.post.PostVO;
 import life.lumen.common.utils.mapstruct.PostMapper;
@@ -36,6 +37,39 @@ public class PostController {
         return  Result.success(res);
     }
 
+    /**
+     * 创建文章
+     * @param createPostDTO
+     * @return
+     */
+    @PostMapping
+    public Result<Void>  createPost(@RequestBody @Valid CreatePostDTO createPostDTO){
+        postService.createPost(createPostDTO);
+        return Result.success();
+    }
+
+    /**
+     * 修改文章
+     * @param createPostDTO
+     * @param id
+     * @return
+     */
+    @PutMapping("/{id}")
+    public Result<Void> updatePost(@RequestBody @Valid CreatePostDTO createPostDTO, @PathVariable Long id){
+        postService.updatePost(createPostDTO,id);
+        return Result.success();
+    }
+
+    /**
+     * 删除文章
+     * @param id
+     * @return
+     */
+    @DeleteMapping("/{id}")
+    public Result<Void> deletePost(@PathVariable Long id){
+        postService.deletePost(id);
+        return Result.success();
+    }
     /**
      * 获取指定id文章的详情
      * @param id

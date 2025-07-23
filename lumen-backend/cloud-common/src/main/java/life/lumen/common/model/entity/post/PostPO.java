@@ -52,6 +52,4 @@ public class PostPO extends BaseEntity {
 
     @Column(name = "solution_comment_id")
     private Long solutionCommentId;
-
-
 }

@@ -10,6 +10,7 @@ public enum ErrorCode {
     SERVICE_CALL_ERROR(1000,"服务调用错误"),
     NOT_RESPONSE_BODY_ERROR(1001,"无响应体"),
     NOT_USER_CONTEXT_ERROR(1002,"用户未登录"),
+    INVALID_PARAMETERS(1003,"参数不合法"),
 
     //登录相关
     VERIFY_CODE_ERROR(2000, "验证码错误或已过期"),

@@ -29,13 +29,10 @@ export const useCategoryStore = defineStore('category', () => {
 
       // 前端扩展字段
       children: apiCategory.children || [],
-      slug: apiCategory.slug,
+      slug: apiCategory.slug
 
-      // 兼容旧字段名
-      created_at: apiCategory.created_at || apiCategory.createdAt,
-      updated_at: apiCategory.updated_at || apiCategory.updatedAt,
-      post_count: apiCategory.post_count || apiCategory.postCount,
-      parent_id: apiCategory.parent_id || (apiCategory.parent ? apiCategory.parent.id : null)
+      // 兼容旧字段名（仅映射到已知属性）
+      // 如果需要兼容旧字段名，请在 Category 类型中添加这些属性
     }
   }
 
