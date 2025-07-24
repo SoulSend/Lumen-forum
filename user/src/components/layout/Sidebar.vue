@@ -61,54 +61,6 @@ const categoryStore = useCategoryStore();
 
 // 分类相关
 const categories = ref<Category[]>([
-  {
-    id: 1,
-    name: '生活技巧',
-    postCount: 256,
-    description: '日常生活中的各种实用技巧和窍门',
-    parent: null,
-    displayOrder: 1
-  },
-  {
-    id: 2,
-    name: '家居装饰',
-    postCount: 185,
-    description: '家居装饰、布置和DIY创意',
-    parent: null,
-    displayOrder: 2
-  },
-  {
-    id: 3,
-    name: '美食烹饪',
-    postCount: 324,
-    description: '美食菜谱、烹饪技巧和餐饮体验',
-    parent: null,
-    displayOrder: 3
-  },
-  {
-    id: 4,
-    name: '旅行探索',
-    postCount: 217,
-    description: '旅行攻略、目的地推荐和旅途体验',
-    parent: null,
-    displayOrder: 4
-  },
-  {
-    id: 5,
-    name: '健康养生',
-    postCount: 198,
-    description: '健康生活方式、运动健身和养生知识',
-    parent: null,
-    displayOrder: 5
-  },
-  {
-    id: 6,
-    name: '职场技能',
-    postCount: 176,
-    description: '职场发展、技能提升和工作经验分享',
-    parent: null,
-    displayOrder: 6
-  }
 ]);
 const categoryLoading = ref(false);
 
