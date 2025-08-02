@@ -5,8 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8c4dc304-a7bf-4794-8f0b-38e820559f14" name="更改" comment="初步完成项目架构搭建，服务间通信，配置，完整的登录/登出流程，redis缓存，简单api">
-      <change beforePath="$PROJECT_DIR$/../user/auto-imports.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../user/auto-imports.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/public/default-avatar.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../user/src/components/layout/Sidebar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/components/layout/Sidebar.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/src/pages/CreatePost.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/pages/CreatePost.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/src/pages/EditPost.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/pages/EditPost.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/src/pages/Home.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/pages/Home.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/src/pages/Notifications.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/pages/Notifications.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/src/pages/PostDetail.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/pages/PostDetail.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/src/pages/Search.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/pages/Search.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/src/pages/Settings.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/pages/Settings.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/src/pages/UserProfile.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/pages/UserProfile.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/src/services/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/services/api.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/src/stores/globalDataStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/stores/globalDataStore.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/src/stores/userStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/stores/userStore.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/src/utils/assets.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/utils/assets.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user/src/utils/dataValidation.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../user/src/utils/dataValidation.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -178,6 +191,9 @@
       </set>
     </attachedChunks>
   </component>
+  <component name="StructureViewState">
+    <option name="selectedTab" value="逻辑" />
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="默认任务">
       <changelist id="8c4dc304-a7bf-4794-8f0b-38e820559f14" name="更改" comment="" />
@@ -214,7 +230,10 @@
       <workItem from="1752990623982" duration="8307000" />
       <workItem from="1753009976154" duration="1049000" />
       <workItem from="1753095351284" duration="2109000" />
-      <workItem from="1753327395892" duration="352000" />
+      <workItem from="1753327395892" duration="13263000" />
+      <workItem from="1753414304084" duration="5213000" />
+      <workItem from="1753497678688" duration="7622000" />
+      <workItem from="1753856890003" duration="19000" />
     </task>
     <task id="LOCAL-00001" summary="初步完成项目架构搭建，服务间通信，配置，完整的登录/登出流程，redis缓存，简单api">
       <option name="closed" value="true" />

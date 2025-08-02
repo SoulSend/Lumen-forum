@@ -243,9 +243,8 @@ import AuthRequired from '../components/common/AuthRequired.vue'
 // @ts-ignore
 import LoginPrompt from '../components/common/LoginPrompt.vue'
 import { usePostStore } from '../stores/postStore'
-// import { useCommentStore } from '../stores/commentStore' // 已删除：API文档中没有评论接口
 import { useUserStore } from '../stores/userStore'
-// import { useBookmarkStore } from '../stores/bookmarkStore' // 🚧 收藏功能未完成，暂时注释
+import { postManagementApi, commentApi, userInteractionApi } from '../services/api'
 import type { Post } from '../types/forum'
 import { formatNumber, formatDate } from '../utils/format'
 import { getUserAvatarUrl } from '../utils/assets'
@@ -254,9 +253,7 @@ import { DEFAULT_TEXTS } from '../constants'
 const route = useRoute()
 const router = useRouter()
 const postStore = usePostStore()
-// const commentStore = useCommentStore() // 已删除：API文档中没有评论接口
 const userStore = useUserStore()
-// const bookmarkStore = useBookmarkStore() // 🚧 收藏功能未完成，暂时注释
 
 const post = ref<Post | null>(null)
 const loading = ref(true)
@@ -270,8 +267,7 @@ const shareLink = ref('')
 // 判断当前用户是否为帖子作者
 const isCurrentUserAuthor = computed(() => {
   if (!post.value || !userStore.currentUser) return false
-  const postUserId = post.value.userId || post.value.user_id
-  return postUserId === userStore.currentUser.id
+  return post.value.userId === userStore.currentUser.id
 })
 
 // 评论表单数据
@@ -304,21 +300,9 @@ const fetchPostDetail = async () => {
     const result = await postStore.fetchPost(postId)
     if (result) {
       post.value = result
-      
-      // 模拟增加浏览量
-      if (post.value) {
-        if (post.value.viewCount !== undefined) {
-          post.value.viewCount += 1
-        } else if (post.value.view_count !== undefined) {
-          post.value.view_count += 1
-        }
-      }
-      
-      // 模拟收藏数据
-      bookmarkCount.value = Math.floor(Math.random() * 50) + 5
-      
+
       // 检查用户是否已收藏
-      checkBookmarkStatus()
+      await checkBookmarkStatus()
     }
   } catch (error) {
     console.error('Failed to fetch post:', error)
@@ -330,107 +314,72 @@ const fetchPostDetail = async () => {
 
 // 使用统一的格式化工具函数
 
-// 🚧 点赞帖子 - 后端未完成，暂时使用模拟操作
+// 点赞帖子
 const handleLike = async () => {
   if (!userStore.isAuthenticated) {
     showLoginPrompt('like')
     return
   }
 
-  // 🚧 暂时只做UI更新，等后端完成后替换为真实API调用
-  if (post.value) {
-    post.value.is_liked = !post.value.is_liked
-  }
+  if (!post.value) return
 
-  if (post.value.is_liked) {
-    if (post.value.likeCount !== undefined) {
-      post.value.likeCount++
-    } else if (post.value.like_count !== undefined) {
-      post.value.like_count++
+  try {
+    const result = await postManagementApi.toggleLike(post.value.id)
+    if (result) {
+      post.value.isLiked = result.isLiked
+      post.value.likeCount = result.likeCount
+      const message = result.isLiked ? '点赞成功' : '已取消点赞'
+      ElMessage.success(message)
     }
-    ElMessage.success('点赞成功')
-  } else {
-    if (post.value.likeCount !== undefined) {
-      post.value.likeCount--
-    } else if (post.value.like_count !== undefined) {
-      post.value.like_count--
-    }
-    ElMessage.info('已取消点赞')
+  } catch (error) {
+    console.error('Failed to like post:', error)
+    ElMessage.error('操作失败，请稍后再试')
   }
-
-  // 🚧 等后端完成后启用以下代码
-  // try {
-  //   const result = await postStore.likePost(post.value.id)
-  //   if (result) {
-  //     post.value.is_liked = result.isLiked
-  //     post.value.like_count = result.likeCount
-  //   }
-  // } catch (error) {
-  //   // 回滚UI状态
-  //   post.value.is_liked = !post.value.is_liked
-  //   if (post.value.is_liked) {
-  //     post.value.like_count++
-  //   } else {
-  //     post.value.like_count--
-  //   }
-  //   ElMessage.error('操作失败，请稍后再试')
-  // }
 }
 
-// 🚧 收藏帖子 - 后端未完成，暂时使用模拟操作
+// 收藏帖子
 const handleBookmark = async () => {
   if (!userStore.isAuthenticated) {
     showLoginPrompt('bookmark')
     return
   }
 
-  // 🚧 暂时只做UI更新，等后端完成后替换为真实API调用
-  isBookmarked.value = !isBookmarked.value
-  if (isBookmarked.value) {
-    bookmarkCount.value++
-    ElMessage.success('收藏成功')
-  } else {
-    bookmarkCount.value--
-    ElMessage.info('已取消收藏')
-  }
+  if (!post.value) return
 
-  // 🚧 等后端完成后启用以下代码
-  // try {
-  //   const result = await bookmarkStore.toggleBookmark(post.value.id)
-  //   if (result) {
-  //     isBookmarked.value = result.isBookmarked
-  //     bookmarkCount.value = result.bookmarkCount || bookmarkCount.value
-  //   }
-  // } catch (error) {
-  //   // 回滚UI状态
-  //   isBookmarked.value = !isBookmarked.value
-  //   if (isBookmarked.value) {
-  //     bookmarkCount.value--
-  //   } else {
-  //     bookmarkCount.value++
-  //   }
-  //   ElMessage.error('操作失败，请稍后再试')
-  // }
+  try {
+    const result = await postManagementApi.toggleBookmark(post.value.id)
+    if (result) {
+      isBookmarked.value = result.isBookmarked
+      bookmarkCount.value = result.bookmarkCount
+      const message = result.isBookmarked ? '收藏成功' : '已取消收藏'
+      ElMessage.success(message)
+    }
+  } catch (error) {
+    console.error('Failed to bookmark post:', error)
+    ElMessage.error('操作失败，请稍后再试')
+  }
 }
 
-// 🚧 检查收藏状态 - 后端未完成，暂时使用模拟数据
+// 检查收藏状态
 const checkBookmarkStatus = async () => {
   if (!userStore.isAuthenticated || !post.value) {
+    isBookmarked.value = false
+    bookmarkCount.value = 0
     return
   }
 
-  // 🚧 暂时使用随机状态，等后端完成后替换为真实API调用
-  isBookmarked.value = Math.random() > 0.7
-
-  // 🚧 等后端完成后启用以下代码
-  // try {
-  //   const result = await bookmarkStore.checkBookmarkStatus(post.value.id)
-  //   if (result) {
-  //     isBookmarked.value = result.isBookmarked
-  //   }
-  // } catch (error) {
-  //   isBookmarked.value = false
-  // }
+  try {
+    // 从帖子数据中获取收藏状态
+    isBookmarked.value = post.value.isBookmarked || false
+    // 如果需要获取收藏数量，可以调用统计API
+    // const stats = await userInteractionApi.getUserStats(post.value.userId)
+    // bookmarkCount.value = stats.bookmarkCount || 0
+    bookmarkCount.value = Math.floor(Math.random() * 50) + 5 // 临时模拟数据
+  } catch (error) {
+    console.error('Failed to check bookmark status:', error)
+    isBookmarked.value = false
+    bookmarkCount.value = 0
+  }
 }
 
 // 显示分享选项
@@ -500,23 +449,29 @@ const submitComment = async () => {
       // 构建评论数据
       const commentData = {
         content: commentForm.content,
-        post_id: post.value?.id,
-        parent_id: commentForm.parent_id
+        postId: post.value?.id,
+        parentId: commentForm.parent_id || null
       }
-      
-      // 🚧 调用评论API - 后端未完成，暂时使用模拟操作
-      // const result = await commentStore.createComment(commentData)
 
-      // 🚧 暂时模拟成功，等后端完成后替换为真实API调用
-      ElMessage.success(replyingTo.value ? '回复成功' : '评论发布成功')
+      // 调用评论API
+      const result = await commentApi.createComment(commentData)
 
-      // 清空表单
-      commentForm.content = ''
-      cancelReply()
+      if (result) {
+        ElMessage.success(replyingTo.value ? '回复成功' : '评论发布成功')
 
-      // 🚧 暂时不触发评论列表刷新，等后端完成后启用
-      // const event = new CustomEvent('refreshComments')
-      // window.dispatchEvent(event)
+        // 清空表单
+        commentForm.content = ''
+        cancelReply()
+
+        // 触发评论列表刷新
+        const event = new CustomEvent('refreshComments')
+        window.dispatchEvent(event)
+
+        // 更新帖子评论数量
+        if (post.value) {
+          post.value.commentCount = (post.value.commentCount || 0) + 1
+        }
+      }
     } catch (error) {
       console.error('Failed to submit comment:', error)
       ElMessage.error('评论提交失败，请稍后再试')
@@ -571,7 +526,7 @@ onMounted(() => {
   fetchPostDetail()
   
   // 监听来自CommentList的事件
-  window.addEventListener('scrollToComments', (event: Event) => {
+  window.addEventListener('scrollToComments', () => {
     const commentsSection = document.getElementById('comments-section')
     if (commentsSection) {
       commentsSection.scrollIntoView({ behavior: 'smooth', block: 'start' })

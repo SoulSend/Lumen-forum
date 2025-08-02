@@ -131,7 +131,7 @@
               <div class="featured-main" v-if="safeFeaturedPosts && safeFeaturedPosts.length > 0">
                 <div class="featured-card main-feature">
                   <div class="featured-image">
-                    <img :src="safeFeaturedPosts[0]?.image || '../assets/default-avatar.png'" :alt="safeFeaturedPosts[0]?.title">
+                    <img :src="safeFeaturedPosts[0]?.image || getUserAvatarUrl()" :alt="safeFeaturedPosts[0]?.title">
                   </div>
                   <div class="featured-content">
                     <div class="featured-category">{{ safeFeaturedPosts[0]?.category?.name }}</div>
@@ -172,7 +172,7 @@
                     </router-link>
                   </div>
                   <div class="side-feature-image">
-                    <img :src="post.image || '../assets/default-avatar.png'" :alt="post.title">
+                    <img :src="post.image || getUserAvatarUrl()" :alt="post.title">
                   </div>
                 </div>
               </div>
@@ -208,7 +208,7 @@
             <div v-else class="life-tips-grid">
               <div v-for="article in safeLifeTipsArticles" :key="article.id" class="life-tip-card card">
                 <div class="tip-card-image">
-                  <img :src="article.image || '../assets/default-avatar.png'" :alt="article.title" class="tip-image">
+                  <img :src="article.image || getUserAvatarUrl()" :alt="article.title" class="tip-image">
                 </div>
                 <div class="tip-card-content">
                   <router-link
@@ -267,7 +267,7 @@ import PostCard from '../components/forum/PostCard.vue'
 import { useCategoryStore } from '../stores/categoryStore'
 import { usePostStore } from '../stores/postStore'
 import { useGlobalDataStore } from '../stores/globalDataStore'
-// import { useStatsStore } from '../stores/statsStore' // 🚧 统计功能未完成，暂时注释
+// import { useStatsStore } from '../stores/statsStore' // 统计功能暂未实现
 import type { Category, Post } from '../types/forum'
 import { Search } from '@element-plus/icons-vue'
 // @ts-ignore
@@ -395,45 +395,8 @@ const fetchFeaturedPosts = async () => {
     const response = await postApi.getRecommendedPostsSide(0, 4)
     featuredPosts.value = response || []
   } catch (error) {
-    // API不可用时使用模拟数据
-    featuredPosts.value = [
-      {
-        id: 1,
-        title: '新手必看：如何快速融入社区',
-        content: '欢迎来到我们的生活技巧分享社区！这里有一些小贴士帮助你快速上手...',
-        category: { name: '新手指南' },
-        viewCount: 1500,
-        likeCount: 89,
-        commentCount: 23
-      },
-      {
-        id: 2,
-        title: '精选：最实用的厨房收纳技巧',
-        content: '厨房空间有限？这些收纳技巧让你的厨房井井有条...',
-        category: { name: '生活技巧' },
-        viewCount: 1200,
-        likeCount: 76,
-        commentCount: 18
-      },
-      {
-        id: 3,
-        title: '健康生活：每日养生小贴士',
-        content: '简单易行的养生方法，让你每天都充满活力...',
-        category: { name: '健康养生' },
-        viewCount: 980,
-        likeCount: 65,
-        commentCount: 15
-      },
-      {
-        id: 4,
-        title: '旅游攻略：周末短途游推荐',
-        content: '不用走太远，周边就有很多值得一去的好地方...',
-        category: { name: '旅游攻略' },
-        viewCount: 756,
-        likeCount: 42,
-        commentCount: 12
-      }
-    ]
+    console.error('Failed to fetch featured posts:', error)
+    featuredPosts.value = []
   } finally {
     featuredPostsLoading.value = false
   }
@@ -447,69 +410,9 @@ const fetchLifeTipsArticles = async () => {
     const response = await postApi.getCategoryPosts(categoryId, 0, 4)
     lifeTipsArticles.value = response?.content || []
   } catch (error) {
-    // API不可用时使用模拟数据
-    lifeTipsArticles.value = [
-      {
-        id: 1,
-        title: '厨房收纳的5个小技巧',
-        content: '让你的厨房空间利用率翻倍...',
-        userId: 1,
-        categoryId: 1,
-        viewCount: 856,
-        likeCount: 45,
-        commentCount: 12,
-        isPinned: false,
-        isFeatured: false,
-        isSolved: false,
-        isRecommended: false,
-        solutionCommentId: null
-      },
-      {
-        id: 2,
-        title: '衣物保养实用指南',
-        content: '延长衣物寿命的小窍门...',
-        userId: 1,
-        categoryId: 1,
-        viewCount: 723,
-        likeCount: 38,
-        commentCount: 9,
-        isPinned: false,
-        isFeatured: false,
-        isSolved: false,
-        isRecommended: false,
-        solutionCommentId: null
-      },
-      {
-        id: 3,
-        title: '家居清洁的高效方法',
-        content: '省时省力的清洁技巧分享...',
-        userId: 1,
-        categoryId: 1,
-        viewCount: 645,
-        likeCount: 32,
-        commentCount: 7,
-        isPinned: false,
-        isFeatured: false,
-        isSolved: false,
-        isRecommended: false,
-        solutionCommentId: null
-      },
-      {
-        id: 4,
-        title: '节能环保生活小贴士',
-        content: '从小事做起，保护我们的地球...',
-        userId: 1,
-        categoryId: 1,
-        viewCount: 567,
-        likeCount: 28,
-        commentCount: 6,
-        isPinned: false,
-        isFeatured: false,
-        isSolved: false,
-        isRecommended: false,
-        solutionCommentId: null
-      }
-    ]
+    console.error('Failed to fetch life tips articles:', error)
+    lifeTipsArticles.value = []
+
   } finally {
     lifeTipsLoading.value = false
   }

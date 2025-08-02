@@ -2,6 +2,8 @@ package life.lumen.user.controller;
 
 
 import jakarta.validation.Valid;
+import life.lumen.common.enums.ErrorCode;
+import life.lumen.common.exception.CustomException;
 import life.lumen.common.model.Result;
 import life.lumen.common.model.dto.PageQueryDTO;
 import life.lumen.common.model.dto.user.UpdateUserDTO;
@@ -9,10 +11,11 @@ import life.lumen.common.model.entity.user.UserPO;
 import life.lumen.common.model.vo.user.UserVO;
 import life.lumen.common.utils.mapstruct.UserMapper;
 import life.lumen.user.service.UserService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
+@Slf4j
 @RestController
 @RequestMapping()
 public class UserController {
@@ -29,6 +32,7 @@ public class UserController {
     public Result<UserVO> getMe(){
         UserPO user=userService.getMe();
         UserVO userVO = UserMapper.INSTANCE.userPOToUserVO(user);
+        log.info("/me:"+userVO.toString());
         return Result.success(userVO);
     }
 
@@ -53,6 +57,7 @@ public class UserController {
     public Result<UserVO> updateProfile(@RequestBody @Valid UpdateUserDTO userDTO){
         UserPO user=userService.updateProfile(userDTO);
         UserVO userVO = UserMapper.INSTANCE.userPOToUserVO(user);
+        log.info("/profile:"+userVO.toString());
         return Result.success(userVO);
     }
 
@@ -62,11 +67,16 @@ public class UserController {
      * @return
      */
     @GetMapping("/active")
-    public Result<List<UserVO>> getActiveUsers(@RequestParam int page,@RequestParam int size){
+    public Result<Page<UserVO>> getActiveUsers(@RequestParam int page, @RequestParam int size){
         PageQueryDTO pageQueryDTO=new PageQueryDTO();
         pageQueryDTO.setPage(page);
         pageQueryDTO.setSize(size);
-        List<UserVO> res=userService.getActiveUsers(pageQueryDTO);
-        return Result.success(res);
+        Page<UserPO> res=userService.getActiveUsers(pageQueryDTO);
+        if(res==null||res.isEmpty()){
+            throw new CustomException(ErrorCode.DATA_IS_NULL);
+        }
+        Page<UserVO> userVOS = UserMapper.INSTANCE.userPOToUserVO(res);
+        log.info("/activeUsers:"+ res);
+        return Result.success(userVOS);
     }
 }

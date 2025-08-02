@@ -2,7 +2,6 @@ package life.lumen.common.model.entity.post;
 
 import jakarta.persistence.*;
 import life.lumen.common.model.entity.BaseEntity;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;

@@ -11,7 +11,7 @@ public enum ErrorCode {
     NOT_RESPONSE_BODY_ERROR(1001,"无响应体"),
     NOT_USER_CONTEXT_ERROR(1002,"用户未登录"),
     INVALID_PARAMETERS(1003,"参数不合法"),
-
+    DATA_IS_NULL(1004,"值为null或empty"),
     //登录相关
     VERIFY_CODE_ERROR(2000, "验证码错误或已过期"),
     CACHE_CODE_ERROR(2001,"验证码缓存异常"),

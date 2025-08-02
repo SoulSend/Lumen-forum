@@ -141,12 +141,12 @@ export const userApi = {
   getCurrentUser: () => get('/users/me'),
 
   // 获取指定用户信息
-  getUserById: (id: string | number) => get(`/users/${id}`),
+  getUserById: (id: string | number) => get(`/users/id/${id}`),
 
   // 更新用户资料
   updateProfile: (data: any) => put('/users/profile', data),
 
-  // 获取活跃用户列表 - 修正为使用查询参数
+  // 获取活跃用户列表 
   getActiveUsers: (page = 0, size = API_CONFIG.DEFAULT_PAGE_SIZE) => get('/users/active', { page, size }),
 }
 
@@ -320,7 +320,7 @@ export const userInteractionApi = {
     get('/users/likes', { page, size, type }),
 
   // 获取用户统计信息
-  getUserStats: (id: string | number) => get(`/users/${id}/stats`),
+  //getUserStats: (id: string | number) => get(`/users/${id}/stats`),
 }
 
 // 标签API - 新增接口

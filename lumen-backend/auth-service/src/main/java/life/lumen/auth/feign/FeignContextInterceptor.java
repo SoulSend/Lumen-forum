@@ -20,7 +20,6 @@ public class FeignContextInterceptor implements RequestInterceptor {
         UserContext userContext = UserContextHolder.getUserContext();
             if(userContext.getIsSystem()){
             stringListMap.put(SYSTEM_CALL_HEAD,List.of("true"));
-            stringListMap.put(SYSTEM_USER_PASSWORD,List.of(SYSTEM_USER_PASSWORD_HEAD));
         }else {
             stringListMap=UserHeaderUtils.convertUserToHeaders(userContext);
         }

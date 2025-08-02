@@ -7,7 +7,7 @@ import life.lumen.common.model.vo.user.UserVO;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-07-19T10:56:02+0800",
+    date = "2025-07-26T12:25:23+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 17.0.15 (Oracle Corporation)"
 )
 public class UserMapperImpl implements UserMapper {

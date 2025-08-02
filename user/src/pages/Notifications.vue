@@ -5,13 +5,19 @@
       <div class="header-content">
         <div class="title-section">
           <h1 class="page-title">通知中心</h1>
-          <p class="page-subtitle">静态演示页面</p>
+          <p class="page-subtitle">管理您的通知消息</p>
         </div>
         
         <div class="header-actions">
-          <el-button type="primary" size="default" class="mark-all-read-btn">
+          <el-button
+            type="primary"
+            size="default"
+            class="mark-all-read-btn"
+            @click="markAllAsRead"
+            :disabled="unreadCount === 0"
+          >
             <el-icon><Check /></el-icon>
-            全部已读
+            全部已读 ({{ unreadCount }})
           </el-button>
         </div>
       </div>
@@ -19,25 +25,29 @@
       <!-- 过滤器 -->
       <div class="filter-section">
         <div class="filter-tabs">
-          <div class="filter-tab active">
+          <div
+            class="filter-tab"
+            :class="{ active: currentFilter === 'all' }"
+            @click="changeFilter('all')"
+          >
             <span class="tab-label">全部</span>
-            <span class="tab-count">5</span>
+            <span class="tab-count">{{ totalElements }}</span>
           </div>
-          <div class="filter-tab">
+          <div
+            class="filter-tab"
+            :class="{ active: currentFilter === 'unread' }"
+            @click="changeFilter('unread')"
+          >
             <span class="tab-label">未读</span>
-            <span class="tab-count">2</span>
+            <span class="tab-count">{{ unreadCount }}</span>
           </div>
-          <div class="filter-tab">
-            <span class="tab-label">评论</span>
-            <span class="tab-count">3</span>
-          </div>
-          <div class="filter-tab">
-            <span class="tab-label">点赞</span>
-            <span class="tab-count">1</span>
-          </div>
-          <div class="filter-tab">
-            <span class="tab-label">系统</span>
-            <span class="tab-count">1</span>
+          <div
+            class="filter-tab"
+            :class="{ active: currentFilter === 'read' }"
+            @click="changeFilter('read')"
+          >
+            <span class="tab-label">已读</span>
+            <span class="tab-count">{{ totalElements - unreadCount }}</span>
           </div>
         </div>
       </div>
@@ -46,124 +56,77 @@
     <!-- 通知内容区域 -->
     <div class="notifications-content">
       <div class="notifications-container">
-        <!-- 静态通知列表 -->
+        <!-- 动态通知列表 -->
         <div class="notifications-list">
-          <!-- 未读通知 -->
-          <div class="notification-card unread">
-            <div class="unread-indicator"></div>
+          <!-- 加载状态 -->
+          <div v-if="loading && notifications.length === 0" class="loading-container">
+            <el-skeleton :rows="5" animated />
+          </div>
+
+          <!-- 空状态 -->
+          <div v-else-if="filteredNotifications.length === 0" class="empty-state">
+            <div class="empty-icon">
+              <el-icon size="48"><ChatDotRound /></el-icon>
+            </div>
+            <div class="empty-text">暂无通知</div>
+          </div>
+
+          <!-- 通知列表 -->
+          <div
+            v-for="notification in filteredNotifications"
+            :key="notification.id"
+            class="notification-card"
+            :class="{ unread: !notification.readAt }"
+          >
+            <div v-if="!notification.readAt" class="unread-indicator"></div>
             <div class="notification-avatar">
-              <div class="avatar-container comment-type">
-                <el-icon><ChatDotRound /></el-icon>
+              <div class="avatar-container" :class="getNotificationTypeClass(notification.type)">
+                <el-icon><component :is="getNotificationIcon(notification.type)" /></el-icon>
               </div>
             </div>
             <div class="notification-body">
               <div class="notification-main">
                 <div class="notification-message">
-                  <strong>张三</strong> 评论了您的帖子 "Vue3开发技巧分享"
+                  {{ notification.title || notification.content }}
                 </div>
                 <div class="notification-meta">
-                  <span class="notification-time">2分钟前</span>
-                  <span class="notification-category">评论通知</span>
+                  <span class="notification-time">{{ formatNotificationTime(notification.createdAt) }}</span>
+                  <span class="notification-category">{{ notification.type === 'comment' ? '评论通知' : notification.type === 'like' ? '点赞通知' : notification.type === 'follow' ? '关注通知' : '系统通知' }}</span>
                 </div>
               </div>
-              <div class="notification-preview">
-                这个技巧很实用，感谢分享！我在项目中也遇到过类似的问题...
+              <div v-if="notification.content && notification.title" class="notification-preview">
+                {{ notification.content }}
               </div>
             </div>
             <div class="notification-actions">
-              <el-button circle size="small" class="action-btn read-btn">
+              <el-button
+                v-if="!notification.readAt"
+                circle
+                size="small"
+                class="action-btn read-btn"
+                @click="markAsRead(notification.id)"
+              >
                 <el-icon><Check /></el-icon>
+              </el-button>
+              <el-button
+                circle
+                size="small"
+                class="action-btn delete-btn"
+                @click="deleteNotification(notification.id)"
+              >
+                <el-icon><Close /></el-icon>
               </el-button>
             </div>
           </div>
 
-          <!-- 已读通知 -->
-          <div class="notification-card">
-            <div class="notification-avatar">
-              <div class="avatar-container like-type">
-                <el-icon><Star /></el-icon>
-              </div>
-            </div>
-            <div class="notification-body">
-              <div class="notification-main">
-                <div class="notification-message">
-                  <strong>李四</strong> 点赞了您的帖子 "前端性能优化实践"
-                </div>
-                <div class="notification-meta">
-                  <span class="notification-time">1小时前</span>
-                  <span class="notification-category">点赞通知</span>
-                </div>
-              </div>
-            </div>
+          <!-- 加载更多 -->
+          <div v-if="hasMore && !loading" class="load-more">
+            <el-button @click="loadMore" :loading="loading">加载更多</el-button>
           </div>
 
-          <!-- 系统通知 -->
-          <div class="notification-card">
-            <div class="notification-avatar">
-              <div class="avatar-container system-type">
-                <el-icon><Setting /></el-icon>
-              </div>
-            </div>
-            <div class="notification-body">
-              <div class="notification-main">
-                <div class="notification-message">
-                  系统维护通知：平台将于今晚23:00-01:00进行系统维护
-                </div>
-                <div class="notification-meta">
-                  <span class="notification-time">3小时前</span>
-                  <span class="notification-category">系统通知</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 未读评论通知 -->
-          <div class="notification-card unread">
-            <div class="unread-indicator"></div>
-            <div class="notification-avatar">
-              <div class="avatar-container comment-type">
-                <el-icon><ChatDotRound /></el-icon>
-              </div>
-            </div>
-            <div class="notification-body">
-              <div class="notification-main">
-                <div class="notification-message">
-                  <strong>王五</strong> 回复了您的评论
-                </div>
-                <div class="notification-meta">
-                  <span class="notification-time">5小时前</span>
-                  <span class="notification-category">评论通知</span>
-                </div>
-              </div>
-              <div class="notification-preview">
-                我觉得你说得很对，这个方法确实能提升不少性能...
-              </div>
-            </div>
-            <div class="notification-actions">
-              <el-button circle size="small" class="action-btn read-btn">
-                <el-icon><Check /></el-icon>
-              </el-button>
-            </div>
-          </div>
-
-          <!-- 提及通知 -->
-          <div class="notification-card">
-            <div class="notification-avatar">
-              <div class="avatar-container mention-type">
-                <el-icon><User /></el-icon>
-              </div>
-            </div>
-            <div class="notification-body">
-              <div class="notification-main">
-                <div class="notification-message">
-                  <strong>赵六</strong> 在帖子中提及了您
-                </div>
-                <div class="notification-meta">
-                  <span class="notification-time">1天前</span>
-                  <span class="notification-category">提及通知</span>
-                </div>
-              </div>
-            </div>
+          <!-- 底部加载状态 -->
+          <div v-if="loading && notifications.length > 0" class="loading-more">
+            <el-skeleton :rows="2" animated />
           </div>
         </div>
       </div>
@@ -172,15 +135,209 @@
 </template>
 
 <script setup lang="ts">
-import { 
-  Check, 
-  Setting, 
+import { ref, onMounted, computed } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import {
+  Check,
+  Setting,
   ChatDotRound,
   Star,
-  User
+  User,
+  Close
 } from '@element-plus/icons-vue'
+import { notificationApi } from '../services/api'
+import { formatDate } from '../utils/format'
 
-// 静态页面，无需复杂逻辑
+// 通知数据
+const notifications = ref<any[]>([])
+const loading = ref(false)
+const currentFilter = ref('all') // all, unread, read
+const currentPage = ref(0)
+const pageSize = ref(20)
+const totalElements = ref(0)
+const hasMore = ref(true)
+
+// 未读通知数量
+const unreadCount = ref(0)
+
+// 过滤后的通知
+const filteredNotifications = computed(() => {
+  if (currentFilter.value === 'all') return notifications.value
+  if (currentFilter.value === 'unread') return notifications.value.filter(n => !n.readAt)
+  if (currentFilter.value === 'read') return notifications.value.filter(n => n.readAt)
+  return notifications.value
+})
+
+// 获取通知列表
+const fetchNotifications = async (reset = false) => {
+  if (loading.value) return
+
+  loading.value = true
+  try {
+    const page = reset ? 0 : currentPage.value
+    const result = await notificationApi.getNotifications(
+      page,
+      pageSize.value,
+      'all',
+      currentFilter.value === 'all' ? 'all' : currentFilter.value
+    )
+
+    if (result && result.content) {
+      if (reset) {
+        notifications.value = result.content
+        currentPage.value = 0
+      } else {
+        notifications.value.push(...result.content)
+      }
+
+      totalElements.value = result.totalElements || 0
+      hasMore.value = !result.last
+      currentPage.value = result.pageable?.pageNumber || 0
+    }
+  } catch (error) {
+    console.error('Failed to fetch notifications:', error)
+    ElMessage.error('获取通知失败')
+  } finally {
+    loading.value = false
+  }
+}
+
+// 获取未读通知数量
+const fetchUnreadCount = async () => {
+  try {
+    const result = await notificationApi.getUnreadCount()
+    if (result) {
+      unreadCount.value = result.total || 0
+    }
+  } catch (error) {
+    console.error('Failed to fetch unread count:', error)
+  }
+}
+
+// 标记单个通知为已读
+const markAsRead = async (notificationId: number) => {
+  try {
+    await notificationApi.markAsRead(notificationId)
+
+    // 更新本地状态
+    const notification = notifications.value.find(n => n.id === notificationId)
+    if (notification && !notification.readAt) {
+      notification.readAt = new Date().toISOString()
+      unreadCount.value = Math.max(0, unreadCount.value - 1)
+    }
+
+    ElMessage.success('已标记为已读')
+  } catch (error) {
+    console.error('Failed to mark as read:', error)
+    ElMessage.error('操作失败')
+  }
+}
+
+// 标记所有通知为已读
+const markAllAsRead = async () => {
+  try {
+    await ElMessageBox.confirm('确定要标记所有通知为已读吗？', '确认操作', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'info'
+    })
+
+    await notificationApi.markAllAsRead()
+
+    // 更新本地状态
+    notifications.value.forEach(notification => {
+      if (!notification.readAt) {
+        notification.readAt = new Date().toISOString()
+      }
+    })
+    unreadCount.value = 0
+
+    ElMessage.success('所有通知已标记为已读')
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error('Failed to mark all as read:', error)
+      ElMessage.error('操作失败')
+    }
+  }
+}
+
+// 删除通知
+const deleteNotification = async (notificationId: number) => {
+  try {
+    await ElMessageBox.confirm('确定要删除这条通知吗？', '确认删除', {
+      confirmButtonText: '删除',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+
+    await notificationApi.deleteNotification(notificationId)
+
+    // 从本地列表中移除
+    const index = notifications.value.findIndex(n => n.id === notificationId)
+    if (index > -1) {
+      const notification = notifications.value[index]
+      if (!notification.readAt) {
+        unreadCount.value = Math.max(0, unreadCount.value - 1)
+      }
+      notifications.value.splice(index, 1)
+      totalElements.value = Math.max(0, totalElements.value - 1)
+    }
+
+    ElMessage.success('通知已删除')
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error('Failed to delete notification:', error)
+      ElMessage.error('删除失败')
+    }
+  }
+}
+
+// 切换过滤器
+const changeFilter = (filter: string) => {
+  currentFilter.value = filter
+  fetchNotifications(true)
+}
+
+// 加载更多
+const loadMore = () => {
+  if (hasMore.value && !loading.value) {
+    currentPage.value++
+    fetchNotifications(false)
+  }
+}
+
+// 获取通知类型图标
+const getNotificationIcon = (type: string) => {
+  switch (type) {
+    case 'comment': return ChatDotRound
+    case 'like': return Star
+    case 'follow': return User
+    case 'system': return Setting
+    default: return ChatDotRound
+  }
+}
+
+// 获取通知类型样式类
+const getNotificationTypeClass = (type: string) => {
+  switch (type) {
+    case 'comment': return 'comment-type'
+    case 'like': return 'like-type'
+    case 'follow': return 'follow-type'
+    case 'system': return 'system-type'
+    default: return 'comment-type'
+  }
+}
+
+// 格式化通知时间
+const formatNotificationTime = (dateString: string) => {
+  return formatDate(dateString)
+}
+
+// 初始化
+onMounted(() => {
+  fetchNotifications(true)
+  fetchUnreadCount()
+})
 </script>
 
 <style scoped>

@@ -2,8 +2,9 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/Z_doc/lumen_databases.sql" dialect="MySQL" />
-    <file url="file://$PROJECT_DIR$/cloud-common/src/main/java/life/lumen/common/model/entity/category/CategoryPO.java" dialect="GenericSQL" />
-    <file url="file://$PROJECT_DIR$/cloud-common/src/main/java/life/lumen/common/model/entity/post/PostPO.java" dialect="GenericSQL" />
-    <file url="file://$PROJECT_DIR$/cloud-common/src/main/java/life/lumen/common/model/entity/user/UserPO.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/cloud-common/src/main/java/life/lumen/common/model/entity/category/CategoryPO.java" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/cloud-common/src/main/java/life/lumen/common/model/entity/post/PostPO.java" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/cloud-common/src/main/java/life/lumen/common/model/entity/tag/TagPO.java" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/cloud-common/src/main/java/life/lumen/common/model/entity/user/UserPO.java" dialect="MySQL" />
   </component>
 </project>

@@ -2,6 +2,7 @@ package life.lumen.gateway.filter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import life.lumen.common.constants.SystemContextConstant;
 import life.lumen.common.model.Result;
 import life.lumen.common.model.bo.UserContext;
 import life.lumen.common.utils.context.UserHeaderUtils;
@@ -17,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
@@ -27,29 +29,26 @@ import java.util.Map;
 @Component
 @Slf4j
 public class AuthFilter implements GlobalFilter, Ordered {
-    // 白名单
-    private static final List<String> WHITE_LIST = Arrays.asList(
-            "/api/auth/login",
-            "/api/auth/login/code",
-            "/api/users/{id}",
-            "/api/users/active",
-            "/api/content/categories",
-            "/api/content/categories/{id}",
-            "/api/content/posts",
-            "/api/content/posts/{id}",
-            "/api/content/posts/user",
-            "/api/content/posts/categories",
-            "/api/content/posts/hot/side",
-            "/api/content/posts/recommended",
-            "/api/content/posts/recommended/side"
+    private static final AntPathMatcher pathMatcher = new AntPathMatcher();
+
+    // 要拦截的名单
+    private static final List<String> FILTER_LIST = Arrays.asList(
+            "/api/logout",
+            "",
+            ""
     );
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getPath().toString();
         log.info("path:{}", path);
-        // 检查是否在白名单中
-        if (WHITE_LIST.stream().anyMatch(path::startsWith)) {
+        // 检查是否在名单中 如果在 则拦截
+        if (FILTER_LIST.stream().noneMatch(path::startsWith)) {
+            exchange = exchange.mutate().request(builder -> {
+                builder.headers(headers -> {
+                    headers.put(SystemContextConstant.SYSTEM_CALL_HEAD,List.of("true"));
+                });
+            }).build();
             return chain.filter(exchange);
         }
         HttpHeaders headers = exchange.getRequest().getHeaders();

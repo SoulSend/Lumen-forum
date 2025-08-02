@@ -69,19 +69,19 @@ const recentActivities = ref([
   { 
     type: 'post', 
     time: Date.now() - 1000 * 60 * 25,
-    user: { id: 1, username: '生活家', avatar: '../assets/default-avatar.png' },
+    user: { id: 1, username: '生活家', avatar: getUserAvatarUrl() },
     post: { id: 101, title: '10个最实用的收纳技巧，让小户型秒变大空间' }
   },
   { 
     type: 'comment', 
     time: Date.now() - 1000 * 60 * 120,
-    user: { id: 3, username: '旅行者', avatar: '../assets/default-avatar.png' },
+    user: { id: 3, username: '旅行者', avatar: getUserAvatarUrl() },
     post: { id: 102, title: '欧洲自助游攻略：如何用最少的钱玩转欧洲' }
   },
   { 
     type: 'like', 
     time: Date.now() - 1000 * 60 * 180,
-    user: { id: 2, username: '美食控', avatar: '../assets/default-avatar.png' },
+    user: { id: 2, username: '美食控', avatar: getUserAvatarUrl() },
     post: { id: 103, title: '在家做出餐厅级美味的5个小窍门' }
   }
 ]);

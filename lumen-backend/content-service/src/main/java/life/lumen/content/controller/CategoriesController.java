@@ -2,6 +2,8 @@ package life.lumen.content.controller;
 
 import life.lumen.common.model.Result;
 import life.lumen.common.model.entity.category.CategoryPO;
+import life.lumen.common.model.vo.category.CategoryVO;
+import life.lumen.common.utils.mapstruct.CategoryMapper;
 import life.lumen.content.service.CategoriesService;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,8 +26,9 @@ public class CategoriesController {
      * @return 返回分类列表
      */
     @GetMapping()
-    public Result<List<CategoryPO>> getCategories(){
-        return Result.success(categoriesService.getCategories());
+    public Result<List<CategoryVO>> getCategories(){
+        List<CategoryPO> categories = categoriesService.getCategories();
+        return Result.success(CategoryMapper.INSTANCE.toCategoryVOList(categories));
     }
 
     /**
@@ -34,8 +37,9 @@ public class CategoriesController {
      * @return 返回对应的分类
      */
     @GetMapping("/{id}")
-    public Result<CategoryPO> getCategory(@PathVariable Long id){
-        return  Result.success(categoriesService.getCategory(id));
+    public Result<CategoryVO> getCategory(@PathVariable Long id){
+        CategoryPO category = categoriesService.getCategory(id);
+        return  Result.success(CategoryMapper.INSTANCE.toCategoryVO(category));
     }
 
 }

@@ -139,7 +139,7 @@ export const useGlobalDataStore = defineStore('globalData', () => {
     return requestDeduplicator.deduplicate('activeUsers', async () => {
       activeUsersLoading.value = true
       try {
-        const response = await userApi.getActiveUsers(0, 8)
+        const response = await userApi.getActiveUsers(0, 10)
         activeUsers.value = response?.content || []
         activeUsersLoaded.value = true
         return activeUsers.value
@@ -196,7 +196,7 @@ export const useGlobalDataStore = defineStore('globalData', () => {
     return requestDeduplicator.deduplicate('recommendedPosts', async () => {
       recommendedPostsLoading.value = true
       try {
-        const response = await postApi.getRecommendedPosts(0, 6)
+        const response = await postApi.getRecommendedPosts(0, 10)
         recommendedPosts.value = response?.content || []
         recommendedPostsLoaded.value = true
         return recommendedPosts.value

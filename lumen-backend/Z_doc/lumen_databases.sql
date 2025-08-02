@@ -99,5 +99,59 @@ VALUES
     ('求推荐一款好用的机械键盘', '预算500以内，主要用来敲代码，求大佬推荐！', 2, 2, 120, 30, 15, 0, 1, 0, 101, 0, NOW(), NOW()),
     ('已解决：Spring Boot 启动失败', '问题原因：application.yml 缩进错误，已修复，谢谢各位！', 3, 3, 800, 100, 8, 1, 1, 1, 202, 0, NOW(), NOW());
 
+-- 标签表
+CREATE TABLE tags (
+                      id   BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '标签主键，自增',
+                      name VARCHAR(50) NOT NULL UNIQUE COMMENT '标签的名字',
+                      slug VARCHAR(60) NOT NULL UNIQUE COMMENT '标签的友好短名',
+                      category_id INT NOT NULL   COMMENT '对应的分类的id',
+                      deleted             TINYINT(1)   DEFAULT 0 COMMENT '逻辑删除标识：0未删除 1已删除',
+                      created_at          TIMESTAMP    DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                      updated_at          TIMESTAMP    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
+);
+-- 再插入二级标签，parent_tag_id 对应上面的一级 id
+-- 假设一级 id 依次是 1-6，实际可用子查询或代码获取
+INSERT INTO tags (name, slug,category_id) VALUES
+-- 生活百科
+('家居整理', 'home-organization', 1),
+('省钱妙招', 'money-saving', 1),
+('旅行攻略', 'travel-guide', 1),
+('生活小窍门', 'daily-hacks', 1),
+('节日庆祝', 'holiday-celebrations', 1),
+
+-- 健康医疗
+('营养膳食', 'nutrition-diet', 2),
+('心理健康', 'mental-health', 2),
+('常见病护理', 'common-illness', 2),
+('运动健身', 'fitness-workout', 2),
+('疫苗接种', 'vaccination', 2),
+
+-- 科学技术
+('人工智能', 'ai', 3),
+('前端开发', 'frontend-dev', 3),
+('太空探索', 'space-exploration', 3),
+('量子计算', 'quantum-computing', 3),
+('新能源技术', 'new-energy', 3),
+
+-- 家庭育儿
+('早教启蒙', 'early-education', 4),
+('亲子游戏', 'parent-child-games', 4),
+('青少年心理', 'teen-psychology', 4),
+('安全急救', 'child-safety', 4),
+('升学择校', 'school-choice', 4),
+
+-- 食品安全
+('食品溯源', 'food-traceability', 5),
+('添加剂解读', 'additive-guide', 5),
+('保质期管理', 'expiry-management', 5),
+('有机认证', 'organic-cert', 5),
+('食品谣言粉碎', 'food-myth-buster', 5),
+
+-- 环保节能
+('垃圾分类', 'waste-sorting', 6),
+('节水技巧', 'water-saving', 6),
+('低碳出行', 'low-carbon-travel', 6),
+('旧物改造', 'upcycling', 6),
+('绿色家居', 'green-home', 6);
 
 

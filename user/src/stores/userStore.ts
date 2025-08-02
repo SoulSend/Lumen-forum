@@ -4,6 +4,7 @@ import type { User, ApiUserResponse, LoginResponse } from '../types/forum'
 import { authApi, userApi } from '../services/api'
 import { ErrorHandler } from '../utils/errorHandler'
 import { ERROR_MESSAGES } from '../constants'
+import { getUserAvatarUrl } from '@/utils/assets'
 
 export const useUserStore = defineStore('user', () => {
   const currentUser = ref<User | null>(null)
@@ -28,7 +29,7 @@ export const useUserStore = defineStore('user', () => {
       username: apiUser.username,
       email: apiUser.email,
       phone: apiUser.phone,
-      avatar: apiUser.avatar || '/img/avatar-default.png',
+      avatar: getUserAvatarUrl(),
       bio: apiUser.bio || '',
       website: apiUser.website || '',
       location: apiUser.location || '',
@@ -111,7 +112,7 @@ export const useUserStore = defineStore('user', () => {
       currentUser.value = {
         id: userContext.userId,
         username: userContext.username,
-        avatar: userContext.avatar || '/img/avatar-default.png',
+        avatar: userContext.avatar ||getUserAvatarUrl() ,
         email: '',
         phone: phone,
         bio: '',
@@ -172,7 +173,7 @@ export const useUserStore = defineStore('user', () => {
       currentUser.value = {
         id: userContext.userId,
         username: userContext.username,
-        avatar: userContext.avatar || '/img/avatar-default.png',
+        avatar: userContext.avatar || getUserAvatarUrl(),
         email: email,
         bio: '',
         website: '',
@@ -266,6 +267,21 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  // 设置用户信息（用于外部更新）
+  function setUser(user: any) {
+    currentUser.value = user
+
+    // 更新本地存储中的用户信息
+    const storedToken = localStorage.getItem('token') || sessionStorage.getItem('token')
+    if (storedToken) {
+      if (localStorage.getItem('token')) {
+        localStorage.setItem('user', JSON.stringify(user))
+      } else {
+        sessionStorage.setItem('user', JSON.stringify(user))
+      }
+    }
+  }
+
   // 更新用户资料
   async function updateProfile(data: any) {
     loading.value = true
@@ -273,17 +289,7 @@ export const useUserStore = defineStore('user', () => {
 
     try {
       const user = await userApi.updateProfile(data)
-      currentUser.value = user
-
-      // 更新本地存储中的用户信息
-      const storedToken = localStorage.getItem('token') || sessionStorage.getItem('token')
-      if (storedToken) {
-        if (localStorage.getItem('token')) {
-          localStorage.setItem('user', JSON.stringify(user))
-        } else {
-          sessionStorage.setItem('user', JSON.stringify(user))
-        }
-      }
+      setUser(user) // 使用setUser方法
 
       return user
     } catch (e: any) {
@@ -349,6 +355,37 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  // 获取用户资料
+  async function fetchUserProfile(userId: string) {
+    loading.value = true
+    error.value = null
+
+    try {
+      const apiUser = await userApi.getUserById(userId)
+      const user = mapApiUserToUser(apiUser)
+      currentUser.value = user
+
+      // 更新本地存储中的用户信息
+      const storedToken = localStorage.getItem('token') || sessionStorage.getItem('token')
+      if (storedToken) {
+        if (localStorage.getItem('token')) {
+          localStorage.setItem('user', JSON.stringify(user))
+        } else {
+          sessionStorage.setItem('user', JSON.stringify(user))
+        }
+      }
+
+      return user
+    } catch (e: any) {
+      const errorInfo = ErrorHandler.handleApiError(e)
+      error.value = ERROR_MESSAGES.FETCH_USER_FAILED
+      ErrorHandler.showError(errorInfo)
+      return null
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     currentUser,
     token,
@@ -362,8 +399,10 @@ export const useUserStore = defineStore('user', () => {
     loginWithEmail,
     logout,
     fetchCurrentUser,
+    setUser,
     updateProfile,
     sendVerificationCode,
-    validateTokenAndFetchUser
+    validateTokenAndFetchUser,
+    fetchUserProfile
   }
-}) 
+})

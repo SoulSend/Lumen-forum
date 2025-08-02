@@ -118,6 +118,7 @@ import Sidebar from '../components/layout/Sidebar.vue';
 import { usePostStore } from '../stores/postStore';
 import { getUserAvatarUrl } from '../utils/assets';
 import { DEFAULT_TEXTS } from '../constants';
+import { searchApi } from '../services/api';
 
 const route = useRoute();
 const router = useRouter();
@@ -160,71 +161,77 @@ watch(() => route.query, (newQuery) => {
 // 执行搜索
 const performSearch = async () => {
   if (!searchQuery.value.trim()) return;
-  
+
   loading.value = true;
   try {
-    // 这里应该调用实际的API
-    // const result = await searchService.search({
-    //   query: searchQuery.value,
-    //   type: activeTab.value === 'all' ? undefined : activeTab.value,
-    //   page: currentPage.value,
-    //   per_page: perPage.value
-    // });
-    
-    // 模拟搜索结果
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    searchResults.value = [
-      {
-        id: 1,
-        type: 'post',
-        title: '如何提高工作效率的10个小技巧',
-        content: '在现代快节奏的工作环境中，提高效率变得越来越重要...',
-        user: { id: 1, username: '效率达人', avatar: '/default-avatar.png' },
-        created_at: '2023-05-15T10:30:00',
-        comment_count: 24,
-        like_count: 56,
-        view_count: 342,
-        category: { id: 1, name: '职场技能' },
-        tags: [{ id: 1, name: '效率' }, { id: 2, name: '工作' }]
-      },
-      {
-        id: 2,
-        type: 'post',
-        title: '居家办公的环境布置建议',
-        content: '随着远程工作的普及，如何打造一个高效的居家办公环境变得尤为重要...',
-        user: { id: 2, username: '家居达人', avatar: '/default-avatar.png' },
-        created_at: '2023-05-10T14:20:00',
-        comment_count: 18,
-        like_count: 42,
-        view_count: 286,
-        category: { id: 2, name: '家居装饰' },
-        tags: [{ id: 3, name: '居家办公' }, { id: 4, name: '环境' }]
-      },
-      {
-        id: 1,
-        type: 'user',
-        username: '效率达人',
-        avatar: '/default-avatar.png',
-        bio: '专注分享提高工作和生活效率的方法和工具',
-        post_count: 45,
-        follower_count: 1200
-      },
-      {
-        id: 1,
-        type: 'tag',
-        name: '效率',
-        post_count: 128
-      },
-      {
-        id: 3,
-        type: 'tag',
-        name: '居家办公',
-        post_count: 86
+    // 调用搜索API
+    const result = await searchApi.search(
+      searchQuery.value,
+      activeTab.value === 'all' ? 'all' : activeTab.value,
+      currentPage.value - 1, // API使用0基索引
+      perPage.value,
+      'relevance'
+    );
+
+    // 处理搜索结果
+    if (result) {
+      const allResults: any[] = []
+
+      // 处理帖子结果
+      if (result.posts && result.posts.content) {
+        result.posts.content.forEach((post: any) => {
+          allResults.push({
+            id: post.id,
+            type: 'post',
+            title: post.title,
+            content: post.content,
+            user: post.user,
+            created_at: post.createdAt,
+            comment_count: post.commentCount,
+            like_count: post.likeCount,
+            view_count: post.viewCount,
+            category: post.category,
+            tags: post.tags,
+            highlight: post.highlight
+          })
+        })
       }
-    ];
-    
-    totalItems.value = 25; // 模拟总数
+
+      // 处理用户结果
+      if (result.users && result.users.content) {
+        result.users.content.forEach((user: any) => {
+          allResults.push({
+            id: user.id,
+            type: 'user',
+            username: user.username,
+            avatar: user.avatar,
+            bio: user.bio,
+            post_count: user.postCount,
+            follower_count: user.reputation
+          })
+        })
+      }
+
+      // 处理分类结果
+      if (result.categories && result.categories.content) {
+        result.categories.content.forEach((category: any) => {
+          allResults.push({
+            id: category.id,
+            type: 'tag',
+            name: category.name,
+            post_count: category.postCount
+          })
+        })
+      }
+
+      searchResults.value = allResults
+
+      // 计算总数
+      const totalPosts = result.posts?.totalElements || 0
+      const totalUsers = result.users?.totalElements || 0
+      const totalCategories = result.categories?.totalElements || 0
+      totalItems.value = totalPosts + totalUsers + totalCategories
+    }
   } catch (error) {
     console.error('搜索失败:', error);
     searchResults.value = [];
@@ -237,36 +244,40 @@ const performSearch = async () => {
 const searchByTag = async (tagId: string) => {
   loading.value = true;
   try {
-    // 实际应该调用API
-    // const result = await tagService.getPostsByTag(tagId, {
-    //   page: currentPage.value,
-    //   per_page: perPage.value
-    // });
-    
-    // 模拟结果
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    searchResults.value = [
-      {
-        id: 1,
+    // 调用标签搜索API
+    const result = await searchApi.searchByTag(
+      tagId,
+      currentPage.value - 1, // API使用0基索引
+      perPage.value
+    );
+
+    // 处理搜索结果
+    if (result && result.content) {
+      searchResults.value = result.content.map((post: any) => ({
+        id: post.id,
         type: 'post',
-        title: '如何提高工作效率的10个小技巧',
-        content: '在现代快节奏的工作环境中，提高效率变得越来越重要...',
-        user: { id: 1, username: '效率达人', avatar: '/default-avatar.png' },
-        created_at: '2023-05-15T10:30:00',
-        comment_count: 24,
-        like_count: 56,
-        view_count: 342,
-        category: { id: 1, name: '职场技能' },
-        tags: [{ id: 1, name: '效率' }, { id: 2, name: '工作' }]
-      }
-    ];
-    
-    totalItems.value = 1;
+        title: post.title,
+        content: post.content,
+        user: post.user,
+        created_at: post.createdAt,
+        comment_count: post.commentCount,
+        like_count: post.likeCount,
+        view_count: post.viewCount,
+        category: post.category,
+        tags: post.tags
+      }));
+
+      totalItems.value = result.totalElements || 0;
+    } else {
+      searchResults.value = [];
+      totalItems.value = 0;
+    }
+
     activeTab.value = 'posts'; // 标签搜索默认显示帖子标签页
   } catch (error) {
     console.error('按标签搜索失败:', error);
     searchResults.value = [];
+    totalItems.value = 0;
   } finally {
     loading.value = false;
   }

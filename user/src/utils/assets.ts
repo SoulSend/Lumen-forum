@@ -3,7 +3,7 @@
  * 解决项目中图片路径不一致的问题
  */
 
-import defaultAvatarImg from '@/assets/default-avatar.png'
+export const DEFAULT_AVATAR_URL = 'http://localhost:5173/src/assets/default-avatar.png';
 
 /**
  * 获取用户头像URL
@@ -14,7 +14,7 @@ export function getUserAvatarUrl(avatar?: string | null): string {
   if (avatar && avatar.trim()) {
     return avatar
   }
-  return defaultAvatarImg
+  return DEFAULT_AVATAR_URL
 }
 
 /**
@@ -22,7 +22,7 @@ export function getUserAvatarUrl(avatar?: string | null): string {
  * @returns 默认头像URL
  */
 export function getDefaultAvatarUrl(): string {
-  return defaultAvatarImg
+  return DEFAULT_AVATAR_URL
 }
 
 /**
@@ -40,6 +40,6 @@ export function isValidImageUrl(url?: string | null): boolean {
  * @param fallback 备用URL
  * @returns 安全的图片URL
  */
-export function getSafeImageUrl(url?: string | null, fallback: string = defaultAvatarImg): string {
+export function getSafeImageUrl(url?: string | null, fallback: string = DEFAULT_AVATAR_URL): string {
   return isValidImageUrl(url) ? url! : fallback
 }

@@ -14,6 +14,10 @@ import life.lumen.common.utils.context.UserContextHolder;
 import life.lumen.user.controller.UserController;
 import life.lumen.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -90,8 +94,8 @@ public class UserService {
         return userRepository.save(oldUser);
     }
 
-    public List<UserVO> getActiveUsers( PageQueryDTO pageQueryDTO) {
-        // todo
-        return null;
+    public Page<UserPO> getActiveUsers(PageQueryDTO pageQueryDTO) {
+        Pageable pageable = PageRequest.of(pageQueryDTO.getPage(), pageQueryDTO.getSize());
+        return  userRepository.findActiveUsers(pageable);
     }
 }

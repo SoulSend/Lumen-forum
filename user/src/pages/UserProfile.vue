@@ -364,7 +364,7 @@ import { ElMessage, ElUpload } from 'element-plus'
 import PostCard from '../components/forum/PostCard.vue'
 import { usePostStore } from '../stores/postStore'
 import { useUserStore } from '../stores/userStore'
-import { postApi } from '../services/api'
+import { postApi, userInteractionApi, userApi, fileApi } from '../services/api'
 import type { Post, User } from '../types/forum'
 import { getUserAvatarUrl } from '../utils/assets'
 import { DEFAULT_TEXTS, UPLOAD_CONFIG, UI_CONFIG } from '../constants'
@@ -406,9 +406,9 @@ const bioDialogVisible = ref(false)
 
 // 计算封面样式
 const coverStyle = computed(() => {
-  if (user.value?.cover_image) {
+  if (user.value?.coverImage) {
     return {
-      backgroundImage: `url(${user.value.cover_image})`
+      backgroundImage: `url(${user.value.coverImage})`
     }
   }
   return {}
@@ -597,52 +597,32 @@ const getCategoryColor = (index: number) => {
 const fetchUserProfile = async () => {
   loading.value = true
   const userId = route.params.id as string
-  
+
   try {
-    // 模拟获取用户资料
-    // 实际项目中应该使用userStore.fetchUserProfile(userId)
-    await new Promise(resolve => setTimeout(resolve, 500))
-    
-    user.value = {
-      id: Number(userId),
-      username: '示例用户',
-      email: 'user@example.com',
-      avatar: '',
-      bio: '这是一个示例用户资料，用于展示页面布局和设计。喜欢分享生活技巧和美食烹饪经验。',
-      showEmail: false,
-      reputation: 150,
-      postCount: 12,
-      commentCount: 45,
-      isAdmin: false,
-      isModerator: true,
-      // 兼容字段
-      created_at: '2023-01-01T00:00:00Z',
-      updated_at: '2023-01-01T00:00:00Z',
-      post_count: 12,
-      comment_count: 45,
-      is_admin: false,
-      is_moderator: true,
-      last_active_at: new Date().toISOString(),
-      // 新字段
-      createdAt: '2023-01-01T00:00:00Z',
-      updatedAt: '2023-01-01T00:00:00Z',
-      lastActiveAt: new Date().toISOString()
+    // 使用 userStore.fetchUserProfile 获取用户资料
+    const fetchedUser = await userStore.fetchUserProfile(userId)
+    if (fetchedUser) {
+      user.value = fetchedUser
+      document.title = `${fetchedUser.username} - Lumen论坛`
+    } else {
+      ElMessage.error('用户资料加载失败')
     }
-    
-    // 模拟关注者数量
-    followersCount.value = 28
-    
-    // 模拟在线状态
+
+    // // 获取用户统计信息
+    // try {
+    //   const stats = await userInteractionApi.getUserStats(userId)
+    //   followersCount.value = stats.followerCount || 0
+    //   totalPosts.value = stats.postCount || 0
+    // } catch (error) {
+    //   console.error('Failed to fetch user stats:', error)
+    //   followersCount.value = 0
+    // }
+
+    // 模拟在线状态（暂时保留）
     isOnline.value = Math.random() > 0.5
-    
-    // 设置页面标题
-    document.title = `${user.value.username} - Lumen论坛`
-    
-    // 获取用户帖子总数
-    totalPosts.value = user.value.post_count
   } catch (error) {
     console.error('Failed to fetch user profile:', error)
-    ElMessage.error('获取用户资料失败')
+    ElMessage.error('加载用户资料时出错')
   } finally {
     loading.value = false
   }
@@ -654,8 +634,6 @@ const fetchUserPosts = async () => {
   postsLoading.value = true
   
   try {
-    // 模拟API调用延迟
-    await new Promise(resolve => setTimeout(resolve, 300))
     
     // 使用正确的API调用获取用户帖子
     const result = await postApi.getUserPosts(userId, currentPage.value, pageSize.value)
@@ -698,9 +676,20 @@ watch(postSortBy, () => {
 })
 
 // 关注用户
-const followUser = (userId: number) => {
-  ElMessage.success(`已关注用户 ID: ${userId}`)
-  // 实际项目中应该调用API进行关注操作
+const followUser = async (userId: number) => {
+  try {
+    const result = await userInteractionApi.toggleFollow(userId)
+    if (result.isFollowing) {
+      ElMessage.success('关注成功')
+      followersCount.value = result.followerCount || followersCount.value + 1
+    } else {
+      ElMessage.success('已取消关注')
+      followersCount.value = Math.max(0, result.followerCount || followersCount.value - 1)
+    }
+  } catch (error) {
+    console.error('Failed to follow user:', error)
+    ElMessage.error('操作失败，请稍后再试')
+  }
 }
 
 // 格式化网站URL显示
@@ -754,7 +743,7 @@ const openAvatarUpload = () => {
 // 打开封面上传窗口
 const openCoverUpload = () => {
   coverUploadVisible.value = true
-  coverPreview.value = user.value?.cover_image || ''
+  coverPreview.value = user.value?.coverImage || ''
   coverFile.value = null
 }
 
@@ -837,12 +826,12 @@ const uploadAvatar = async () => {
   
   uploadingAvatar.value = true
   try {
-    // 模拟上传
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
+    // 上传头像
+    const result = await fileApi.uploadAvatar(avatarFile.value!)
+
     // 更新用户头像
-    if (user.value) {
-      user.value.avatar = avatarPreview.value
+    if (user.value && result) {
+      user.value.avatar = result.url
       ElMessage.success('头像更新成功')
       avatarUploadVisible.value = false
     }
@@ -863,12 +852,12 @@ const uploadCover = async () => {
   
   uploadingCover.value = true
   try {
-    // 模拟上传
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
+    // 上传封面
+    const result = await fileApi.uploadCoverImage(coverFile.value!)
+
     // 更新用户封面
-    if (user.value) {
-      user.value.cover_image = coverPreview.value
+    if (user.value && result) {
+      user.value.coverImage = result.url
       ElMessage.success('封面更新成功')
       coverUploadVisible.value = false
     }
@@ -1180,7 +1169,7 @@ onMounted(() => {
   border-bottom: 1px solid var(--border-light);
 }
 
-.profile-tabs :deep(.el-tabs__nav-wrap::after) {
+.profile_tabs :deep(.el-tabs__nav-wrap::after) {
   display: none;
 }
 
@@ -1436,4 +1425,4 @@ onMounted(() => {
   background-color: #3c5a87; /* 深一点的蓝色 */
   border-color: #3c5a87;
 }
-</style> 
+</style>

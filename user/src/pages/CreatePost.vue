@@ -274,6 +274,9 @@ import type { FormInstance, FormRules } from 'element-plus'
 import { usePostStore } from '../stores/postStore'
 import { useCategoryStore } from '../stores/categoryStore'
 import { useUserStore } from '../stores/userStore'
+import { postManagementApi, tagApi, fileApi } from '../services/api'
+import { useFormSubmit } from '../composables/useLoading'
+import { useFileUpload } from '../composables/useApi'
 import type { Category, Tag } from '../types/forum'
 // 暂时移除Quill编辑器，使用简单的文本编辑器
 // import { QuillEditor } from '@vueup/vue-quill'
@@ -375,25 +378,31 @@ const rules: FormRules = {
 }
 
 // 封面图片上传前检查
-const beforeCoverUpload = (file) => {
+const beforeCoverUpload = (file: any) => {
   const isImage = file.type.startsWith('image/');
-  const isLt2M = file.size / 1024 / 1024 < 2;
+  const isLt5M = file.size / 1024 / 1024 < 5;
 
   if (!isImage) {
     ElMessage.error('上传封面只能是图片格式!');
     return false;
   }
-  if (!isLt2M) {
-    ElMessage.error('上传封面图片大小不能超过 2MB!');
+  if (!isLt5M) {
+    ElMessage.error('上传封面图片大小不能超过 5MB!');
     return false;
   }
   return true;
 }
 
 // 封面图片上传成功回调
-const handleCoverSuccess = (res, file) => {
-  // 实际项目中应该从API响应中获取URL
-  postForm.cover_image = URL.createObjectURL(file.raw);
+const handleCoverSuccess = async (file: any) => {
+  try {
+    const result = await fileApi.uploadCoverImage(file.raw)
+    postForm.cover_image = result.url
+    ElMessage.success('封面图片上传成功')
+  } catch (error) {
+    console.error('Failed to upload cover image:', error)
+    ElMessage.error('封面图片上传失败')
+  }
 }
 
 // 获取分类列表
@@ -415,10 +424,22 @@ const saveDraft = async () => {
   if (!postForm.title.trim() && !postForm.content.trim()) {
     return
   }
-  
+
   try {
-    // 保存草稿到本地存储
-    // 在实际项目中，应该调用API保存草稿到服务器
+    // 调用API保存草稿到服务器
+    await postManagementApi.saveDraft({
+      title: postForm.title,
+      content: postForm.content,
+      categoryId: postForm.category_id,
+      tags: postForm.tags,
+      coverImage: postForm.cover_image
+    })
+
+    // 显示自动保存通知
+    showSaveNotificationMessage();
+  } catch (error) {
+    console.error('Failed to save draft:', error)
+    // 如果服务器保存失败，降级到本地存储
     localStorage.setItem('post_draft', JSON.stringify({
       title: postForm.title,
       content: postForm.content,
@@ -427,11 +448,6 @@ const saveDraft = async () => {
       cover_image: postForm.cover_image,
       timestamp: Date.now()
     }))
-    
-    // 显示自动保存通知
-    showSaveNotificationMessage();
-  } catch (error) {
-    console.error('Failed to save draft:', error)
   }
 }
 
@@ -483,21 +499,38 @@ const handleSubmit = async () => {
     if (valid) {
       loading.value = true
       try {
-        // 模拟创建帖子
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        const result = {
-          id: Math.floor(Math.random() * 1000),
-          title: postForm.title,
-          content: postForm.content
+        let result
+
+        if (postForm.save_draft) {
+          // 保存草稿
+          result = await postManagementApi.saveDraft({
+            title: postForm.title,
+            content: postForm.content,
+            categoryId: postForm.category_id,
+            tags: postForm.tags,
+            coverImage: postForm.cover_image
+          })
+        } else {
+          // 发布帖子
+          result = await postManagementApi.createPost({
+            title: postForm.title,
+            content: postForm.content,
+            categoryId: postForm.category_id,
+            tags: postForm.tags,
+            coverImage: postForm.cover_image,
+            allowComments: postForm.allow_comments,
+            isOriginal: postForm.is_original,
+            notifyFollowers: postForm.notify_followers
+          })
         }
-        
+
         if (result) {
-          // 清除草稿
+          // 清除本地草稿
           localStorage.removeItem('post_draft')
-          
+
           const message = postForm.save_draft ? '草稿保存成功！' : '帖子发布成功！'
           ElMessage.success(message)
-          
+
           if (postForm.save_draft) {
             const currentUserId = userStore.currentUser?.id
             if (currentUserId) {
@@ -515,9 +548,6 @@ const handleSubmit = async () => {
               params: { id: result.id }
             })
           }
-        } else {
-          const action = postForm.save_draft ? '保存草稿' : '发布帖子'
-          ElMessage.error(`${action}失败，请稍后再试`)
         }
       } catch (error) {
         console.error('Failed to create post:', error)
@@ -582,14 +612,22 @@ onMounted(async () => {
   // 添加页面离开事件监听
   window.addEventListener('beforeunload', handleBeforeUnload)
   
-  // 模拟的标签数据，实际项目中应该从API获取
-  tags.value = [
-    { id: 1, name: '生活技巧', description: '', slug: '', post_count: 0, created_at: '', updated_at: '' },
-    { id: 2, name: '家居', description: '', slug: '', post_count: 0, created_at: '', updated_at: '' },
-    { id: 3, name: '美食', description: '', slug: '', post_count: 0, created_at: '', updated_at: '' },
-    { id: 4, name: '旅行', description: '', slug: '', post_count: 0, created_at: '', updated_at: '' },
-    { id: 5, name: '健康', description: '', slug: '', post_count: 0, created_at: '', updated_at: '' }
-  ]
+  // 获取标签数据
+  try {
+    const tagResponse = await tagApi.getPopularTags(50)
+    tags.value = tagResponse.map((tag: any) => ({
+      id: tag.id,
+      name: tag.name,
+      description: tag.description || '',
+      slug: tag.slug || '',
+      post_count: tag.postCount || 0,
+      created_at: tag.createdAt || '',
+      updated_at: tag.updatedAt || ''
+    }))
+  } catch (error) {
+    console.error('Failed to fetch tags:', error)
+    ElMessage.warning('获取标签列表失败，请刷新页面重试')
+  }
 })
 
 // 组件卸载时清理

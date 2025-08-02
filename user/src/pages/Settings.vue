@@ -220,6 +220,7 @@ import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import { useUserStore } from '../stores/userStore'
 import { getUserAvatarUrl } from '../utils/assets'
+import { settingsApi, userApi, fileApi } from '../services/api'
 
 const userStore = useUserStore()
 
@@ -415,9 +416,30 @@ const updateProfile = async () => {
 const submitProfileForm = async () => {
   profileLoading.value = true
   try {
-    // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 500))
-    ElMessage.success('个人资料已更新')
+    // 先上传头像（如果有）
+    let avatarUrl = userStore.currentUser?.avatar
+    if (profileForm.avatar) {
+      const avatarResult = await fileApi.uploadAvatar(profileForm.avatar)
+      avatarUrl = avatarResult.url
+    }
+
+    // 调用用户信息更新API
+    const result = await userApi.updateProfile({
+      username: profileForm.username,
+      bio: profileForm.bio,
+      avatar: avatarUrl
+    })
+
+    if (result) {
+      // 更新本地用户信息
+      if (userStore.setUser) {
+        userStore.setUser(result)
+      } else {
+        // 降级处理：直接更新currentUser
+        userStore.currentUser = result
+      }
+      ElMessage.success('个人资料已更新')
+    }
   } catch (error) {
     console.error('Failed to update profile:', error)
     ElMessage.error('更新个人资料失败')
@@ -441,8 +463,13 @@ const changePassword = async () => {
 const submitPasswordForm = async () => {
   passwordLoading.value = true
   try {
-    // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 500))
+    // 调用修改密码API
+    await settingsApi.changePassword(
+      passwordForm.currentPassword,
+      passwordForm.newPassword,
+      passwordForm.confirmPassword
+    )
+
     ElMessage.success('密码已修改，请使用新密码登录')
     passwordForm.currentPassword = ''
     passwordForm.newPassword = ''
@@ -552,8 +579,22 @@ const unbindPhone = async () => {
 const saveNotificationSettings = async () => {
   notificationLoading.value = true
   try {
-    // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 500))
+    // 构建通知设置数据
+    const settingsData = {
+      emailNotifications: {},
+      pushNotifications: {},
+      frequency: 'immediate'
+    }
+
+    // 从notificationSettings数组构建设置对象
+    notificationSettings.forEach((setting, index) => {
+      const key = ['comment', 'like', 'follow', 'system', 'mention'][index] || `setting_${index}`
+      settingsData.emailNotifications[key] = setting.value
+      settingsData.pushNotifications[key] = setting.value
+    })
+
+    // 调用API保存设置
+    await settingsApi.updateUserSettings({ notification: settingsData })
     ElMessage.success('通知设置已保存')
   } catch (error) {
     console.error('Failed to save notification settings:', error)

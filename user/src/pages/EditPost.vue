@@ -92,6 +92,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import { usePostStore } from '../stores/postStore'
 import { useCategoryStore } from '../stores/categoryStore'
 import { useUserStore } from '../stores/userStore'
+import { postManagementApi, tagApi } from '../services/api'
 import type { Post, Category, Tag } from '../types/forum'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
@@ -177,17 +178,17 @@ const fetchPostData = async () => {
       
       // 检查是否有权限编辑
       const currentUser = userStore.currentUser
-      if (!currentUser || (currentUser.id !== result.user_id && !currentUser.is_admin && !currentUser.is_moderator)) {
+      if (!currentUser || (currentUser.id !== result.userId && !currentUser.isAdmin && !currentUser.isModerator)) {
         post.value = null
         ElMessage.error('您没有权限编辑此帖子')
         return
       }
-      
+
       // 填充表单
       postForm.title = result.title
       postForm.content = result.content
-      postForm.category_id = result.category_id
-      postForm.tags = result.tags.map(tag => tag.id)
+      postForm.category_id = result.categoryId
+      postForm.tags = result.tags?.map(tag => tag.id) || []
       
       // 设置页面标题
       document.title = `编辑: ${result.title} - Lumen论坛`
@@ -221,20 +222,20 @@ const handleSubmit = async () => {
     if (valid) {
       submitting.value = true
       try {
-        const result = await postStore.updatePost(post.value.id, {
+        const result = await postManagementApi.updatePost(post.value.id, {
           title: postForm.title,
           content: postForm.content,
-          category_id: postForm.category_id as number,
+          categoryId: postForm.category_id as number,
           tags: postForm.tags
         })
-        
+
         if (result) {
           ElMessage({
             message: '帖子更新成功！即将返回帖子详情页',
             type: 'success',
             duration: 2000
           })
-          
+
           // 延迟跳转，让用户看到成功提示
           setTimeout(() => {
             router.push({
@@ -242,8 +243,6 @@ const handleSubmit = async () => {
               params: { id: post.value!.id }
             })
           }, 1500)
-        } else {
-          ElMessage.error('帖子更新失败，请稍后再试')
         }
       } catch (error) {
         console.error('Failed to update post:', error)
@@ -259,10 +258,10 @@ const handleSubmit = async () => {
 const cancel = () => {
   // 如果有内容已修改，则弹出确认提示
   if (
-    postForm.title !== post.value?.title || 
-    postForm.content !== post.value?.content || 
-    postForm.category_id !== post.value?.category_id ||
-    !areTagsEqual(postForm.tags, post.value?.tags.map(t => t.id) || [])
+    postForm.title !== post.value?.title ||
+    postForm.content !== post.value?.content ||
+    postForm.category_id !== post.value?.categoryId ||
+    !areTagsEqual(postForm.tags, post.value?.tags?.map(t => t.id) || [])
   ) {
     ElMessageBox.confirm(
       '您有未保存的修改，确定要离开吗？',
@@ -296,14 +295,22 @@ onMounted(async () => {
   // 获取分类列表
   await fetchCategories()
   
-  // 模拟的标签数据，实际项目中应该从API获取
-  tags.value = [
-    { id: 1, name: '生活技巧', description: '', slug: '', post_count: 0, created_at: '', updated_at: '' },
-    { id: 2, name: '家居', description: '', slug: '', post_count: 0, created_at: '', updated_at: '' },
-    { id: 3, name: '美食', description: '', slug: '', post_count: 0, created_at: '', updated_at: '' },
-    { id: 4, name: '旅行', description: '', slug: '', post_count: 0, created_at: '', updated_at: '' },
-    { id: 5, name: '健康', description: '', slug: '', post_count: 0, created_at: '', updated_at: '' }
-  ]
+  // 获取标签数据
+  try {
+    const tagResponse = await tagApi.getPopularTags(50)
+    tags.value = tagResponse.map((tag: any) => ({
+      id: tag.id,
+      name: tag.name,
+      description: tag.description || '',
+      slug: tag.slug || '',
+      post_count: tag.postCount || 0,
+      created_at: tag.createdAt || '',
+      updated_at: tag.updatedAt || ''
+    }))
+  } catch (error) {
+    console.error('Failed to fetch tags:', error)
+    ElMessage.warning('获取标签列表失败，请刷新页面重试')
+  }
   
   // 获取帖子详情
   await fetchPostData()

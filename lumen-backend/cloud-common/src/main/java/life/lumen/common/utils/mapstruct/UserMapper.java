@@ -6,6 +6,7 @@ import life.lumen.common.model.vo.user.UserVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
+import org.springframework.data.domain.Page;
 
 @Mapper
 public interface UserMapper {
@@ -15,4 +16,8 @@ public interface UserMapper {
 
     @Mapping(source = "id",target = "userId")
     UserContext userPOToUserSession(UserPO userPO);
+
+    default Page<UserVO> userPOToUserVO(Page<UserPO> userPOs){
+        return userPOs.map(this::userPOToUserVO);
+    }
 }

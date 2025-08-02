@@ -13,9 +13,9 @@ export function safeUser(user: Partial<User> | null | undefined): User {
   if (!user) {
     return {
       id: 0,
-      username: '未知用户',
+      username: ' 小流明',
       email: '',
-      avatar: '/img/avatar-default.png',
+      avatar: getUserAvatarUrl(),
       bio: '',
       showEmail: false,
       reputation: 0,
@@ -31,7 +31,7 @@ export function safeUser(user: Partial<User> | null | undefined): User {
     id: user.id ?? 0,
     username: user.username ?? '未知用户',
     email: user.email ?? '',
-    avatar: user.avatar ?? '/img/avatar-default.png',
+    avatar: user.avatar ?? getUserAvatarUrl(),
     bio: user.bio ?? '',
     showEmail: user.showEmail ?? false,
     reputation: user.reputation ?? 0,
